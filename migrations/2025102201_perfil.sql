@@ -1,0 +1,1 @@
+update ouvidoria_perfil set descricao = 'Ouvidoria' where id_perfil = 1;

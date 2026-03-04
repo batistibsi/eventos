@@ -1,0 +1,1 @@
+alter table ouvidoria_tarefa add column arquivos varchar;

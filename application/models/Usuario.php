@@ -1,0 +1,297 @@
+<?php
+class Usuario
+{
+
+	public static $erro;
+
+	public function __construct() {}
+
+	public static function buscaId($id_usuario)
+	{
+
+		$db = Zend_Registry::get('db');
+
+		$select = "select * from ouvidoria_usuario where id_usuario = " . $id_usuario;
+
+		$registros = $db->fetchAll($select);
+
+		if (count($registros) == 0) {
+			Usuario::$erro = "Usuário não encontrado.";
+			return false;
+		} else {
+			return $registros[0];
+		}
+	}
+
+	public static function buscaEmail($email)
+	{
+
+		$db = Zend_Registry::get('db');
+
+		$select = "select * from ouvidoria_usuario where email = '" . $email . "' and ativo";
+
+		$registros = $db->fetchAll($select);
+
+		if (count($registros) == 0) {
+			Usuario::$erro = "Usuário não encontrado.";
+			return false;
+		} else {
+			return $registros[0];
+		}
+	}
+
+	public static function alterarSenha($id_usuario, $senhaAtual, $novaSenha)
+	{
+
+		$hashAtual = Usuario::buscaId($id_usuario);
+		$hashAtual = $hashAtual['senha'];
+
+		if ($senhaAtual != $hashAtual) {
+			Usuario::$erro = 'A senha atual informada não confere!';
+			return false;
+		}
+
+		$db = Zend_Registry::get('db');
+
+		$data = array(
+			"senha" => $novaSenha
+		);
+
+		$db->update("ouvidoria_usuario", $data, "id_usuario = '" . $id_usuario . "'");
+
+		return true;
+	}
+
+	public static function uniqueEmail($id, $email)
+	{
+		$db = Zend_Registry::get('db');
+
+		$select = "select * from ouvidoria_usuario where id_usuario <> " . $id . " and email = '" . $email . "' and ativo";
+
+		$registros = $db->fetchAll($select);
+
+		if (count($registros) == 0) return true;
+
+		return false;
+	}
+
+	public static function logLogin($id_usuario)
+	{
+
+		$db = Zend_Registry::get('db');
+
+		$data = array(
+			"id_usuario" => $id_usuario
+		);
+
+		$db->insert("ouvidoria_login", $data);
+
+		return true;
+	}
+
+	public static function insert($email, $nome, $idPerfil, $ativo, $senha, $confirmSenha, $id_empresa)
+	{
+
+		if ($ativo) {
+			$idPerfil = (int) $idPerfil;
+
+			if (strlen($email) < 3 || strlen($email) > 80) {
+				Usuario::$erro = 'Email inválido!';
+				return false;
+			}
+
+			if (strlen($nome) > 80 || strlen($nome) < 1) {
+				Usuario::$erro = 'Nome inválido!';
+				return false;
+			}
+
+			if (!Usuario::uniqueEmail(0, $email)) {
+				Usuario::$erro = 'Já existe um registro com o email: ' . $email . '.';
+				return false;
+			}
+
+			if (!$idPerfil) {
+				Usuario::$erro = 'Perfil inválido!';
+				return false;
+			}
+
+			if ($senha != "" && $confirmSenha != $senha) {
+				Usuario::$erro = 'Senhas informadas não conferem!';
+				return false;
+			}
+
+			if ($senha == "") {
+				Usuario::$erro = 'Informe uma senha para salvar!';
+				return false;
+			}
+		}
+
+		$db = Zend_Registry::get('db');
+
+
+		$data = array(
+			"email" => $email,
+			"nome" => $nome,
+			"senha" => $senha,
+			"id_perfil" => $idPerfil,
+			"id_empresa" => $id_empresa,
+			"ativo" => $ativo
+		);
+
+		$db->insert("ouvidoria_usuario", $data);
+
+		$link = $_SERVER['HTTP_HOST'];
+
+		$msg = '<p>Parabéns, seu cadastro na plataforma OUVIDORIA foi concluído com sucesso.</p>'
+			. '<p>Acesse o sistema clicando no link abaixo</p>'
+			. '<p><a href="' . $link . '">' . $link . '</a></p>';
+
+		Email::enviar($email, 'Cadastro de acesso à Plataforma de Ouvidoria confirmado', $msg);
+
+		return true;
+	}
+
+	public static function update($email, $nome, $idPerfil, $ativo, $senha, $id_usuario, $confirmSenha)
+	{
+
+		if (strlen($email) < 3 || strlen($email) > 80) {
+			Usuario::$erro = 'Email inválido!';
+			return false;
+		}
+
+		if (strlen($nome) > 80 || strlen($nome) < 1) {
+			Usuario::$erro = 'Nome inválido!';
+			return false;
+		}
+
+		if (!Usuario::uniqueEmail($id_usuario, $email)) {
+			Usuario::$erro = 'Já existe um registro com o email: ' . $email . '.';
+			return false;
+		}
+
+		if (!$idPerfil) {
+			Usuario::$erro = 'Perfil inválido!';
+			return false;
+		}
+
+
+		if ($senha != "" && $confirmSenha != $senha) {
+			Usuario::$erro = 'Senhas informadas não conferem!';
+			return false;
+		}
+
+		$db = Zend_Registry::get('db');
+
+		$data = array(
+			"email" => $email,
+			"nome" => $nome,
+			"id_perfil" => $idPerfil,
+			"ativo" => $ativo
+		);
+
+		if ($senha != "") {
+			$data['senha'] = $senha;
+			self::emailSenha($email, $senha);
+		}
+
+		$db->update("ouvidoria_usuario", $data, "id_usuario = " . $id_usuario);
+
+		return true;
+	}
+
+	public static function emailSenha($email, $senha)
+	{
+		$msg = '<p>ATENÇÃO!</p>'
+			. '<p>Sua nova Senha de acesso à Plataforma de Ouvidoria é:</p>'
+			. '<p><strong>' . $senha . '</strong></p>';
+
+		Email::enviar($email, 'Mudança de senha', $msg);
+	}
+
+	public static function desativar($id_usuario)
+	{
+
+		if ($id_usuario == 1) {
+			Usuario::$erro = 'Este usuário não pode ser removido!';
+			return false;
+		}
+
+		$db = Zend_Registry::get('db');
+
+		$data = array(
+			"ativo" => false
+		);
+
+		$db->update("ouvidoria_usuario", $data, "id_usuario = " . $id_usuario);
+
+		return true;
+	}
+
+	public static function lista($id_perfil = '1,2')
+	{
+
+		$db = Zend_Registry::get('db');
+
+		$select = "select ouvidoria_usuario.*,
+					ouvidoria_perfil.descricao as descricao_perfil,
+					e.titulo,
+					e.id_empresa
+				  from ouvidoria_usuario
+				  inner join ouvidoria_empresa e on e.id_empresa = ouvidoria_usuario.id_empresa
+				  left join ouvidoria_perfil on ouvidoria_usuario.id_perfil = ouvidoria_perfil.id_perfil
+				   where ouvidoria_usuario.ativo and ouvidoria_perfil.id_perfil in(" . $id_perfil . ") and ouvidoria_usuario.id_usuario <> 1
+				  order by ouvidoria_usuario.nome";
+
+		$retorno = $db->fetchAll($select);
+
+		return $retorno;
+	}
+
+	public static function logins()
+	{
+
+		$db = Zend_Registry::get('db');
+
+		$select = "select a.nome,
+					l.*
+				  from ouvidoria_usuario a
+				  inner join ouvidoria_login l on l.id_usuario = a.id_usuario
+				  where a.id_usuario <> 1
+				  order by a.nome";
+
+		$retorno = $db->fetchAll($select);
+
+		return $retorno;
+	}
+
+	public static function pesquisar($parametro)
+	{
+
+		$db = Zend_Registry::get('db');
+
+		$select = "select 'u'||a.id_usuario as id_entidade, 						
+							a.nome as tag, 
+							'u'||a.id_usuario as id, 
+							a.nome,
+							'Usuario' as tipo
+				  from ouvidoria_usuario a
+				  where a.ativo
+				  and REPLACE(upper(unaccent(a.nome)),'''',' ') like '" . strtoupper(Util::tirarAcentos($parametro)) . "%'
+				  order by a.nome";
+
+		$retorno = $db->fetchAll($select);
+
+		return $retorno;
+	}
+
+	public static function comboPerfil()
+	{
+		$db = Zend_Registry::get('db');
+
+		$select = "select * from ouvidoria_perfil where id_perfil <= 2 order by id_perfil";
+
+		$retorno = $db->fetchAll($select);
+
+		return $retorno;
+	}
+}

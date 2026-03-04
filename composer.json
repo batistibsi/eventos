@@ -1,0 +1,6 @@
+{
+    "name": "root/ouvidoria",
+    "require": {
+        "phpmailer/phpmailer": "^6.9"
+    }
+}

@@ -1,0 +1,339 @@
+ <style>
+     .chart-box {
+         position: relative;
+         /* necessário para Chart.js calcular corretamente */
+         height: 350px;
+         /* defina a altura que quiser */
+     }
+ </style>
+
+ <div class="d-flex justify-content-center justify-content-md-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+     <h2 class="h2 text-info">Dashboard</h2>
+     <form id="form_consulta" class="d-flex flex-column flex-md-row align-items-md-center">
+
+         <input style="min-width:240px; background:#fff" class="form-control text-center mb-2 mb-sm-0" type="text" id="periodo" readonly>
+         <input type='hidden' id="inicio" value="<?= Util::formatData($this->inicio) ?>" />
+         <input type='hidden' id="fim" value="<?= Util::formatData($this->fim) ?>" />
+
+         <? if ($this->permissao == 1): ?>
+             <select class="form-control ml-0 ml-sm-2" name="id_empresa" id="id_empresa">
+                 <option value="0">Todos os Clientes</option>
+                 <? foreach ($this->empresas as $key => $value): ?>
+                     <option <?= $this->id_empresa == $value['id_empresa'] ? "selected" : "" ?> value="<?= $value['id_empresa'] ?>"><?= $value['titulo'] ?></option>
+                 <? endforeach; ?>
+             </select>
+         <? endif; ?>
+     </form>
+ </div>
+
+ <main class="col-sm-12 col-md-12 m-0">
+     <div class="row m-0 p-0">
+         <div class="col-md-<?= !$this->id_empresa ? '2' : '4' ?> p-0 m-0 mb-4">
+             <div class="card shadow m-0 mb-4">
+                 <div class="card-header h4 bg-info text-white text-center">
+                     Total
+                 </div>
+                 <div class="card-body text-center p-2">
+                     <h4><?= number_format($this->estatistica['total'], 0, ',', '.') ?></h4>
+                 </div>
+             </div>
+             <div class="card shadow m-0 mb-4">
+                 <div class="card-header h4 bg-info text-white text-center">
+                     Procedentes
+                 </div>
+                 <div class="card-body text-center p-2">
+                     <h4><?= number_format($this->estatistica['procedentes'], 0, ',', '.') ?></h4>
+                 </div>
+             </div>
+             <div class="card shadow m-0">
+                 <div class="card-header h4 bg-info text-white text-center">
+                     Maior
+                 </div>
+                 <div class="card-body text-center p-2">
+                     <h4><?= $this->estatistica['maior'] ? $this->estatistica['maior']['descricao'] : 'Nada enviado' ?></h4>
+                 </div>
+             </div>
+         </div>
+         <div class="col-md-<?= !$this->id_empresa ? '10' : '8' ?> m-0 p-0 mb-4">
+             <div class="row p-0 mt-0 justify-content-center">
+                 <div class="col-md-<?= !$this->id_empresa ? '6' : '12' ?> pl-md-4 text-center mb-4">
+                     <div class="row px-md-4">
+                         <?php foreach ($this->estatistica['formularios'] as $formulario): ?>
+                             <div class="col-md-4 p-md-1 m-md-0 pb-1">
+                                 <div class="card shadow rounded" style="background-color: <?= $formulario['cor']  ?>">
+                                     <div class="card-header h6 text-white text-center">
+                                         <?= $formulario['descricao']  ?>
+                                     </div>
+                                     <div class="card-body text-white">
+                                         <i class="fa fa-2x fa-bullhorn"></i>
+                                         <h2><?= $formulario['quantidade']  ?></h2>
+                                     </div>
+                                 </div>
+                             </div>
+                         <?php endforeach; ?>
+                     </div>
+                 </div>
+                 <? if (!$this->id_empresa): ?>
+                     <div class="col-md-6 text-center">
+                         <h2 class="h2 text-info">Cliente x Categoria</h2>
+                         <div class="chart-box"><canvas id="stackedBar"></canvas></div>
+                     </div>
+                 <? endif; ?>
+             </div>
+         </div>
+     </div>
+
+     <div class="row mt-2">
+         <div class="col-12 text-center">
+             <h2 class="h2 text-info">Manifestações por Cliente - Anual</h2>
+             <div class="chart-box"><canvas id="clientesMes"></canvas></div>
+         </div>
+     </div>
+
+     <div class="modal fade" id="modalDetalhes" tabindex="-1" role="dialog" aria-labelledby="modalDetalhesLabel" aria-hidden="true">
+         <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+             <div class="modal-content">
+                 <div class="modal-header">
+                     <h5 class="modal-title" id="modalDetalhesLabel">Detalhes</h5>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                         <span aria-hidden="true">&times;</span>
+                     </button>
+                 </div>
+                 <div class="modal-body" id="conteudoModalDetalhes">
+                     Carregando...
+                 </div>
+             </div>
+         </div>
+     </div>
+ </main>
+
+
+
+ <script type="text/javascript">
+     $(document).ready(function() {
+
+
+         const cores = [
+             '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+             '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
+             '#393b79', '#637939', '#8c6d31', '#843c39', '#7b4173',
+             '#3182bd', '#6baed6', '#9ecae1', '#e6550d', '#fd8d3c',
+             '#fdae6b', '#31a354', '#74c476', '#a1d99b', '#756bb1',
+             '#9e9ac8', '#bcbddc', '#636363', '#969696', '#bdbdbd',
+             '#17a2b8', '#ffc107', '#dc3545', '#28a745', '#6f42c1',
+             '#20c997', '#6610f2', '#fd7e14', '#343a40', '#adb5bd',
+             '#198754', '#0dcaf0', '#6c757d', '#ffc107', '#f8f9fa',
+             '#007bff', '#e83e8c', '#fdc86f', '#b24fce', '#009999'
+         ];
+
+         // Eixo X: meses do ano
+         const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+         // Clientes (cada um vira um dataset)
+         const clientesMes = JSON.parse('<?= json_encode(array_values($this->empresas)) ?>');
+
+         // Dados fictícios: valores mensais consolidados por cliente (ex.: em R$ mil)
+         const base = JSON.parse('<?= json_encode($this->dadosAno) ?>');
+
+         let datasets = clientesMes.map((c, i) => ({
+             label: c.titulo,
+             data: base[c.id_empresa],
+             backgroundColor: cores[i] + "B3", // ~70% opacidade
+             borderColor: cores[i],
+             borderWidth: 1,
+             borderRadius: 4,
+             barThickness: "flex"
+         }));
+
+         // Helpers para formatar como BRL (assumindo dados "em mil")
+         const moedaBRL = new Intl.NumberFormat("pt-BR", {
+             style: "decimal",
+             currency: "BRL",
+             maximumFractionDigits: 0
+         });
+
+         const formatValor = v => moedaBRL.format(v);
+
+         // Cria gráfico (barras agrupadas — não empilhado)
+         const ctxAno = document.getElementById("clientesMes").getContext("2d");
+         new Chart(ctxAno, {
+             type: "bar", // troque para "line" se preferir linhas por cliente
+             data: {
+                 labels: meses,
+                 datasets: datasets
+             },
+             options: {
+                 responsive: true,
+                 maintainAspectRatio: false,
+                 plugins: {
+                     legend: {
+                         position: "top",
+                         labels: {
+                             boxWidth: 16,
+                             boxHeight: 16,
+                             padding: 12
+                         }
+                     },
+                     tooltip: {
+                         mode: "index",
+                         intersect: false,
+                         callbacks: {
+                             label: (ctx) => ` ${ctx.dataset.label}: ${formatValor(ctx.parsed.y ?? 0)}`,
+                             footer: (items) => {
+                                 const total = items.reduce((a, i) => a + (i.parsed.y ?? 0), 0);
+                                 return ` Total do mês: ${formatValor(total)}`;
+                             }
+                         },
+                         footerFont: {
+                             weight: "bold"
+                         }
+                     }
+                 },
+                 scales: {
+                     x: {
+                         stacked: false,
+                         grid: {
+                             display: false
+                         }
+                     },
+                     y: {
+                         beginAtZero: true,
+                         grid: {
+                             color: "rgba(0,0,0,.06)"
+                         },
+                         ticks: {
+                             callback: (v) => formatValor(v)
+                         }
+                     }
+                 },
+                 layout: {
+                     padding: {
+                         top: 8,
+                         right: 8,
+                         bottom: 8,
+                         left: 8
+                     }
+                 }
+             }
+         });
+
+         <? if (!$this->id_empresa): ?>
+             const clientes = JSON.parse('<?= json_encode(array_values($this->clientes)) ?>');
+             const categorias = JSON.parse('<?= json_encode(array_values($this->estatistica['formularios'])) ?>');
+
+             const dados = JSON.parse('<?= json_encode($this->dados) ?>');
+
+             datasets2 = categorias.map(p => ({
+                 label: p.descricao,
+                 data: dados[p.id_formulario],
+                 backgroundColor: p.cor + "B3", // ~70% opacidade
+                 borderColor: p.cor,
+                 borderWidth: 1,
+                 borderRadius: 6,
+                 barThickness: "flex"
+             }));
+
+             const ctx = document.getElementById("stackedBar").getContext("2d");
+             new Chart(ctx, {
+                 type: "bar",
+                 data: {
+                     labels: clientes,
+                     datasets: datasets2
+                 },
+                 options: {
+                     responsive: true,
+                     maintainAspectRatio: false, // ⬅️ com altura controlada pelo contêiner
+                     plugins: {
+                         legend: {
+                             position: "top"
+                         },
+                         tooltip: {
+                             mode: "index",
+                             intersect: false,
+                             callbacks: {
+                                 label: (ctx) => ` ${ctx.dataset.label}: ${formatValor(ctx.parsed.y ?? 0)}`,
+                                 footer: (items) => ` Total: ${formatValor(items.reduce((a,i)=>a+(i.parsed.y??0),0))}`
+                             }
+                         }
+                     },
+                     scales: {
+                         x: {
+                             stacked: true,
+                             grid: {
+                                 display: false
+                             }
+                         },
+                         y: {
+                             stacked: true,
+                             beginAtZero: true
+                         }
+                     }
+                 }
+             });
+
+         <? endif; ?>
+
+         var id_empresa = <?= $this->id_empresa ?>;
+
+         var inicio = '<?= $this->inicio ?>';
+         var fim = '<?= $this->fim ?>';
+
+         $('#id_empresa').on('change', function() {
+             id_empresa = $(this).val();
+             carregarTela('../../dashboard?id_empresa=' + id_empresa + '&inicio=' + inicio + '&fim=' + fim);
+         });
+
+         let periodo = $('#periodo').daterangepicker({
+             startDate: new Date('<?= $this->inicio ?> 00:00:00'),
+             endDate: new Date('<?= $this->fim ?> 23:59:59'),
+             ranges: {
+                 'Hoje': [moment(), moment()],
+                 'Ontem': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                 'Últimos 7 dias': [moment().subtract(6, 'days'), moment()],
+                 'Semana Atual': [moment().clone().startOf('isoWeek'), moment().clone().endOf('isoWeek')],
+                 'Semana Passada': [moment().clone().subtract(1, 'weeks').startOf('isoWeek'), moment().clone().subtract(1, 'weeks').endOf('isoWeek')],
+                 'Últimos 30 dias': [moment().subtract(29, 'days'), moment()],
+                 'Mês Atual': [moment().startOf('month'), moment().endOf('month')],
+                 'Mês Passado': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+             },
+             "locale": {
+                 format: 'DD/MM/YYYY',
+                 "separator": " até ",
+                 "applyLabel": "Aplicar",
+                 "cancelLabel": "Cancelar",
+                 "fromLabel": "De",
+                 "toLabel": "Até",
+                 "customRangeLabel": "Selecionar Data",
+                 "daysOfWeek": [
+                     "Dom",
+                     "Seg",
+                     "Ter",
+                     "Qua",
+                     "Qui",
+                     "Sex",
+                     "Sáb"
+                 ],
+                 "monthNames": [
+                     "Janeiro",
+                     "Fevereiro",
+                     "Março",
+                     "Abril",
+                     "Maio",
+                     "Junho",
+                     "Julho",
+                     "Agosto",
+                     "Setembro",
+                     "Outubro",
+                     "Novembro",
+                     "Dezembro"
+                 ],
+                 "firstDay": 0
+             }
+         }, function(start, end) {
+             inicio = start.format('YYYY-MM-DD');
+             fim = end.format('YYYY-MM-DD');
+             carregarTela('../../dashboard?id_empresa=' + id_empresa + '&inicio=' + inicio + '&fim=' + fim);
+         });
+
+     });
+ </script>
