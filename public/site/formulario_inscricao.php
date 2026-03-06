@@ -7,92 +7,111 @@ $datasEvento = [
 ?>
 <!doctype html>
 <html lang="pt-br">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Instituto ACIM | Responsabilidade Social</title>
 
-<link rel="icon" type="image/png" href="./favicon.ico">
+  <link rel="icon" type="image/png" href="./favicon.ico">
 
   <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
-        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
-        crossorigin="anonymous">
+    href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+    integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+    crossorigin="anonymous">
 
   <style>
-    :root{
-      --brand:#183885;
-      --accent:#abca69;
-      --bg:#f6f8fb;
-      --card:#ffffff;
-      --muted:#6c757d;
+    :root {
+      --brand: #183885;
+      --accent: #abca69;
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --muted: #6c757d;
     }
-    body{ background:var(--bg); }
 
-    .hero{
-      background: radial-gradient(1200px 500px at 10% 10%, rgba(24,56,133,.18), transparent 60%),
-                  radial-gradient(800px 400px at 90% 20%, rgba(171,202,105,.20), transparent 55%),
-                  var(--card);
-      border-bottom: 1px solid rgba(0,0,0,.06);
+    body {
+      background: var(--bg);
+    }
+
+    .hero {
+      background: radial-gradient(1200px 500px at 10% 10%, rgba(24, 56, 133, .18), transparent 60%),
+        radial-gradient(800px 400px at 90% 20%, rgba(171, 202, 105, .20), transparent 55%),
+        var(--card);
+      border-bottom: 1px solid rgba(0, 0, 0, .06);
       padding: 44px 0 52px;
     }
-    .brand{ color: var(--brand); font-weight: 800; letter-spacing: -.4px; }
-    .subtitle{ color: var(--muted); }
 
-    .badge-accent{
-      background: rgba(171,202,105,.22);
-      color:#2b3a16;
-      border: 1px solid rgba(171,202,105,.35);
+    .brand {
+      color: var(--brand);
+      font-weight: 800;
+      letter-spacing: -.4px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+    }
+
+    .badge-accent {
+      background: rgba(171, 202, 105, .22);
+      color: #2b3a16;
+      border: 1px solid rgba(171, 202, 105, .35);
       border-radius: 999px;
       padding: .35rem .6rem;
       font-weight: 700;
     }
 
-    .card-soft{
-      border: 1px solid rgba(0,0,0,.08);
+    .card-soft {
+      border: 1px solid rgba(0, 0, 0, .08);
       border-radius: 18px;
-      box-shadow: 0 12px 28px rgba(0,0,0,.08);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, .08);
       background: var(--card);
     }
 
-    .btn-brand{
+    .btn-brand {
       background: var(--brand);
       border-color: var(--brand);
-      color:#fff;
+      color: #fff;
       border-radius: 12px;
       padding: 10px 14px;
       font-weight: 700;
     }
-    .btn-brand:hover{ filter: brightness(.95); color:#fff; }
 
-    .form-control{
+    .btn-brand:hover {
+      filter: brightness(.95);
+      color: #fff;
+    }
+
+    .form-control {
       border-radius: 12px;
-      border: 1px solid rgba(0,0,0,.14);
+      border: 1px solid rgba(0, 0, 0, .14);
       height: calc(1.5em + 1.1rem + 2px);
     }
-    .form-control:focus{
-      border-color: rgba(24,56,133,.55);
-      box-shadow: 0 0 0 .2rem rgba(24,56,133,.12);
+
+    .form-control:focus {
+      border-color: rgba(24, 56, 133, .55);
+      box-shadow: 0 0 0 .2rem rgba(24, 56, 133, .12);
     }
 
-    .help{
+    .help {
       font-size: 12.5px;
       color: var(--muted);
     }
 
     /* Logo */
-    .hero-logo{
-      height: 44px;
+    .hero-logo {
+      height: 72px;
       width: auto;
-      background:#fff;
-      border:1px solid rgba(0,0,0,.08);
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, .08);
       border-radius: 12px;
       padding: 6px;
-      box-shadow: 0 8px 18px rgba(0,0,0,.06);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, .06);
     }
 
-    @media (max-width: 576px){
-      .hero-title{ font-size: 34px !important; }
+    @media (max-width: 576px) {
+      .hero-title {
+        font-size: 34px !important;
+      }
     }
   </style>
 </head>
@@ -107,7 +126,7 @@ $datasEvento = [
           <!-- Troque o src pelo caminho do seu logo -->
           <img src="./images/logo.png" alt="Logo" class="hero-logo mr-3">
           <div>
-            <div class="brand" style="font-size:22px; line-height:1.1;">Inscreva-se no Evento</div>
+            <div class="brand" style="font-size:24px; line-height:1.1;">Inscreva-se no Evento</div>
             <div class="subtitle">Preencha seus dados e escolha uma data disponível.</div>
           </div>
         </div>
@@ -140,12 +159,12 @@ $datasEvento = [
                 <div class="form-group col-md-6">
                   <label class="mb-1">Nome *</label>
                   <input type="text" class="form-control" name="nome" required maxlength="80"
-                         placeholder="Seu nome completo">
+                    placeholder="Seu nome completo">
                 </div>
                 <div class="form-group col-md-6">
                   <label class="mb-1">E-mail *</label>
                   <input type="email" class="form-control" name="email" required maxlength="120"
-                         placeholder="seuemail@dominio.com">
+                    placeholder="seuemail@dominio.com">
                 </div>
               </div>
 
@@ -181,19 +200,19 @@ $datasEvento = [
 
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
-          crossorigin="anonymous"></script>
+    integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+    crossorigin="anonymous"></script>
 
   <script>
-    $(function(){
-      function showAlert(type, msg){
+    $(function() {
+      function showAlert(type, msg) {
         $('#alerta')
           .removeClass('d-none alert-success alert-danger alert-warning')
           .addClass('alert-' + type)
           .text(msg);
       }
 
-      $('#formInscricao').on('submit', function(e){
+      $('#formInscricao').on('submit', function(e) {
         e.preventDefault();
 
         const form = this;
@@ -210,14 +229,14 @@ $datasEvento = [
           url: '/api/inscricao', // <- troque pela sua rota PHP
           method: 'POST',
           data: dados,
-          success: function(){
+          success: function() {
             showAlert('success', 'Inscrição enviada! Verifique seu e-mail.');
             form.reset();
           },
-          error: function(){
+          error: function() {
             showAlert('danger', 'Não foi possível enviar. Tente novamente.');
           },
-          complete: function(){
+          complete: function() {
             $('#btnEnviar').prop('disabled', false).text('Enviar inscrição');
           }
         });
@@ -226,4 +245,5 @@ $datasEvento = [
   </script>
 
 </body>
+
 </html>
