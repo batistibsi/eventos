@@ -1,220 +1,444 @@
-<!doctype html>
-<html lang="pt-br">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Página de Inscrição</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Bootstrap 4.6 (jsDelivr) -->
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
-        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
-        crossorigin="anonymous">
+<title>Instituto ACIM | Responsabilidade Social</title>
 
-  <style>
-    body { background: #f8fafc; }
-    .hero {
-      padding: 70px 0;
-      background: #ffffff;
-      border-bottom: 1px solid #e9ecef;
-    }
-    .hero h1 { font-weight: 700; }
-    .card-soft {
-      border: 1px solid #e9ecef;
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(0,0,0,.06);
-    }
-  </style>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- reCAPTCHA v2 -->
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+color:#1f2937;
+line-height:1.6;
+}
+
+/* HEADER */
+
+header{
+position:fixed;
+top:0;
+width:100%;
+background:white;
+box-shadow:0 2px 10px rgba(0,0,0,0.08);
+z-index:1000;
+}
+
+.container{
+width:90%;
+max-width:1200px;
+margin:auto;
+}
+
+nav{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:18px 0;
+}
+
+.logo img{
+height:45px;
+}
+
+.menu a{
+margin-left:25px;
+text-decoration:none;
+color:#1f2937;
+font-weight:500;
+}
+
+.menu a:hover{
+color:#0ea5a4;
+}
+
+/* HERO CAROUSEL */
+
+.hero{
+margin-top:80px;
+position:relative;
+height:500px;
+overflow:hidden;
+}
+
+.slide{
+position:absolute;
+width:100%;
+height:100%;
+background-size:cover;
+background-position:center;
+opacity:0;
+transition:opacity 1s;
+}
+
+.slide.active{
+opacity:1;
+}
+
+.hero-text{
+position:absolute;
+bottom:60px;
+left:50%;
+transform:translateX(-50%);
+color:white;
+text-align:center;
+background:rgba(0,0,0,0.4);
+padding:20px 40px;
+border-radius:10px;
+}
+
+.hero-text h1{
+font-size:36px;
+}
+
+/* SECTION */
+
+section{
+padding:80px 0;
+}
+
+.section-title{
+text-align:center;
+margin-bottom:50px;
+}
+
+.section-title h2{
+font-size:32px;
+color:#0f3d4c;
+}
+
+.section-title h1{
+font-size:32px;
+color:#ffffff;
+}
+
+/* SOBRE */
+
+.sobre p{
+max-width:800px;
+margin:auto;
+text-align:center;
+}
+
+/* PILARES */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:25px;
+}
+
+.card{
+background:white;
+padding:30px;
+border-radius:12px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+.card h3{
+color:#0f3d4c;
+margin-bottom:10px;
+}
+
+/* ATUAÇÃO */
+
+.atuacao{
+background:#f5f7fa;
+}
+
+/* CERTIFICAÇÃO */
+
+.certificacao{
+background:#0f3d4c;
+color:white;
+}
+
+.certificacao p{
+margin-bottom:15px;
+}
+
+.btn{
+display:inline-block;
+background:#ff7a18;
+color:white;
+padding:14px 30px;
+border-radius:30px;
+text-decoration:none;
+margin-top:20px;
+}
+
+/* CONTATO */
+
+.contato{
+background:#f5f7fa;
+text-align:center;
+}
+
+.redes a{
+margin:10px;
+display:inline-block;
+color:#0f3d4c;
+text-decoration:none;
+font-weight:500;
+}
+
+/* FOOTER */
+
+footer{
+background:#0f3d4c;
+color:white;
+text-align:center;
+padding:25px;
+font-size:14px;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:768px){
+
+.menu{
+display:none;
+}
+
+.hero-text h1{
+font-size:26px;
+}
+
+}
+
+</style>
 </head>
 
 <body>
 
-  <!-- PÁGINA HOME -->
-  <section id="paginaHome">
-    <header class="hero">
-      <div class="container">
-        <div class="row align-items-center">
-          <div class="col-lg-7">
-            <h1 class="mb-3">Participe do nosso evento</h1>
-            <p class="lead text-muted mb-4">
-              Um texto de apresentação aqui. Explique o objetivo, benefícios, data e o que a pessoa ganha ao se inscrever.
-            </p>
-            <button id="btnIrInscricao" class="btn btn-primary btn-lg">
-              Inscreva-se
-            </button>
-          </div>
-          <div class="col-lg-5 mt-4 mt-lg-0">
-            <div class="card card-soft">
-              <div class="card-body">
-                <h5 class="mb-2">Resumo</h5>
-                <ul class="mb-0 text-muted">
-                  <li>Data: 10/04/2026</li>
-                  <li>Horário: 19:00</li>
-                  <li>Local: Online</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
+<header>
+<div class="container">
+<nav>
 
-    <main class="container py-5">
-      <div class="row">
-        <div class="col-lg-8">
-          <h3>Sobre</h3>
-          <p class="text-muted">
-            Detalhes do evento/curso/inscrição. Pode colocar agenda, palestrantes, perguntas frequentes, etc.
-          </p>
-        </div>
-      </div>
-    </main>
-  </section>
+<div class="logo">
+<img src="https://drive.google.com/file/d/1LXRNvrS0sBYeKh2E2kxbs29965lwRlI8/view?usp=drive_link">
+</div>
 
-  <!-- PÁGINA INSCRIÇÃO -->
-  <section id="paginaInscricao" class="d-none">
-    <div class="container py-5">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h2 class="mb-0">Formulário de Inscrição</h2>
-        <button id="btnVoltarHome" class="btn btn-outline-secondary">
-          Voltar
-        </button>
-      </div>
+<div class="menu">
+<a href="#quem">Quem Somos</a>
+<a href="#atuacao">Onde Atuamos</a>
+<a href="#certificacao">Certificação Impactacim</a>
+<a href="#contato">Contato</a>
+</div>
 
-      <div class="card card-soft">
-        <div class="card-body p-4 p-md-5">
+</nav>
+</div>
+</header>
 
-          <div id="alerta" class="alert d-none" role="alert"></div>
+<!-- HERO -->
 
-          <form id="formInscricao" novalidate>
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label>Nome *</label>
-                <input type="text" class="form-control" name="nome" required maxlength="80">
-              </div>
-              <div class="form-group col-md-6">
-                <label>E-mail *</label>
-                <input type="email" class="form-control" name="email" required maxlength="120">
-              </div>
-            </div>
+<section class="hero">
 
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label>Telefone</label>
-                <input type="text" class="form-control" name="telefone" maxlength="20">
-              </div>
-              <div class="form-group col-md-6">
-                <label>Cidade</label>
-                <input type="text" class="form-control" name="cidade" maxlength="60">
-              </div>
-            </div>
+<div class="slide active" style="background-image:url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d')"></div>
 
-            <div class="form-group">
-              <label>Mensagem</label>
-              <textarea class="form-control" name="mensagem" rows="3" maxlength="500"></textarea>
-            </div>
+<div class="slide" style="background-image:url('https://images.unsplash.com/photo-1509099836639-18ba1795216d')"></div>
 
-            <div class="form-group">
-              <div class="g-recaptcha" data-sitekey="SUA_SITE_KEY_AQUI"></div>
-              <small class="text-muted">Marque o captcha para enviar.</small>
-            </div>
+<div class="slide" style="background-image:url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f')"></div>
 
-            <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-primary" id="btnEnviar">Enviar inscrição</button>
-            </div>
-          </form>
+<div class="hero-text">
+<h1>Responsabilidade Social que transforma Maringá</h1>
+</div>
 
-        </div>
-      </div>
-    </div>
-  </section>
+</section>
 
-  <!-- jQuery + Bootstrap 4 -->
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
-          crossorigin="anonymous"></script>
+<!-- QUEM SOMOS -->
 
-  <script>
-    function irParaInscricao() {
-      $('#paginaHome').addClass('d-none');
-      $('#paginaInscricao').removeClass('d-none');
-      window.scrollTo(0, 0);
+<section id="quem" class="sobre">
 
-      $('#alerta').addClass('d-none').removeClass('alert-success alert-danger').text('');
-      $('#formInscricao')[0].reset();
-      if (window.grecaptcha) grecaptcha.reset();
-    }
+<div class="container">
 
-    function voltarParaHome() {
-      $('#paginaInscricao').addClass('d-none');
-      $('#paginaHome').removeClass('d-none');
-      window.scrollTo(0, 0);
-    }
+<div class="section-title">
+<h2>Instituto ACIM</h2>
+</div>
 
-    $(function () {
-      $('#btnIrInscricao').on('click', irParaInscricao);
-      $('#btnVoltarHome').on('click', voltarParaHome);
+<p>
+O Instituto ACIM é uma entidade sem fins lucrativos vinculada à Associação Comercial de Maringá, com o propósito de fomentar um ecossistema capaz de gerar resultados de alto impacto social e ambiental de forma sustentável.
+</p>
 
-      $('#formInscricao').on('submit', function (e) {
-        e.preventDefault();
+</div>
 
-        const form = this;
-        if (!form.checkValidity()) {
-          form.reportValidity();
-          return;
-        }
+</section>
 
-        const captcha = (window.grecaptcha) ? grecaptcha.getResponse() : '';
-        if (!captcha) {
-          $('#alerta')
-            .removeClass('d-none')
-            .removeClass('alert-success')
-            .addClass('alert alert-danger')
-            .text('Por favor, confirme o captcha.');
-          return;
-        }
+<!-- PILARES -->
 
-        const dados = $(form).serializeArray().reduce((acc, x) => {
-          acc[x.name] = x.value;
-          return acc;
-        }, {});
-        dados['g-recaptcha-response'] = captcha;
+<section>
 
-        $('#btnEnviar').prop('disabled', true).text('Enviando...');
+<div class="container">
 
-        $.ajax({
-          url: '/api/inscricao', // <- sua rota
-          method: 'POST',
-          data: dados,
-          success: function () {
-            $('#alerta')
-              .removeClass('d-none')
-              .removeClass('alert-danger')
-              .addClass('alert alert-success')
-              .text('Inscrição enviada com sucesso!');
+<div class="section-title">
+<h2>Pilares Culturais</h2>
+</div>
 
-            setTimeout(voltarParaHome, 1200);
-          },
-          error: function () {
-            $('#alerta')
-              .removeClass('d-none')
-              .removeClass('alert-success')
-              .addClass('alert alert-danger')
-              .text('Não foi possível enviar. Tente novamente.');
+<div class="grid">
 
-            if (window.grecaptcha) grecaptcha.reset();
-          },
-          complete: function () {
-            $('#btnEnviar').prop('disabled', false).text('Enviar inscrição');
-          }
-        });
-      });
-    });
-  </script>
+<div class="card">
+<h3>Propósito</h3>
+<p>Fomentar um ecossistema para gerar resultados de alto impacto social e ambiental.</p>
+</div>
+
+<div class="card">
+<h3>Missão</h3>
+<p>Sensibilizar empresas para agirem com responsabilidade social.</p>
+</div>
+
+<div class="card">
+<h3>Visão</h3>
+<p>Tornar Maringá reconhecida nacionalmente pela atuação socialmente responsável.</p>
+</div>
+
+<div class="card">
+<h3>Valores</h3>
+<p>Protagonismo, representatividade, impacto social e compromisso.</p>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ONDE ATUAMOS -->
+
+<section id="atuacao" class="atuacao">
+
+<div class="container">
+
+<div class="section-title">
+<h2>Onde Atuamos</h2>
+</div>
+
+<div class="grid">
+
+<div class="card">
+<h3>Filantrópico</h3>
+<p>Nosso compromisso com o bem-estar social através de ações e iniciativas.</p>
+</div>
+
+<div class="card">
+<h3>Ambiental</h3>
+<p>Iniciativas que ajudam a minimizar o impacto ambiental.</p>
+</div>
+
+<div class="card">
+<h3>Esportivo</h3>
+<p>Promoção de atividades saudáveis e integração comunitária.</p>
+</div>
+
+<div class="card">
+<h3>Sustentabilidade</h3>
+<p>Projetos que promovem um futuro sustentável para a comunidade.</p>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- CERTIFICAÇÃO -->
+
+<section id="certificacao" class="certificacao">
+
+<div class="container">
+
+<div class="section-title">
+<h1>Certificação IMPACTACIM</h1>
+</div>
+
+<p>
+A Certificação IMPACTACIM reconhece práticas ESG realizadas por empresas e organizações brasileiras.
+</p>
+
+<p>
+Empresas podem submeter de 1 a 15 práticas relacionadas aos pilares ESG: ambiental, social e governança.
+</p>
+
+<p>
+As organizações podem ser classificadas em quatro categorias: Iniciante, Bronze, Prata e Ouro.
+</p>
+
+<h3>Quer fazer parte?</h3>
+
+<a class="btn" href="./formulario_inscricao.php" target="_blank">
+Participar da Certificação
+</a>
+
+</div>
+
+</section>
+
+<!-- CONTATO -->
+
+<section id="contato" class="contato">
+
+<div class="container">
+
+<div class="section-title">
+<h2>Contato</h2>
+</div>
+
+<p>R. Ver. Basílio Sautchuk, 388 - Zona 01, Maringá - PR</p>
+<p>Email: gestao@institutoacim.org.br</p>
+<p>Telefone: (44) 99910-0938</p>
+
+<div class="redes">
+
+<a href="https://instagram.com/instituto.acim">Instagram</a>
+
+<a href="https://www.facebook.com/profile.php?id=61564453792982">
+Facebook
+</a>
+
+<a href="https://www.linkedin.com/in/instituto-acim-de-responsabilidade-social-64237b1b6/">
+LinkedIn
+</a>
+
+</div>
+
+</div>
+
+</section>
+
+<footer>
+
+<p>© 2026 Instituto ACIM - Todos os direitos reservados</p>
+
+</footer>
+
+<script>
+
+/* CARROSSEL */
+
+let slides=document.querySelectorAll('.slide');
+let index=0;
+
+function nextSlide(){
+
+slides[index].classList.remove('active');
+
+index=(index+1)%slides.length;
+
+slides[index].classList.add('active');
+
+}
+
+setInterval(nextSlide,4000);
+
+</script>
 
 </body>
 </html>
