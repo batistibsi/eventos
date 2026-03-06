@@ -10,7 +10,9 @@ $datasEvento = [
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Inscrição</title>
+  <title>Instituto ACIM | Responsabilidade Social</title>
+
+<link rel="icon" type="image/png" href="./favicon.ico">
 
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
@@ -26,20 +28,33 @@ $datasEvento = [
       --muted:#6c757d;
     }
     body{ background:var(--bg); }
+
     .hero{
       background: radial-gradient(1200px 500px at 10% 10%, rgba(24,56,133,.18), transparent 60%),
                   radial-gradient(800px 400px at 90% 20%, rgba(171,202,105,.20), transparent 55%),
                   var(--card);
       border-bottom: 1px solid rgba(0,0,0,.06);
-      padding: 56px 0;
+      padding: 44px 0 52px;
     }
     .brand{ color: var(--brand); font-weight: 800; letter-spacing: -.4px; }
     .subtitle{ color: var(--muted); }
+
+    .badge-accent{
+      background: rgba(171,202,105,.22);
+      color:#2b3a16;
+      border: 1px solid rgba(171,202,105,.35);
+      border-radius: 999px;
+      padding: .35rem .6rem;
+      font-weight: 700;
+    }
+
     .card-soft{
       border: 1px solid rgba(0,0,0,.08);
       border-radius: 18px;
       box-shadow: 0 12px 28px rgba(0,0,0,.08);
+      background: var(--card);
     }
+
     .btn-brand{
       background: var(--brand);
       border-color: var(--brand);
@@ -49,14 +64,7 @@ $datasEvento = [
       font-weight: 700;
     }
     .btn-brand:hover{ filter: brightness(.95); color:#fff; }
-    .badge-accent{
-      background: rgba(171,202,105,.22);
-      color:#2b3a16;
-      border: 1px solid rgba(171,202,105,.35);
-      border-radius: 999px;
-      padding: .35rem .6rem;
-      font-weight: 700;
-    }
+
     .form-control{
       border-radius: 12px;
       border: 1px solid rgba(0,0,0,.14);
@@ -66,22 +74,53 @@ $datasEvento = [
       border-color: rgba(24,56,133,.55);
       box-shadow: 0 0 0 .2rem rgba(24,56,133,.12);
     }
+
     .help{
       font-size: 12.5px;
       color: var(--muted);
+    }
+
+    /* Logo */
+    .hero-logo{
+      height: 44px;
+      width: auto;
+      background:#fff;
+      border:1px solid rgba(0,0,0,.08);
+      border-radius: 12px;
+      padding: 6px;
+      box-shadow: 0 8px 18px rgba(0,0,0,.06);
+    }
+
+    @media (max-width: 576px){
+      .hero-title{ font-size: 34px !important; }
     }
   </style>
 </head>
 
 <body>
 
+  <!-- Header com logo -->
   <header class="hero">
     <div class="container">
-      <span class="badge-accent">Vagas limitadas</span>
-      <h1 class="mt-3 mb-2 brand">Inscreva-se no Evento</h1>
-      <p class="lead subtitle mb-0">
-        Preencha seus dados e escolha uma data disponível. Você receberá a confirmação por e-mail.
-      </p>
+      <div class="d-flex align-items-center justify-content-between flex-wrap">
+        <div class="d-flex align-items-center">
+          <!-- Troque o src pelo caminho do seu logo -->
+          <img src="./images/logo.png" alt="Logo" class="hero-logo mr-3">
+          <div>
+            <div class="brand" style="font-size:22px; line-height:1.1;">Inscreva-se no Evento</div>
+            <div class="subtitle">Preencha seus dados e escolha uma data disponível.</div>
+          </div>
+        </div>
+
+        <span class="badge-accent mt-3 mt-md-0">Vagas limitadas</span>
+      </div>
+
+      <div class="mt-4">
+        <h1 class="brand mb-2 hero-title" style="font-size:40px;">Formulário de Inscrição</h1>
+        <p class="lead subtitle mb-0">
+          Você receberá a confirmação por e-mail após enviar.
+        </p>
+      </div>
     </div>
   </header>
 
@@ -91,7 +130,7 @@ $datasEvento = [
 
         <div class="card card-soft">
           <div class="card-body p-4 p-md-5">
-            <h3 class="mb-1">Formulário de inscrição</h3>
+            <h3 class="mb-1">Dados da inscrição</h3>
             <p class="subtitle mb-4">Campos com * são obrigatórios.</p>
 
             <div id="alerta" class="alert d-none" role="alert"></div>
