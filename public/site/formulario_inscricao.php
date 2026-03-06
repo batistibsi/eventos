@@ -133,13 +133,7 @@ $datasEvento = [
 
         <span class="badge-accent mt-3 mt-md-0">Vagas limitadas</span>
       </div>
-
-      <div class="mt-4">
-        <h1 class="brand mb-2 hero-title" style="font-size:40px;">Formulário de Inscrição</h1>
-        <p class="lead subtitle mb-0">
-          Você receberá a confirmação por e-mail após enviar.
-        </p>
-      </div>
+      
     </div>
   </header>
 
