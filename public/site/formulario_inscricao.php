@@ -13,7 +13,7 @@ $datasEvento = [
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Instituto ACIM | Responsabilidade Social</title>
 
-  <link rel="icon" type="image/png" href="./favicon.ico">
+  <link rel="icon" href="./favicon.ico">
 
   <link rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
@@ -124,7 +124,7 @@ $datasEvento = [
       <div class="d-flex align-items-center justify-content-between flex-wrap">
         <div class="d-flex align-items-center">
           <!-- Troque o src pelo caminho do seu logo -->
-          <img src="./images/logo.png" alt="Logo" class="hero-logo mr-3">
+          <img src="./images/logo_header.png" alt="Logo" class="hero-logo mr-3">
           <div>
             <div class="brand" style="font-size:24px; line-height:1.1;">Inscreva-se no Evento</div>
             <div class="subtitle">Preencha seus dados e escolha uma data disponível.</div>
@@ -133,7 +133,7 @@ $datasEvento = [
 
         <span class="badge-accent mt-3 mt-md-0">Vagas limitadas</span>
       </div>
-      
+
     </div>
   </header>
 
@@ -180,7 +180,7 @@ $datasEvento = [
                   Ao enviar, você concorda em receber a confirmação por e-mail.
                 </small>
                 <button type="submit" id="btnEnviar" class="btn btn-brand">
-                  Enviar inscrição
+                  Enviar
                 </button>
               </div>
             </form>

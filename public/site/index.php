@@ -6,7 +6,7 @@
 
 <title>Instituto ACIM | Responsabilidade Social</title>
 
-<link rel="icon" type="image/png" href="./favicon.ico">
+<link rel="icon" href="./favicon.ico">
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -227,7 +227,7 @@ font-size:26px;
 <nav>
 
 <div class="logo">
-<img src="./images/logo.png" alt="Logo">
+<img src="./images/logo_header.png" alt="Logo">
 </div>
 
 <div class="menu">
