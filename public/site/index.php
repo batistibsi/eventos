@@ -417,7 +417,7 @@ LinkedIn
 
 <footer>
 
-<p>© 2026 Instituto ACIM - Todos os direitos reservados</p>
+<p>© <?= date('Y') ?> Instituto ACIM - Todos os direitos reservados</p>
 
 </footer>
 
