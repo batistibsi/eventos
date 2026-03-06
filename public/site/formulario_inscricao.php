@@ -120,7 +120,7 @@ $datasEvento = [
                     </option>
                   <?php endforeach; ?>
                 </select>
-                <small class="help">As datas são carregadas pelo PHP.</small>
+                <small class="help">As datas disponíveis para o evento.</small>
               </div>
 
               <div class="d-flex align-items-center justify-content-between mt-4">
