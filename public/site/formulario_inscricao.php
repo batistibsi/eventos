@@ -1,8 +1,8 @@
 <?php
 $datasEvento = [
-  ['value' => '2026-04-10 19:00', 'label' => '10/04/2026 - 19:00'],
-  ['value' => '2026-04-12 09:00', 'label' => '12/04/2026 - 09:00'],
-  ['value' => '2026-04-15 20:00', 'label' => '15/04/2026 - 20:00'],
+  ['id_evento' => '1', 'label' => '10/04/2026 - 19:00'],
+  ['id_evento' => '2', 'label' => '12/04/2026 - 09:00'],
+  ['id_evento' => '3', 'label' => '15/04/2026 - 20:00'],
 ];
 ?>
 <!doctype html>
@@ -164,10 +164,10 @@ $datasEvento = [
 
               <div class="form-group">
                 <label class="mb-1">Data do evento *</label>
-                <select class="form-control" name="data_evento" required>
+                <select class="form-control" name="id_evento" required>
                   <option value="">Selecione uma data...</option>
                   <?php foreach ($datasEvento as $d): ?>
-                    <option value="<?= htmlspecialchars($d['value'], ENT_QUOTES, 'UTF-8') ?>">
+                    <option value="<?= $d['id_evento'] ?>">
                       <?= htmlspecialchars($d['label'], ENT_QUOTES, 'UTF-8') ?>
                     </option>
                   <?php endforeach; ?>
