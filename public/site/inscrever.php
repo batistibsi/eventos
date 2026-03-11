@@ -1,5 +1,34 @@
 <?php
-declare(strict_types=1);
+
+header('Content-Type: application/json; charset=UTF-8');
+
+include_once "../zend.php";
+
+$nome     = trim($_POST['nome'] ?? '');
+$email    = trim($_POST['email'] ?? '');
+$id_evento = (int)($_POST['id_evento'] ?? null);
+
+if ($nome === '' || $email === '' || $id_evento <= 0) {
+  //http_response_code(400);
+  echo json_encode(['success' => false, 'erro' => 'Informe nome, email e evento.'], JSON_UNESCAPED_UNICODE);
+  exit;
+}
+
+$campos = [];
+$campos['nome'] = $nome;
+$campos['email'] = $email;
+$campos['id_evento'] = $id_evento;
+
+if (!Inscricao::nova($campos)) {
+  echo json_encode(['success' => false, 'erro' => Inscricao::$erro], JSON_UNESCAPED_UNICODE);
+  exit;
+}
+
+echo json_encode(['success' => true, 'mensagem' => 'Inscrição criada. Confirme pelo e-mail.'], JSON_UNESCAPED_UNICODE);
+exit;
+
+
+//declare(strict_types=1);
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -45,12 +74,12 @@ $smtpPass = $cfg['smtp_pass'];
 $smtpPort = (int)$cfg['smtp_port'];
 
 // mapeia texto do banco -> PHPMailer
-$smtpSecure = match (strtolower(trim($cfg['smtp_secure']))) {
+/*$smtpSecure = match (strtolower(trim($cfg['smtp_secure']))) {
   'tls', 'starttls' => PHPMailer::ENCRYPTION_STARTTLS,
   'ssl'             => PHPMailer::ENCRYPTION_SMTPS,
   'none', ''        => false,
   default           => PHPMailer::ENCRYPTION_STARTTLS,
-};
+};*/
 
 $fromEmail = $cfg['from_email'];
 $fromName  = $cfg['from_name'];

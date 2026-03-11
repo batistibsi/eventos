@@ -1,6 +1,6 @@
 <?php
 /*Inclui Zend*/
-set_include_path(PATH_SEPARATOR . '/var/www/ouvidoria/application/models/' . PATH_SEPARATOR . '/var/www/ouvidoria/application/helpers/' . PATH_SEPARATOR . '/var/www/library/');
+set_include_path(PATH_SEPARATOR . '/var/www/eventos/application/models/' . PATH_SEPARATOR . '/var/www/eventos/application/helpers/' . PATH_SEPARATOR . '/var/www/library/');
 require_once "Zend/Loader/Autoloader.php";
 // Set up autoload.
 $autoloader = Zend_Loader_Autoloader::getInstance();
@@ -13,7 +13,7 @@ $options = array(
 $config = new Zend_Config_Ini('/var/www/config.ini', 'interface');
 Zend_Registry::set('skin', $config->skin);
 
-$config = new Zend_Config_Ini('/var/www/config.ini', 'ouvidoria_db');
+$config = new Zend_Config_Ini('/var/www/config.ini', 'eventos_db');
 Zend_Registry::set('config', $config);
 $arr = $config->db->config->toArray();
 $arr['options'] = $options;

@@ -220,12 +220,17 @@ $datasEvento = [
         $('#btnEnviar').prop('disabled', true).text('Enviando...');
 
         $.ajax({
-          url: '/api/inscricao', // <- troque pela sua rota PHP
+          url: './inscrever.php', // <- troque pela sua rota PHP
           method: 'POST',
           data: dados,
-          success: function() {
-            showAlert('success', 'Inscrição enviada! Verifique seu e-mail.');
-            form.reset();
+          dataType: 'json',
+          success: function(data) {
+            if (data.success) {
+              showAlert('success', data.mensagem);
+              //form.reset();
+            } else {
+              showAlert('danger', data.erro);
+            }
           },
           error: function() {
             showAlert('danger', 'Não foi possível enviar. Tente novamente.');
