@@ -26,25 +26,74 @@ create table eventos_inscricao (
   constraint uq_token_confirmacao unique (token_confirmacao)
 );
 
-create table eventos_config (
-  id_config bigserial primary key,
-  base_url_confirmacao text not null,
-  token_validade_horas int not null default 24,
+-- Table: public.eventos_perfil
 
-  smtp_host text not null,
-  smtp_user text not null,
-  smtp_pass text not null,
-  smtp_port int not null default 587,
-  smtp_secure text not null default 'tls', -- tls | ssl | none
+-- DROP TABLE IF EXISTS public.eventos_perfil;
 
-  from_email text not null,
-  from_name text not null,
+CREATE TABLE IF NOT EXISTS public.eventos_perfil
+(
+    id_perfil integer NOT NULL,
+    descricao character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT eventos_perfil_pkey PRIMARY KEY (id_perfil)
+)
 
-  ativo boolean not null default true,
-  updated_at timestamp not null default now()
-);
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.eventos_perfil
+    OWNER to postgres;
+		
+	
+-- Table: public.eventos_usuario
+
+-- DROP TABLE IF EXISTS public.eventos_usuario;
+
+CREATE TABLE IF NOT EXISTS public.eventos_usuario
+(
+    id_usuario serial NOT NULL,
+    nome character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    email character varying(255) COLLATE pg_catalog."default",
+    senha character(32) COLLATE pg_catalog."default" NOT NULL,
+    ativo boolean DEFAULT true,
+    id_perfil integer,
+    CONSTRAINT eventos_usuario_pkey PRIMARY KEY (id_usuario),
+    CONSTRAINT eventos_usuario_id_perfil_fkey FOREIGN KEY (id_perfil)
+        REFERENCES public.eventos_perfil (id_perfil) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.eventos_usuario
+    OWNER to postgres;
+	
+	
+insert into eventos_perfil values(1,'Adminstrador');
+	
+insert into eventos_usuario(nome,email,senha,id_perfil)
+	values('Administrador Bem Feito','batisti_bsi@hotmail.com','81dc9bdb52d04dc20036dbd8313ed055',1);
 
 
+-- Table: public.eventos_login
+
+-- DROP TABLE IF EXISTS public.eventos_login;
+
+CREATE TABLE IF NOT EXISTS public.eventos_login
+(
+    id serial NOT NULL,
+    id_usuario integer NOT NULL,
+    data_hora timestamp without time zone DEFAULT now(),
+    CONSTRAINT eventos_login_pkey PRIMARY KEY (id),
+    CONSTRAINT eventos_login_id_usuario_fkey FOREIGN KEY (id_usuario)
+        REFERENCES public.eventos_usuario (id_usuario) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.eventos_login
+    OWNER to postgres;
 
 INSERT INTO public.eventos_evento(
 	titulo, data_hora, ativo, limite_vagas)

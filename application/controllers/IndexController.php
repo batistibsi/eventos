@@ -12,8 +12,6 @@ class IndexController extends Zend_Controller_Action
 		$this->view->usuario = Zend_Registry::get('usuario');
 		$this->view->idUsuario = Zend_Registry::get('id_usuario');
 		$this->view->permissao = Zend_Registry::get('permissao');
-
-		$this->view->empresa = Empresa::buscaId(Zend_Registry::get('id_empresa'));
 	}
 
 	public function logoutAction()

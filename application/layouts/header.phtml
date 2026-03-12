@@ -1,5 +1,5 @@
 <?php
-$skyn = Zend_Registry::get('skin') ? Zend_Registry::get('skin') : 'padrao';
+$skyn = 'padrao';
 ?>
 <!doctype html>
 <html lang="en" class="h-100">
@@ -77,16 +77,6 @@ $skyn = Zend_Registry::get('skin') ? Zend_Registry::get('skin') : 'padrao';
         </div>
       </li>
     </ul>
-    <!--<ul class="navbar-nav px-3">
-      <li class="nav-item text-nowrap">
-        <a class="btn text-primary principal-link" data-src="../../agenda" href="#"><i class="fa fa-calendar"></i></a>
-      </li>
-    </ul>
-    <ul class="navbar-nav px-3">
-      <li class="nav-item text-nowrap">
-        <a class="btn text-primary" href="../../index/logout"><i class="fa fa-sign-out"></i></a>
-      </li>
-    </ul-->
   </nav>
   <?php
   $modulo = Util::getController();
@@ -100,12 +90,6 @@ $skyn = Zend_Registry::get('skin') ? Zend_Registry::get('skin') : 'padrao';
             <a href="#" class="principal-link nav-link" data-menu-item="dashboard" data-src="../../dashboard">
               <i class="fa fa-line-chart" aria-hidden="true"></i>
               Dashboard
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="principal-link nav-link" data-menu-item="kanban" data-src="../../kanban">
-              <i class="fa fa-clone" aria-hidden="true"></i>
-              Kanban
             </a>
           </li>
           <li class="nav-item">
@@ -124,12 +108,6 @@ $skyn = Zend_Registry::get('skin') ? Zend_Registry::get('skin') : 'padrao';
               </a>
             </li>
           <? endif; ?>
-          <li class="nav-item">
-            <a href="#" class="principal-link nav-link" data-menu-item="empresa" data-src="../../empresa">
-              <i class="fa fa-cogs" aria-hidden="true"></i>
-              Empresa
-            </a>
-          </li>
         </ul>
       </div>
     </nav>

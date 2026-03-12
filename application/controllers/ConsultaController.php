@@ -21,8 +21,6 @@ class ConsultaController extends Zend_Controller_Action
 		$this->view->inicio = $inicio;
 		$this->view->fim = $fim;
 
-		$id_empresa = Zend_Registry::get('permissao') > 1 ? Zend_Registry::get('id_empresa') : null;
-
-		$this->view->registros = Formulario::consulta($inicio, $fim, $id_empresa);
+		$this->view->registros = Inscricao::consulta($inicio, $fim);
 	}
 }

@@ -75,4 +75,15 @@ class Inscricao
 
                 return $registros[0]['id_inscricao'];
         }
+
+        public static function consulta($inicio, $fim)
+        {
+                $db = Zend_Registry::get('db');
+
+                $select = "select * from eventos_inscricao";
+
+                $registros = $db->fetchAll($select);
+
+                return $registros;
+        }
 }

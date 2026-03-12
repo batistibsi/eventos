@@ -22,8 +22,8 @@ ini_set('log_errors', 'on');
 ini_set('error_log', $config->errorlog);
 
 // produção ou teste?
-/*if ($config->producao) ini_set('display_errors', 0);
-else ini_set('display_errors', 'on');*/
+if ($config->producao) ini_set('display_errors', 0);
+else ini_set('display_errors', 'on');
 
 ini_set('display_errors', 'on');
 

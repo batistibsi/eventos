@@ -89,7 +89,7 @@ class Usuario
 		return true;
 	}
 
-	public static function insert($email, $nome, $idPerfil, $ativo, $senha, $confirmSenha, $id_empresa)
+	public static function insert($email, $nome, $idPerfil, $ativo, $senha, $confirmSenha)
 	{
 
 		if ($ativo) {
@@ -134,7 +134,6 @@ class Usuario
 			"nome" => $nome,
 			"senha" => $senha,
 			"id_perfil" => $idPerfil,
-			"id_empresa" => $id_empresa,
 			"ativo" => $ativo
 		);
 
@@ -233,11 +232,8 @@ class Usuario
 		$db = Zend_Registry::get('db');
 
 		$select = "select eventos_usuario.*,
-					eventos_perfil.descricao as descricao_perfil,
-					e.titulo,
-					e.id_empresa
+					eventos_perfil.descricao as descricao_perfil
 				  from eventos_usuario
-				  inner join eventos_empresa e on e.id_empresa = eventos_usuario.id_empresa
 				  left join eventos_perfil on eventos_usuario.id_perfil = eventos_perfil.id_perfil
 				   where eventos_usuario.ativo and eventos_perfil.id_perfil in(" . $id_perfil . ") and eventos_usuario.id_usuario <> 1
 				  order by eventos_usuario.nome";
@@ -253,9 +249,12 @@ class Usuario
 		$db = Zend_Registry::get('db');
 
 		$select = "select a.nome,
+					a.email,
+					p.descricao as descricao_perfil,
 					l.*
 				  from eventos_usuario a
-				  inner join eventos_login l on l.id_usuario = a.id_usuario
+				  inner join eventos_login l on l.id_usuario = a.id_usuario				  
+				  left join eventos_perfil p on a.id_perfil = p.id_perfil
 				  where a.id_usuario <> 1
 				  order by a.nome";
 
