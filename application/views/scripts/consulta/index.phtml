@@ -14,8 +14,8 @@
         <thead>
             <tr>
                 <th></th>
-                <th class="text-left">INSCRICAO</th>                
-                <th class="text-left">EVENTO</th>                
+                <th class="text-left">INSCRICAO</th>
+                <th class="text-left">EVENTO</th>
                 <th class="text-left">DATA</th>
                 <th class="text-left">NOME</th>
                 <th class="text-left">EMAIL</th>
@@ -39,9 +39,9 @@
                             <a class="btn btn-primary" href="#" onclick="carregarTela('../../tarefa/cadastro?id_tarefa=<?= $value['id_tarefa_atual'] ?>')"><i class="fa fa-eye"></i></a>
                         </div>
                     </td>
-                    <td class="text-left align-middle"><?= Util::formatData($value['created_at']) ?></td>
+                    <td class="text-left align-middle"><?= Util::formatData($value['created_at']) ?> <?= Util::formatHora($value['created_at']) ?></td>
                     <td class="text-left align-middle"><?= $value['titulo'] ?></td>
-                    <td class="text-left align-middle"><?= Util::formatData($value['data_hora']) ?></td>
+                    <td class="text-left align-middle"><?= Util::formatData($value['data_hora']) ?> <?= Util::formatHora($value['data_hora']) ?></td>
                     <td class="text-left align-middle"><?= $value['nome'] ?></td>
                     <td class="text-left align-middle"><?= $value['email'] ?></td>
                     <td class="text-left align-middle"><?= $value['status'] ?></td>
@@ -129,23 +129,23 @@
             "order": [
                 [1, 'asc']
             ],
-            dom:
-  "<'row align-items-center mb-2'\
+            dom: "<'row align-items-center mb-2'\
      <'col-12 col-md-3'l>\
      <'col-12 col-md-6 dt-buttons-center'B>\
      <'col-12 col-md-3 text-md-right d-none d-md-block'f>>" +
-  "<'row'<'col-12'tr>>" +
-  "<'row align-items-center mt-2'<'col-12 col-md-5'i><'col-12 col-md-7'p>>",
-            buttons: [/*{
-                    extend: 'copy',
-                    titleAttr: 'Copiar',
-                    text: '<i class="fas fa-copy"></i>',
-                    className: 'text-info',
-                    exportOptions: {
-                        search: 'applied',
-                        columns: [1, 2, 3, 4, 5]
-                    }
-                },*/
+                "<'row'<'col-12'tr>>" +
+                "<'row align-items-center mt-2'<'col-12 col-md-5'i><'col-12 col-md-7'p>>",
+            buttons: [
+                /*{
+                                    extend: 'copy',
+                                    titleAttr: 'Copiar',
+                                    text: '<i class="fas fa-copy"></i>',
+                                    className: 'text-info',
+                                    exportOptions: {
+                                        search: 'applied',
+                                        columns: [1, 2, 3, 4, 5]
+                                    }
+                                },*/
                 {
                     extend: 'excel',
                     titleAttr: 'Excel',
@@ -154,7 +154,7 @@
                     filename: 'eventos',
                     exportOptions: {
                         search: 'applied',
-                        columns: [1, 2, 3, 4, 5]
+                        columns: [1, 2, 3, 4, 5, 6]
                     }
                 },
                 /*{
