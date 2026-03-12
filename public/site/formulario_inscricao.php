@@ -147,7 +147,7 @@ $datasEvento = [
     </div>
   </header>
 
-  <main class="container py-5">
+  <main class="container py-3">
     <div class="row justify-content-center">
       <div class="col-lg-8">
 
