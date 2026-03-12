@@ -16,6 +16,13 @@ class Inscricao
                 return false;
         }
 
+        public static function url($token, $acao)
+        {
+                $url = Util::request_origin(false);
+
+                return $url . '/site/' . $acao . '?token=' . $token;
+        }
+
         public static function novo($campos)
         {
                 $db = Zend_Registry::get('db');
@@ -54,6 +61,17 @@ class Inscricao
                 $registros = $db->fetchAll($select);
 
                 $db->commit();
+
+                $link_cancelar = self::url($token, 'cancelar_inscricao.php');
+                $link_confirmar = self::url($token, 'confirmar_inscricao.php');
+
+                $msg = '<p>Você acaba solicitar a inscrição no evento.</p>'
+                        . '<p>Confirme a inscrição clicando no link abaixo:</p>'
+                        . '<p><a target="_blank" href="' . $link_confirmar . '">' . $link_confirmar . '</a></p>'
+                        . '<br></br><p>Se deseja <strong>CANCELAR A INSCRIÇÃO</strong>, clique neste link:</p>'
+                        . '<p><a target="_blank" href="' . $link_cancelar . '">' . $link_cancelar . '</a></p>';
+
+                Email::enviar($campos['email'], 'Solicitação de inscrição', $msg);
 
                 return $registros[0]['id_inscricao'];
         }
