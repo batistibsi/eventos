@@ -7,7 +7,7 @@ class Config
         {
                 $db = Zend_Registry::get('db');
 
-                $select = "select * from ouvidoria_config a
+                $select = "select * from eventos_config a
                                 where id_config = 1";
 
                 $registros = $db->fetchAll($select);

@@ -1,5 +1,5 @@
 <?php
-require '/var/www/ouvidoria/vendor/autoload.php';
+require '/var/www/eventos/vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 
