@@ -19,7 +19,7 @@ $campos['nome'] = $nome;
 $campos['email'] = $email;
 $campos['id_evento'] = $id_evento;
 
-if (!Inscricao::nova($campos)) {
+if (!Inscricao::novo($campos)) {
   echo json_encode(['success' => false, 'erro' => Inscricao::$erro], JSON_UNESCAPED_UNICODE);
   exit;
 }

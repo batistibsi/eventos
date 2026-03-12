@@ -22,9 +22,6 @@ create table eventos_inscricao (
   created_at timestamp not null default now(),
   confirmado_em timestamp null,
 
-  -- evita duplicar inscrição do mesmo email no mesmo evento
-  constraint uq_evento_email unique (id_evento, email),
-
   -- token único (para link)
   constraint uq_token_confirmacao unique (token_confirmacao)
 );
@@ -46,3 +43,11 @@ create table eventos_config (
   ativo boolean not null default true,
   updated_at timestamp not null default now()
 );
+
+
+
+INSERT INTO public.eventos_evento(
+	titulo, data_hora, ativo, limite_vagas)
+	VALUES ('Evento 1', '2026-04-01 16:00:00', true, 30),
+	('Evento 2', '2026-05-01 17:00:00', true, 10),
+	('Evento 3', '2026-06-01 12:00:00', true, 5);
