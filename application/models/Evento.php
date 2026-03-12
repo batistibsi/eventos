@@ -3,6 +3,11 @@ class Evento
 {
         public static $erro;
 
+        public static function getLabel($titulo, $data_hora)
+        {
+                return $titulo . ' - ' . (new DateTime($data_hora))->format('d/m/Y H:i:s');
+        }
+
         public static function buscaId($id_evento)
         {
 
@@ -19,16 +24,19 @@ class Evento
                         return false;
                 } else {
                         $registro = $registros[0];
+                        $registro['label'] = self::getLabel($registro['titulo'], $registro['data_hora']);
                         return $registro;
                 }
         }
 
-        public static function confereVagas($id_evento)
+        public static function confereVagas($id_evento, $limite_vagas = false)
         {
                 $db = Zend_Registry::get('db');
 
-                $evento = self::buscaId($id_evento);
-                $limite_vagas =  $evento['limite_vagas'];
+                if ($limite_vagas === false) {
+                        $evento = self::buscaId($id_evento);
+                        $limite_vagas =  $evento['limite_vagas'];
+                }
 
                 $select = "select count(*) as inscritos 
                                 from eventos_inscricao 
@@ -55,7 +63,7 @@ class Evento
 
                 if (count($registros)) {
                         foreach ($registros as $value) {
-                                $value['label'] = (new DateTime($value['data_hora']))->format('d/m/Y H:i:s');
+                                $value['label'] = self::getLabel($value['titulo'], $value['data_hora']);
                                 $arrAux[] = $value;
                         }
                 }

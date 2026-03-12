@@ -32,8 +32,10 @@ class Inscricao
                         return false;
                 }
 
-                if (!Evento::confereVagas($campos['id_evento'])) {
-                        self::$erro = 'Limite de vagas já atingida para o evento!';
+                $evento = Evento::buscaId($campos['id_evento']);
+
+                if (!$evento) {
+                        self::$erro = 'Erro ao resgatar o evento!';
                         return false;
                 }
 
@@ -44,6 +46,11 @@ class Inscricao
                 $expiraEm = (new DateTimeImmutable())->modify("+{$tokenValidadeHoras} hours")->format('Y-m-d H:i:s');
 
                 $db->beginTransaction();
+
+                if (!Evento::confereVagas($campos['id_evento'], $evento['limite_vagas'])) {
+                        self::$erro = 'Limite de vagas já atingida para o evento!';
+                        return false;
+                }
 
                 $data = array(
                         'id_evento' => $campos['id_evento'],
@@ -65,7 +72,7 @@ class Inscricao
                 $link_cancelar = self::url($token, 'cancelar_inscricao.php');
                 $link_confirmar = self::url($token, 'confirmar_inscricao.php');
 
-                $msg = '<p>Você acaba solicitar a inscrição no evento.</p>'
+                $msg = '<p>Você acaba solicitar a inscrição no evento ' . $evento['label'] . '.</p>'
                         . '<p>Confirme a inscrição clicando no link abaixo:</p>'
                         . '<p><a target="_blank" href="' . $link_confirmar . '">' . $link_confirmar . '</a></p>'
                         . '<br></br><p>Se deseja <strong>CANCELAR A INSCRIÇÃO</strong>, clique neste link:</p>'
@@ -80,8 +87,8 @@ class Inscricao
         {
                 $db = Zend_Registry::get('db');
 
-                $inicio = $db->quote($inicio.' 00:00:00');
-                $fim = $db->quote($fim.' 23:59:59');
+                $inicio = $db->quote($inicio . ' 00:00:00');
+                $fim = $db->quote($fim . ' 23:59:59');
 
                 $select = "select a.*, b.titulo, b.data_hora
                         from eventos_inscricao a
