@@ -1,9 +1,18 @@
 <?php
+
+include_once "../zend.php";
+
+$eventos = Evento::lista(true);
+
+/*print_r($eventos);
+die();
+
 $datasEvento = [
   ['id_evento' => '1', 'label' => '10/04/2026 - 19:00'],
   ['id_evento' => '2', 'label' => '12/04/2026 - 09:00'],
   ['id_evento' => '3', 'label' => '15/04/2026 - 20:00'],
-];
+];*/
+
 ?>
 <!doctype html>
 <html lang="pt-br">
@@ -12,6 +21,7 @@ $datasEvento = [
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Instituto ACIM | Responsabilidade Social</title>
+  <meta http-equiv="refresh" content="600">
 
   <link rel="icon" href="./favicon.ico">
 
@@ -166,9 +176,9 @@ $datasEvento = [
                 <label class="mb-1">Data do evento *</label>
                 <select class="form-control" name="id_evento" required>
                   <option value="">Selecione uma data...</option>
-                  <?php foreach ($datasEvento as $d): ?>
-                    <option value="<?= $d['id_evento'] ?>">
-                      <?= htmlspecialchars($d['label'], ENT_QUOTES, 'UTF-8') ?>
+                  <?php foreach ($eventos as $evento): ?>
+                    <option value="<?= $evento['id_evento'] ?>">
+                      <?= htmlspecialchars($evento['label'], ENT_QUOTES, 'UTF-8') ?>
                     </option>
                   <?php endforeach; ?>
                 </select>
