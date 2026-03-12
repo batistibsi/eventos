@@ -39,7 +39,7 @@ Zend_Registry::set('basedir', $config->basedir);
 Zend_Registry::set('skin', $config->skin);
 
 // Vericação de login
-if (!isset($_SESSION['usuario_ouvidoria']) || !isset($_SESSION['permissao_ouvidoria'])) {
+if (!isset($_SESSION['usuario_eventos']) || !isset($_SESSION['permissao_eventos'])) {
 
 	if (!$_POST) {
 		echo '<script>parent.parent.location = "' . Zend_Registry::get("url") . '/logon.php";</script>';
@@ -49,10 +49,10 @@ if (!isset($_SESSION['usuario_ouvidoria']) || !isset($_SESSION['permissao_ouvido
 	exit();
 }
 
-Zend_Registry::set('usuario', $_SESSION['usuario_ouvidoria']);
-Zend_Registry::set('permissao', $_SESSION['permissao_ouvidoria']);
-Zend_Registry::set('id_usuario', $_SESSION['id_usuario_ouvidoria']);
-Zend_Registry::set('id_empresa', $_SESSION['id_empresa_ouvidoria']);
+Zend_Registry::set('usuario', $_SESSION['usuario_eventos']);
+Zend_Registry::set('permissao', $_SESSION['permissao_eventos']);
+Zend_Registry::set('id_usuario', $_SESSION['id_usuario_eventos']);
+Zend_Registry::set('id_empresa', $_SESSION['id_empresa_eventos']);
 
 // setting the view
 $view = new Zend_View;
@@ -66,7 +66,7 @@ $options = array(
 	Zend_Db::AUTO_QUOTE_IDENTIFIERS => false
 );
 
-$config = new Zend_Config_Ini('/var/www/config.ini', 'ouvidoria_db');
+$config = new Zend_Config_Ini('/var/www/config.ini', 'eventos_db');
 
 Zend_Registry::set('config', $config);
 $arr = $config->db->config->toArray();

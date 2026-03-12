@@ -1,9 +1,4 @@
 ﻿<?php
-
-/*if(!isset($_GET['ajax'])){
-	Util::gotoIndex();
-}*/
-
 if (Zend_Registry::get('permissao') != 1) exit();
 
 class UsuarioController extends Zend_Controller_Action

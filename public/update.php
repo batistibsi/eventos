@@ -7,16 +7,16 @@ if (isset($_SERVER['REMOTE_ADDR'])) {
 
 $arrConf = parse_ini_file("/var/www/config.ini", true);
 
-$host = $arrConf['ouvidoria_db']['db.config.host'];
-$dbname = $arrConf['ouvidoria_db']['db.config.dbname'];
-$user = $arrConf['ouvidoria_db']['db.config.username'];
-$password = $arrConf['ouvidoria_db']['db.config.password'];
-$port = $arrConf['ouvidoria_db']['db.config.port'];
+$host = $arrConf['eventos_db']['db.config.host'];
+$dbname = $arrConf['eventos_db']['db.config.dbname'];
+$user = $arrConf['eventos_db']['db.config.username'];
+$password = $arrConf['eventos_db']['db.config.password'];
+$port = $arrConf['eventos_db']['db.config.port'];
 $stringConnection = "host=" . $host . " port=" . $port . " dbname=" . $dbname . " user=" . $user . " password=" . $password;
 $con = pg_connect($stringConnection);
 
 // Diretório dos scripts
-$migrationDir = '/var/www/ouvidoria/migrations';
+$migrationDir = '/var/www/eventos/migrations';
 $migrationFiles = scandir($migrationDir);
 
 $query = "CREATE TABLE IF NOT EXISTS public.migrations

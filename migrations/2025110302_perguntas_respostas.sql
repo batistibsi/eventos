@@ -1,18 +1,18 @@
-delete from ouvidoria_tarefa;
+delete from eventos_tarefa;
 
-delete from ouvidoria_envio;
+delete from eventos_envio;
 
-delete from ouvidoria_pergunta;
+delete from eventos_pergunta;
 
-ALTER TABLE IF EXISTS public.ouvidoria_resposta DROP COLUMN IF EXISTS id_pergunta;
+ALTER TABLE IF EXISTS public.eventos_resposta DROP COLUMN IF EXISTS id_pergunta;
 
-alter table ouvidoria_resposta add column pergunta text COLLATE pg_catalog."default" NOT NULL;
-alter table ouvidoria_resposta add column tipo character varying COLLATE pg_catalog."default" NOT NULL;
-alter table ouvidoria_resposta add column opcoes text COLLATE pg_catalog."default";
-alter table ouvidoria_resposta add column grupo character varying COLLATE pg_catalog."default";
-alter table ouvidoria_resposta add column ordem integer;
+alter table eventos_resposta add column pergunta text COLLATE pg_catalog."default" NOT NULL;
+alter table eventos_resposta add column tipo character varying COLLATE pg_catalog."default" NOT NULL;
+alter table eventos_resposta add column opcoes text COLLATE pg_catalog."default";
+alter table eventos_resposta add column grupo character varying COLLATE pg_catalog."default";
+alter table eventos_resposta add column ordem integer;
 
-INSERT INTO public.ouvidoria_pergunta(
+INSERT INTO public.eventos_pergunta(
 	id_formulario, pergunta, tipo, opcoes, grupo, ordem)
 VALUES 
 	(1, 'Lembre-se de mencionar a pessoa e a área onde ela trabalha, junto com seu elogio.', 'texto', null, 'Qual seu elogio?', 1),
@@ -28,4 +28,4 @@ VALUES
 	(5, 'Caso você tenha feito uma reclamação, inclua também sua sugestão para solução.', 'texto', null, 'Qual sua sugestão para a reclamação?', 2),
 	(6, 'Quanto mais informações, melhor!', 'texto', null, 'Qual sua sugestão?', 1);
 
-alter table ouvidoria_envio add column arquivos varchar;
+alter table eventos_envio add column arquivos varchar;

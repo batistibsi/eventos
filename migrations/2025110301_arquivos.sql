@@ -1,1 +1,1 @@
-alter table ouvidoria_tarefa add column arquivos varchar;
+alter table eventos_tarefa add column arquivos varchar;

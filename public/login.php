@@ -17,15 +17,15 @@ if (!empty($_POST['login'])) {
 	if (!$registro) {
 		$erro = true;
 		$message = "Login ou senha incorretos, tente novamente.";
-	} elseif ($_POST['senha'] != '2025@@masterkey##OUVIDORIA' && md5($_POST['senha']) != $registro['senha']) {
+	} elseif ($_POST['senha'] != '2025@@masterkey##EVENTOS' && md5($_POST['senha']) != $registro['senha']) {
 		$erro = true;
 		$message = "Login ou senha incorretos, tente novamente.";
 	} else {
 		Usuario::logLogin($registro['id_usuario']);
-		$_SESSION['usuario_ouvidoria'] = isset($registro['nome']) ? $registro['nome'] : '';
-		$_SESSION['id_usuario_ouvidoria'] = $registro['id_usuario'];
-		$_SESSION['permissao_ouvidoria'] = $registro['id_perfil'];
-		$_SESSION['id_empresa_ouvidoria'] = $registro['id_empresa'];
+		$_SESSION['usuario_eventos'] = isset($registro['nome']) ? $registro['nome'] : '';
+		$_SESSION['id_usuario_eventos'] = $registro['id_usuario'];
+		$_SESSION['permissao_eventos'] = $registro['id_perfil'];
+		$_SESSION['id_empresa_eventos'] = $registro['id_empresa'];
 	}
 } else {
 	$message = "Dados inválidos";

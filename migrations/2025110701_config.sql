@@ -1,4 +1,4 @@
-create table ouvidoria_config(
+create table eventos_config(
     id_config integer not null primary key,
     nome_empresa varchar,
     cnpj_empresa varchar,
@@ -12,7 +12,7 @@ create table ouvidoria_config(
 );
 
 INSERT INTO
-    public.ouvidoria_config(
+    public.eventos_config(
         id_config,
         nome_empresa,
         cnpj_empresa,

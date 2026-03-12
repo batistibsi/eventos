@@ -1,18 +1,18 @@
 -- Tabela de formulario
-CREATE TABLE ouvidoria_empresa (
+CREATE TABLE eventos_empresa (
     id_empresa serial NOT NULL PRIMARY KEY,
     titulo VARCHAR(255) NOT NULL,
     descricao TEXT
 );
 
 -- Tabela de formulario
-CREATE TABLE ouvidoria_formulario (
+CREATE TABLE eventos_formulario (
     id_formulario INTEGER NOT NULL PRIMARY KEY,
 	descricao VARCHAR
 );
 
 -- Tabela de perguntas
-CREATE TABLE ouvidoria_pergunta (
+CREATE TABLE eventos_pergunta (
     id_pergunta SERIAL NOT NULL PRIMARY KEY,	
     id_formulario INTEGER NOT NULL,
     pergunta TEXT NOT NULL,
@@ -20,10 +20,10 @@ CREATE TABLE ouvidoria_pergunta (
     opcoes TEXT NULL,
     grupo varchar,
     ordem integer,
-    FOREIGN KEY (id_formulario) REFERENCES ouvidoria_formulario(id_formulario) ON DELETE CASCADE
+    FOREIGN KEY (id_formulario) REFERENCES eventos_formulario(id_formulario) ON DELETE CASCADE
 );
 
-CREATE TABLE ouvidoria_envio(
+CREATE TABLE eventos_envio(
     id_envio serial NOT NULL PRIMARY KEY,
     id_empresa INTEGER,
     id_formulario INTEGER,    
@@ -31,18 +31,18 @@ CREATE TABLE ouvidoria_envio(
     sexo varchar,
     idade integer,
     frequencia varchar,
-    FOREIGN KEY (id_formulario) REFERENCES ouvidoria_formulario(id_formulario) ON DELETE CASCADE,
-    FOREIGN KEY (id_empresa) REFERENCES ouvidoria_empresa(id_empresa) ON DELETE CASCADE
+    FOREIGN KEY (id_formulario) REFERENCES eventos_formulario(id_formulario) ON DELETE CASCADE,
+    FOREIGN KEY (id_empresa) REFERENCES eventos_empresa(id_empresa) ON DELETE CASCADE
 );
 
 
 -- Tabela de resposta
-CREATE TABLE ouvidoria_resposta (
+CREATE TABLE eventos_resposta (
     id_resposta serial NOT NULL PRIMARY KEY,
     id_envio INTEGER,
     id_pergunta INTEGER,
     resposta TEXT NOT NULL,
     observacao TEXT,
-    FOREIGN KEY (id_envio) REFERENCES ouvidoria_envio(id_envio) ON DELETE CASCADE,
-    FOREIGN KEY (id_pergunta) REFERENCES ouvidoria_pergunta(id_pergunta) ON DELETE CASCADE
+    FOREIGN KEY (id_envio) REFERENCES eventos_envio(id_envio) ON DELETE CASCADE,
+    FOREIGN KEY (id_pergunta) REFERENCES eventos_pergunta(id_pergunta) ON DELETE CASCADE
 );

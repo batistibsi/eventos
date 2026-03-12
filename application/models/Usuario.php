@@ -11,7 +11,7 @@ class Usuario
 
 		$db = Zend_Registry::get('db');
 
-		$select = "select * from ouvidoria_usuario where id_usuario = " . $id_usuario;
+		$select = "select * from eventos_usuario where id_usuario = " . $id_usuario;
 
 		$registros = $db->fetchAll($select);
 
@@ -28,7 +28,7 @@ class Usuario
 
 		$db = Zend_Registry::get('db');
 
-		$select = "select * from ouvidoria_usuario where email = '" . $email . "' and ativo";
+		$select = "select * from eventos_usuario where email = '" . $email . "' and ativo";
 
 		$registros = $db->fetchAll($select);
 
@@ -57,7 +57,7 @@ class Usuario
 			"senha" => $novaSenha
 		);
 
-		$db->update("ouvidoria_usuario", $data, "id_usuario = '" . $id_usuario . "'");
+		$db->update("eventos_usuario", $data, "id_usuario = '" . $id_usuario . "'");
 
 		return true;
 	}
@@ -66,7 +66,7 @@ class Usuario
 	{
 		$db = Zend_Registry::get('db');
 
-		$select = "select * from ouvidoria_usuario where id_usuario <> " . $id . " and email = '" . $email . "' and ativo";
+		$select = "select * from eventos_usuario where id_usuario <> " . $id . " and email = '" . $email . "' and ativo";
 
 		$registros = $db->fetchAll($select);
 
@@ -84,7 +84,7 @@ class Usuario
 			"id_usuario" => $id_usuario
 		);
 
-		$db->insert("ouvidoria_login", $data);
+		$db->insert("eventos_login", $data);
 
 		return true;
 	}
@@ -138,15 +138,15 @@ class Usuario
 			"ativo" => $ativo
 		);
 
-		$db->insert("ouvidoria_usuario", $data);
+		$db->insert("eventos_usuario", $data);
 
 		$link = $_SERVER['HTTP_HOST'];
 
-		$msg = '<p>Parabéns, seu cadastro na plataforma OUVIDORIA foi concluído com sucesso.</p>'
+		$msg = '<p>Parabéns, seu cadastro na plataforma EVENTOS foi concluído com sucesso.</p>'
 			. '<p>Acesse o sistema clicando no link abaixo</p>'
 			. '<p><a href="' . $link . '">' . $link . '</a></p>';
 
-		Email::enviar($email, 'Cadastro de acesso à Plataforma de Ouvidoria confirmado', $msg);
+		Email::enviar($email, 'Cadastro de acesso à Plataforma de Eventos confirmado', $msg);
 
 		return true;
 	}
@@ -194,7 +194,7 @@ class Usuario
 			self::emailSenha($email, $senha);
 		}
 
-		$db->update("ouvidoria_usuario", $data, "id_usuario = " . $id_usuario);
+		$db->update("eventos_usuario", $data, "id_usuario = " . $id_usuario);
 
 		return true;
 	}
@@ -202,7 +202,7 @@ class Usuario
 	public static function emailSenha($email, $senha)
 	{
 		$msg = '<p>ATENÇÃO!</p>'
-			. '<p>Sua nova Senha de acesso à Plataforma de Ouvidoria é:</p>'
+			. '<p>Sua nova Senha de acesso à Plataforma de Eventos é:</p>'
 			. '<p><strong>' . $senha . '</strong></p>';
 
 		Email::enviar($email, 'Mudança de senha', $msg);
@@ -222,7 +222,7 @@ class Usuario
 			"ativo" => false
 		);
 
-		$db->update("ouvidoria_usuario", $data, "id_usuario = " . $id_usuario);
+		$db->update("eventos_usuario", $data, "id_usuario = " . $id_usuario);
 
 		return true;
 	}
@@ -232,15 +232,15 @@ class Usuario
 
 		$db = Zend_Registry::get('db');
 
-		$select = "select ouvidoria_usuario.*,
-					ouvidoria_perfil.descricao as descricao_perfil,
+		$select = "select eventos_usuario.*,
+					eventos_perfil.descricao as descricao_perfil,
 					e.titulo,
 					e.id_empresa
-				  from ouvidoria_usuario
-				  inner join ouvidoria_empresa e on e.id_empresa = ouvidoria_usuario.id_empresa
-				  left join ouvidoria_perfil on ouvidoria_usuario.id_perfil = ouvidoria_perfil.id_perfil
-				   where ouvidoria_usuario.ativo and ouvidoria_perfil.id_perfil in(" . $id_perfil . ") and ouvidoria_usuario.id_usuario <> 1
-				  order by ouvidoria_usuario.nome";
+				  from eventos_usuario
+				  inner join eventos_empresa e on e.id_empresa = eventos_usuario.id_empresa
+				  left join eventos_perfil on eventos_usuario.id_perfil = eventos_perfil.id_perfil
+				   where eventos_usuario.ativo and eventos_perfil.id_perfil in(" . $id_perfil . ") and eventos_usuario.id_usuario <> 1
+				  order by eventos_usuario.nome";
 
 		$retorno = $db->fetchAll($select);
 
@@ -254,8 +254,8 @@ class Usuario
 
 		$select = "select a.nome,
 					l.*
-				  from ouvidoria_usuario a
-				  inner join ouvidoria_login l on l.id_usuario = a.id_usuario
+				  from eventos_usuario a
+				  inner join eventos_login l on l.id_usuario = a.id_usuario
 				  where a.id_usuario <> 1
 				  order by a.nome";
 
@@ -274,7 +274,7 @@ class Usuario
 							'u'||a.id_usuario as id, 
 							a.nome,
 							'Usuario' as tipo
-				  from ouvidoria_usuario a
+				  from eventos_usuario a
 				  where a.ativo
 				  and REPLACE(upper(unaccent(a.nome)),'''',' ') like '" . strtoupper(Util::tirarAcentos($parametro)) . "%'
 				  order by a.nome";
@@ -288,7 +288,7 @@ class Usuario
 	{
 		$db = Zend_Registry::get('db');
 
-		$select = "select * from ouvidoria_perfil where id_perfil <= 2 order by id_perfil";
+		$select = "select * from eventos_perfil where id_perfil <= 2 order by id_perfil";
 
 		$retorno = $db->fetchAll($select);
 

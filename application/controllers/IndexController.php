@@ -20,9 +20,9 @@ class IndexController extends Zend_Controller_Action
 	{
 		$this->_helper->viewRenderer->setNoRender();
 
-		unset($_SESSION['usuario_ouvidoria']);
-		unset($_SESSION['id_usuario_ouvidoria']);
-		unset($_SESSION['permissao_ouvidoria']);
+		unset($_SESSION['usuario_eventos']);
+		unset($_SESSION['id_usuario_eventos']);
+		unset($_SESSION['permissao_eventos']);
 		header("location: " . Zend_Registry::get('url') . "/");
 	}
 

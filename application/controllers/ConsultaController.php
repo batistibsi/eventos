@@ -1,9 +1,4 @@
 <?php
-
-if(!isset($_GET['ajax'])){
-	Util::gotoIndex();
-}
-
 class ConsultaController extends Zend_Controller_Action
 {
 

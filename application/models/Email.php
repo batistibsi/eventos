@@ -23,7 +23,7 @@ class Email
 		$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 		$mail->Port       = 587;
 
-		$mail->setFrom($config['email'], 'Ouvidoria');
+		$mail->setFrom($config['email'], 'Eventos');
 		$mail->addAddress($destino);
 		$mail->isHTML(true);
 		$mail->Subject = $titulo;

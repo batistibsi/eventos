@@ -10,7 +10,7 @@ ini_set('memory_limit', '1024M');
 
 $arquivo = isset($_REQUEST["arquivo"]) ? urldecode($_REQUEST["arquivo"]) : '';
 
-$arquivo = '/var/www/ouvidoria/uploads/'.$arquivo;
+$arquivo = '/var/www/eventos/uploads/'.$arquivo;
 
 // Verifica se o arquivo existe
 if (file_exists($arquivo)) {

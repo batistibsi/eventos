@@ -1,21 +1,21 @@
-insert into ouvidoria_perfil values(3,'Relator');
+insert into eventos_perfil values(3,'Relator');
 
--- Table: ouvidoria_tipo_tarefa
+-- Table: eventos_tipo_tarefa
 
--- DROP TABLE IF EXISTS ouvidoria_tipo_tarefa;
+-- DROP TABLE IF EXISTS eventos_tipo_tarefa;
 
-CREATE TABLE IF NOT EXISTS ouvidoria_tipo_tarefa
+CREATE TABLE IF NOT EXISTS eventos_tipo_tarefa
 (
     id_tipo_tarefa serial NOT NULL PRIMARY KEY,
 	nome varchar not null,
     kanban BOOLEAN	
 );
 
--- Table: ouvidoria_tipo_tarefa
+-- Table: eventos_tipo_tarefa
 
--- DROP TABLE IF EXISTS ouvidoria_tipo_tarefa;
+-- DROP TABLE IF EXISTS eventos_tipo_tarefa;
 
-CREATE TABLE IF NOT EXISTS ouvidoria_tipo_tarefa_permissao
+CREATE TABLE IF NOT EXISTS eventos_tipo_tarefa_permissao
 (
     id_tipo_tarefa INTEGER NOT NULL,
 	id_perfil INTEGER NOT NULL,
@@ -25,33 +25,33 @@ CREATE TABLE IF NOT EXISTS ouvidoria_tipo_tarefa_permissao
     id_tipo_tarefa_sequencia INTEGER
 );
 
-ALTER TABLE IF EXISTS public.ouvidoria_tipo_tarefa_permissao
+ALTER TABLE IF EXISTS public.eventos_tipo_tarefa_permissao
     ADD PRIMARY KEY (id_tipo_tarefa,id_perfil)
     INCLUDE (id_perfil);
-ALTER TABLE IF EXISTS public.ouvidoria_tipo_tarefa_permissao
+ALTER TABLE IF EXISTS public.eventos_tipo_tarefa_permissao
     ADD FOREIGN KEY (id_perfil)
-    REFERENCES public.ouvidoria_perfil (id_perfil) MATCH SIMPLE
+    REFERENCES public.eventos_perfil (id_perfil) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
-	ALTER TABLE IF EXISTS public.ouvidoria_tipo_tarefa_permissao
+	ALTER TABLE IF EXISTS public.eventos_tipo_tarefa_permissao
     ADD FOREIGN KEY (id_tipo_tarefa)
-    REFERENCES public.ouvidoria_tipo_tarefa (id_tipo_tarefa) MATCH SIMPLE
+    REFERENCES public.eventos_tipo_tarefa (id_tipo_tarefa) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
-ALTER TABLE IF EXISTS public.ouvidoria_tipo_tarefa_permissao
+ALTER TABLE IF EXISTS public.eventos_tipo_tarefa_permissao
     ADD FOREIGN KEY (id_tipo_tarefa_sequencia)
-    REFERENCES public.ouvidoria_tipo_tarefa (id_tipo_tarefa) MATCH SIMPLE
+    REFERENCES public.eventos_tipo_tarefa (id_tipo_tarefa) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
--- Table: ouvidoria_tarefa
+-- Table: eventos_tarefa
 
--- DROP TABLE IF EXISTS ouvidoria_tarefa;
+-- DROP TABLE IF EXISTS eventos_tarefa;
 
-CREATE TABLE IF NOT EXISTS ouvidoria_tarefa
+CREATE TABLE IF NOT EXISTS eventos_tarefa
 (
     id_tarefa serial NOT NULL PRIMARY KEY,
 	id_envio integer NOT NULL,
@@ -62,21 +62,21 @@ CREATE TABLE IF NOT EXISTS ouvidoria_tarefa
 	comentario_interno varchar
 );
 
-ALTER TABLE IF EXISTS public.ouvidoria_tarefa
+ALTER TABLE IF EXISTS public.eventos_tarefa
     ADD FOREIGN KEY (id_envio)
-    REFERENCES public.ouvidoria_envio (id_envio) MATCH SIMPLE
+    REFERENCES public.eventos_envio (id_envio) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
-ALTER TABLE IF EXISTS public.ouvidoria_tarefa
+ALTER TABLE IF EXISTS public.eventos_tarefa
     ADD FOREIGN KEY (id_tipo_tarefa)
-    REFERENCES public.ouvidoria_tipo_tarefa (id_tipo_tarefa) MATCH SIMPLE
+    REFERENCES public.eventos_tipo_tarefa (id_tipo_tarefa) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
-INSERT INTO ouvidoria_tipo_tarefa(nome,kanban)
+INSERT INTO eventos_tipo_tarefa(nome,kanban)
 VALUES
 ('Não iniciado',true),
 ('Em análise',true),
@@ -89,9 +89,9 @@ VALUES
 ('Não procede',false),
 ('Concluído',false);
 
-delete from ouvidoria_tipo_tarefa_permissao;
+delete from eventos_tipo_tarefa_permissao;
 
-INSERT INTO public.ouvidoria_tipo_tarefa_permissao(
+INSERT INTO public.eventos_tipo_tarefa_permissao(
 	id_perfil, id_tipo_tarefa, visualizar, realizar, atribuir, id_tipo_tarefa_sequencia)
 VALUES 
 (2, 1, true, false, false,NULL),
