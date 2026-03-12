@@ -14,14 +14,16 @@
         <thead>
             <tr>
                 <th></th>
-                <th class="text-left">ABERTURA</th>
-                <th class="text-left">EMPRESA</th>
-                <th class="text-left">TIPO</th>
+                <th class="text-left">INSCRICAO</th>                
+                <th class="text-left">EVENTO</th>                
+                <th class="text-left">DATA</th>
+                <th class="text-left">NOME</th>
+                <th class="text-left">EMAIL</th>
                 <th class="text-left">STATUS</th>
-                <th class="text-left">MOVIMENTO</th>
             </tr>
             <tr>
                 <th></th>
+                <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
                 <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
                 <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
                 <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
@@ -37,11 +39,12 @@
                             <a class="btn btn-primary" href="#" onclick="carregarTela('../../tarefa/cadastro?id_tarefa=<?= $value['id_tarefa_atual'] ?>')"><i class="fa fa-eye"></i></a>
                         </div>
                     </td>
-                    <td class="text-left align-middle"><?= Util::formatData($value['data_envio']) ?></td>
-                    <td class="text-left align-middle"><?= $value['empresa'] ?></td>
-                    <td class="text-left align-middle"><?= $value['nome_formulario'] ?></td>
-                    <td class="text-left align-middle"><?= $value['tipo_tarefa'] ?></td>
-                    <td class="text-left align-middle"><?= Util::formatData($value['data_movimento']) ?></td>
+                    <td class="text-left align-middle"><?= Util::formatData($value['created_at']) ?></td>
+                    <td class="text-left align-middle"><?= $value['titulo'] ?></td>
+                    <td class="text-left align-middle"><?= Util::formatData($value['data_hora']) ?></td>
+                    <td class="text-left align-middle"><?= $value['nome'] ?></td>
+                    <td class="text-left align-middle"><?= $value['email'] ?></td>
+                    <td class="text-left align-middle"><?= $value['status'] ?></td>
                 </tr>
             <? endforeach; ?>
         </tbody>
@@ -148,7 +151,7 @@
                     titleAttr: 'Excel',
                     text: '<i class="fas fa-file-excel"></i>',
                     className: 'text-info',
-                    filename: 'puvidoria',
+                    filename: 'eventos',
                     exportOptions: {
                         search: 'applied',
                         columns: [1, 2, 3, 4, 5]
@@ -162,7 +165,7 @@
                     text: '<i class="fas fa-file-pdf"></i>',
                     className: 'text-info',
                     title: 'Relatório de Faturamento',
-                    filename: 'puvidoria',
+                    filename: 'eventos',
                     customize: function(doc) {
                         doc.content.splice(0, 0, {
                             margin: [0, 0, 0, 12],

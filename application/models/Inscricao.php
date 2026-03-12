@@ -80,7 +80,13 @@ class Inscricao
         {
                 $db = Zend_Registry::get('db');
 
-                $select = "select * from eventos_inscricao";
+                $inicio = $db->quote($inicio.' 00:00:00');
+                $fim = $db->quote($fim.' 23:59:59');
+
+                $select = "select a.*, b.titulo, b.data_hora
+                        from eventos_inscricao a
+                        inner join eventos_evento b on a.id_evento = b.id_evento
+                        where a.created_at between " . $inicio . " and " . $fim;
 
                 $registros = $db->fetchAll($select);
 
