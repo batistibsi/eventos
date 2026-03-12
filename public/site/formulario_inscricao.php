@@ -4,14 +4,13 @@ include_once "../zend.php";
 
 $eventos = Evento::lista(true);
 
-/*print_r($eventos);
-die();
-
-$datasEvento = [
-  ['id_evento' => '1', 'label' => '10/04/2026 - 19:00'],
-  ['id_evento' => '2', 'label' => '12/04/2026 - 09:00'],
-  ['id_evento' => '3', 'label' => '15/04/2026 - 20:00'],
-];*/
+if (count($eventos)) {
+  foreach ($eventos as $key => $value) {
+    if (!Evento::confereVagas($value['id_evento'], $value['limite_vagas'])) {
+      unset($eventos[$key]);
+    }
+  }
+}
 
 ?>
 <!doctype html>
@@ -128,130 +127,137 @@ $datasEvento = [
 
 <body>
 
-  <!-- Header com logo -->
-  <header class="hero">
-    <div class="container">
-      <div class="d-flex align-items-center justify-content-between flex-wrap">
-        <div class="d-flex align-items-center">
-          <!-- Troque o src pelo caminho do seu logo -->
-          <img src="./images/logo_header.png" alt="Logo" class="hero-logo mr-3">
-          <div>
-            <div class="brand" style="font-size:24px; line-height:1.1;">Inscreva-se no Evento</div>
-            <div class="subtitle">Preencha seus dados e escolha uma data disponível.</div>
+  
+    <!-- Header com logo -->
+    <header class="hero">
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
+          <div class="d-flex align-items-center">
+            <!-- Troque o src pelo caminho do seu logo -->
+            <img src="./images/logo_header.png" alt="Logo" class="hero-logo mr-3">
+            <div>
+              <div class="brand" style="font-size:24px; line-height:1.1;">Inscreva-se no Evento</div>
+              <div class="subtitle">Preencha seus dados e escolha uma data disponível.</div>
+            </div>
           </div>
-        </div>
 
-        <span class="badge-accent mt-3 mt-md-0">Vagas limitadas</span>
-      </div>
-
-    </div>
-  </header>
-
-  <main class="container py-3">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-
-        <div class="card card-soft">
-          <div class="card-body p-4 p-md-5">
-            <h3 class="mb-1">Dados da inscrição</h3>
-            <p class="subtitle mb-4">Campos com * são obrigatórios.</p>
-
-            <div id="alerta" class="alert d-none" role="alert"></div>
-
-            <form id="formInscricao" novalidate>
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label class="mb-1">Nome *</label>
-                  <input type="text" class="form-control" name="nome" required maxlength="80"
-                    placeholder="Seu nome completo">
-                </div>
-                <div class="form-group col-md-6">
-                  <label class="mb-1">E-mail *</label>
-                  <input type="email" class="form-control" name="email" required maxlength="120"
-                    placeholder="seuemail@dominio.com">
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label class="mb-1">Data do evento *</label>
-                <select class="form-control" name="id_evento" required>
-                  <option value="">Selecione uma data...</option>
-                  <?php foreach ($eventos as $evento): ?>
-                    <option value="<?= $evento['id_evento'] ?>">
-                      <?= htmlspecialchars($evento['label'], ENT_QUOTES, 'UTF-8') ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-                <small class="help">As datas disponíveis para o evento.</small>
-              </div>
-
-              <div class="d-flex align-items-center justify-content-between mt-4">
-                <small class="help mb-0">
-                  Ao enviar, você concorda em receber a confirmação por e-mail.
-                </small>
-                <button type="submit" id="btnEnviar" class="btn btn-brand">
-                  Enviar
-                </button>
-              </div>
-            </form>
-
-          </div>
+          <span class="badge-accent mt-3 mt-md-0">Vagas limitadas</span>
         </div>
 
       </div>
-    </div>
-  </main>
+    </header>
 
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
-    crossorigin="anonymous"></script>
+    <? if (count($eventos)): ?>
 
-  <script>
-    $(function() {
-      function showAlert(type, msg) {
-        $('#alerta')
-          .removeClass('d-none alert-success alert-danger alert-warning')
-          .addClass('alert-' + type)
-          .text(msg);
-      }
+    <main class="container py-3">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
 
-      $('#formInscricao').on('submit', function(e) {
-        e.preventDefault();
+          <div class="card card-soft">
+            <div class="card-body p-4 p-md-5">
+              <h3 class="mb-1">Dados da inscrição</h3>
+              <p class="subtitle mb-4">Campos com * são obrigatórios.</p>
 
-        const form = this;
-        if (!form.checkValidity()) {
-          form.reportValidity();
-          return;
+              <div id="alerta" class="alert d-none" role="alert"></div>
+
+              <form id="formInscricao" novalidate>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">Nome *</label>
+                    <input type="text" class="form-control" name="nome" required maxlength="80"
+                      placeholder="Seu nome completo">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">E-mail *</label>
+                    <input type="email" class="form-control" name="email" required maxlength="120"
+                      placeholder="seuemail@dominio.com">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="mb-1">Data do evento *</label>
+                  <select class="form-control" name="id_evento" required>
+                    <option value="">Selecione uma data...</option>
+                    <?php foreach ($eventos as $evento): ?>
+                      <option value="<?= $evento['id_evento'] ?>">
+                        <?= htmlspecialchars($evento['label'], ENT_QUOTES, 'UTF-8') ?>
+                      </option>
+                    <?php endforeach; ?>
+                  </select>
+                  <small class="help">As datas disponíveis para o evento.</small>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mt-4">
+                  <small class="help mb-0">
+                    Ao enviar, você concorda em receber a confirmação por e-mail.
+                  </small>
+                  <button type="submit" id="btnEnviar" class="btn btn-brand">
+                    Enviar
+                  </button>
+                </div>
+              </form>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+      crossorigin="anonymous"></script>
+
+    <script>
+      $(function() {
+        function showAlert(type, msg) {
+          $('#alerta')
+            .removeClass('d-none alert-success alert-danger alert-warning')
+            .addClass('alert-' + type)
+            .text(msg);
         }
 
-        const dados = $(form).serialize();
+        $('#formInscricao').on('submit', function(e) {
+          e.preventDefault();
 
-        $('#btnEnviar').prop('disabled', true).text('Enviando...');
-
-        $.ajax({
-          url: './inscrever.php', // <- troque pela sua rota PHP
-          method: 'POST',
-          data: dados,
-          dataType: 'json',
-          success: function(data) {
-            if (data.success) {
-              showAlert('success', data.mensagem);
-              //form.reset();
-            } else {
-              showAlert('danger', data.erro);
-            }
-          },
-          error: function() {
-            showAlert('danger', 'Não foi possível enviar. Tente novamente.');
-          },
-          complete: function() {
-            $('#btnEnviar').prop('disabled', false).text('Enviar inscrição');
+          const form = this;
+          if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
           }
+
+          const dados = $(form).serialize();
+
+          $('#btnEnviar').prop('disabled', true).text('Enviando...');
+
+          $.ajax({
+            url: './inscrever.php', // <- troque pela sua rota PHP
+            method: 'POST',
+            data: dados,
+            dataType: 'json',
+            success: function(data) {
+              if (data.success) {
+                showAlert('success', data.mensagem);
+                //form.reset();
+              } else {
+                showAlert('danger', data.erro);
+              }
+            },
+            error: function() {
+              showAlert('danger', 'Não foi possível enviar. Tente novamente.');
+            },
+            complete: function() {
+              $('#btnEnviar').prop('disabled', false).text('Enviar inscrição');
+            }
+          });
         });
       });
-    });
-  </script>
+    </script>
+
+  <? else: ?>
+    <h1 class="text-center py-5">NÃO HÁ EVENTOS DISPONÍVEIS NO MOMENTO</h1>
+  <? endif; ?>
 
 </body>
 
