@@ -1,1 +1,0 @@
-update eventos_tipo_tarefa set nome = 'Devolutiva do relator' where id_tipo_tarefa = 7;

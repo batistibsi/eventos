@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 include_once "../zend.php";
 
@@ -96,7 +96,12 @@ if (count($eventos)) {
       height: calc(1.5em + 1.1rem + 2px);
     }
 
-    .form-control:focus {
+    textarea.form-control {
+      min-height: 110px;
+    }
+
+    .form-control:focus,
+    .form-control-file:focus {
       border-color: rgba(24, 56, 133, .55);
       box-shadow: 0 0 0 .2rem rgba(24, 56, 133, .12);
     }
@@ -106,7 +111,6 @@ if (count($eventos)) {
       color: var(--muted);
     }
 
-    /* Logo */
     .hero-logo {
       height: 72px;
       width: auto;
@@ -127,27 +131,23 @@ if (count($eventos)) {
 
 <body>
 
-  
-    <!-- Header com logo -->
-    <header class="hero">
-      <div class="container">
-        <div class="d-flex align-items-center justify-content-between flex-wrap">
-          <div class="d-flex align-items-center">
-            <!-- Troque o src pelo caminho do seu logo -->
-            <img src="./images/logo_header.png" alt="Logo" class="hero-logo mr-3">
-            <div>
-              <div class="brand" style="font-size:24px; line-height:1.1;">Inscreva-se no Evento</div>
-              <div class="subtitle">Preencha seus dados e escolha uma data disponível.</div>
-            </div>
+  <header class="hero">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between flex-wrap">
+        <div class="d-flex align-items-center">
+          <img src="./images/logo_header.png" alt="Logo" class="hero-logo mr-3">
+          <div>
+            <div class="brand" style="font-size:24px; line-height:1.1;">Inscreva-se no Evento</div>
+            <div class="subtitle">Preencha os dados da organização e escolha uma data disponível.</div>
           </div>
-
-          <span class="badge-accent mt-3 mt-md-0">Vagas limitadas</span>
         </div>
 
+        <span class="badge-accent mt-3 mt-md-0">Vagas limitadas</span>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <? if (count($eventos)): ?>
+  <? if (count($eventos)): ?>
 
     <main class="container py-3">
       <div class="row justify-content-center">
@@ -160,35 +160,179 @@ if (count($eventos)) {
 
               <div id="alerta" class="alert d-none" role="alert"></div>
 
-              <form id="formInscricao" novalidate>
+              <form id="formInscricao" novalidate enctype="multipart/form-data">
                 <div class="form-row">
                   <div class="form-group col-md-6">
-                    <label class="mb-1">Nome *</label>
-                    <input type="text" class="form-control" name="nome" required maxlength="80"
-                      placeholder="Seu nome completo">
+                    <label class="mb-1">Nome do responsável *</label>
+                    <input type="text" class="form-control" name="nome" required maxlength="120"
+                      placeholder="Nome do responsável pela organização">
+                    <small class="help">Nome do responsável da organização que irá assinar o termo de compromisso.</small>
                   </div>
                   <div class="form-group col-md-6">
-                    <label class="mb-1">E-mail *</label>
+                    <label class="mb-1">CPF do responsável *</label>
+                    <input type="text" class="form-control" name="cpf_responsavel" required maxlength="11"
+                      placeholder="Apenas numeros" pattern="[0-9]{11}" inputmode="numeric">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">E-mail do responsável *</label>
                     <input type="email" class="form-control" name="email" required maxlength="120"
-                      placeholder="seuemail@dominio.com">
+                      placeholder="responsavel@organizacao.com.br">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">Nome da organização *</label>
+                    <input type="text" class="form-control" name="nome_organizacao" required maxlength="150"
+                      placeholder="Nome da organização">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">CNPJ *</label>
+                    <input type="text" class="form-control" name="cnpj" required maxlength="14"
+                      placeholder="Apenas numeros" pattern="[0-9]{14}" inputmode="numeric">
+                    <small class="help">Informe apenas os 14 numeros do CNPJ.</small>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">Endereço *</label>
+                    <input type="text" class="form-control" name="endereco" required maxlength="200"
+                      placeholder="Rua, avenida, bairro, cidade">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">Número de colaboradores / voluntários *</label>
+                    <input type="number" class="form-control" name="numero_colaboradores" required min="1" step="1"
+                      placeholder="Quantidade">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">Data do evento *</label>
+                    <select class="form-control" name="id_evento" required>
+                      <option value="">Selecione uma data...</option>
+                      <?php foreach ($eventos as $evento): ?>
+                        <option value="<?= $evento['id_evento'] ?>">
+                          <?= htmlspecialchars($evento['label'], ENT_QUOTES, 'UTF-8') ?>
+                        </option>
+                      <?php endforeach; ?>
+                    </select>
+                    <small class="help">As datas disponíveis para o evento.</small>
+                  </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h5 class="mb-3">Representantes</h5>
+
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">Nome completo do representante 1 *</label>
+                    <input type="text" class="form-control" name="representante_1_nome" required maxlength="120"
+                      placeholder="Nome completo">
+                    <small class="help">Preencha corretamente, pois o nome será utilizado para emissão dos certificados de participação.</small>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">E-mail do representante 1 *</label>
+                    <input type="email" class="form-control" name="representante_1_email" required maxlength="120"
+                      placeholder="representante1@organizacao.com.br">
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label class="mb-1">Data do evento *</label>
-                  <select class="form-control" name="id_evento" required>
-                    <option value="">Selecione uma data...</option>
-                    <?php foreach ($eventos as $evento): ?>
-                      <option value="<?= $evento['id_evento'] ?>">
-                        <?= htmlspecialchars($evento['label'], ENT_QUOTES, 'UTF-8') ?>
-                      </option>
-                    <?php endforeach; ?>
-                  </select>
-                  <small class="help">As datas disponíveis para o evento.</small>
+                  <label class="mb-1">Telefone do representante 1 *</label>
+                  <input type="tel" class="form-control" name="representante_1_telefone" required maxlength="20"
+                    placeholder="(00) 00000-0000">
                 </div>
 
-                <div class="d-flex align-items-center justify-content-between mt-4">
-                  <small class="help mb-0">
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">Nome completo do representante 2</label>
+                    <input type="text" class="form-control" name="representante_2_nome" maxlength="120"
+                      placeholder="Nome completo">
+                    <small class="help">Preencha corretamente, pois o nome será utilizado para emissão dos certificados de participação.</small>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">E-mail do representante 2</label>
+                    <input type="email" class="form-control" name="representante_2_email" maxlength="120"
+                      placeholder="representante2@organizacao.com.br">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="mb-1">Telefone do representante 2</label>
+                  <input type="tel" class="form-control" name="representante_2_telefone" maxlength="20"
+                    placeholder="(00) 00000-0000">
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">Nome completo do representante 3</label>
+                    <input type="text" class="form-control" name="representante_3_nome" maxlength="120"
+                      placeholder="Nome completo">
+                    <small class="help">Preencha corretamente, pois o nome será utilizado para emissão dos certificados de participação.</small>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">E-mail do representante 3</label>
+                    <input type="email" class="form-control" name="representante_3_email" maxlength="120"
+                      placeholder="representante3@organizacao.com.br">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="mb-1">Telefone do representante 3</label>
+                  <input type="tel" class="form-control" name="representante_3_telefone" maxlength="20"
+                    placeholder="(00) 00000-0000">
+                </div>
+
+                <hr class="my-4">
+
+                <div class="form-group">
+                  <label class="mb-2 d-block">É sua primeira participação? *</label>
+                  <div class="custom-control custom-radio mb-2">
+                    <input type="radio" id="primeira_participacao_sim" name="primeira_participacao" value="sim" class="custom-control-input" required>
+                    <label class="custom-control-label" for="primeira_participacao_sim">Sim, será minha primeira vez participando.</label>
+                  </div>
+                  <div class="custom-control custom-radio">
+                    <input type="radio" id="primeira_participacao_nao" name="primeira_participacao" value="nao" class="custom-control-input" required>
+                    <label class="custom-control-label" for="primeira_participacao_nao">Não, já participei em edições anteriores.</label>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="mb-1">Nome da organização no certificado *</label>
+                  <input type="text" class="form-control" name="nome_certificado" required maxlength="150"
+                    placeholder="Como o nome deve aparecer no certificado e troféu">
+                  <small class="help">Informe como o nome da empresa deve aparecer nos materiais.</small>
+                </div>
+
+                <div class="form-group">
+                  <label class="mb-1">Logo da organização *</label>
+                  <input type="file" class="form-control-file" name="logo_organizacao" required accept=".pdf,image/*">
+                  <small class="help">Anexe a logo da organização. Arquivos aceitos: PDF ou imagem até 10 MB.</small>
+                </div>
+
+                <div class="form-group">
+                  <label class="mb-1">Como ficou sabendo da certificação? *</label>
+                  <select class="form-control" name="como_soube" required>
+                    <option value="">Selecione...</option>
+                    <option value="E-mail">E-mail</option>
+                    <option value="Redes Sociais">Redes Sociais</option>
+                    <option value="Eventos do Instituto ACIM">Eventos do Instituto ACIM</option>
+                    <option value="Participante de edições anteriores">Participante de edições anteriores</option>
+                    <option value="Outro">Outro</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="mb-1">Gostaria de indicar alguma organização para participar?</label>
+                  <textarea class="form-control" name="indicacao_organizacao" rows="4" maxlength="500"
+                    placeholder="Se sim, deixe o contato aqui."></textarea>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mt-4 flex-wrap">
+                  <small class="help mb-2 mb-md-0">
                     Ao enviar, você concorda em receber a confirmação por e-mail.
                   </small>
                   <button type="submit" id="btnEnviar" class="btn btn-brand">
@@ -211,6 +355,7 @@ if (count($eventos)) {
 
     <script>
       $(function() {
+
         function showAlert(type, msg) {
           $('#alerta')
             .removeClass('d-none alert-success alert-danger alert-warning')
@@ -227,24 +372,39 @@ if (count($eventos)) {
             return;
           }
 
-          const dados = $(form).serialize();
+          const dados = new FormData(form);
 
           $('#btnEnviar').prop('disabled', true).text('Enviando...');
 
           $.ajax({
-            url: './inscrever.php', // <- troque pela sua rota PHP
+            url: './inscrever.php',
             method: 'POST',
             data: dados,
-            dataType: 'json',
-            success: function(data) {
-              if (data.success) {
-                showAlert('success', data.mensagem);
-                //form.reset();
+            dataType: 'text',
+            processData: false,
+            contentType: false,
+            success: function(response) {
+              let data = response;
+
+              if (typeof response === 'string') {
+                try {
+                  data = JSON.parse(response.trim());
+                } catch (e) {
+                  console.error('Resposta inválida do backend:', response);
+                  showAlert('danger', 'A resposta do servidor veio em formato inválido.');
+                  return;
+                }
+              }
+
+              if (data && data.success) {
+                showAlert('success', data.mensagem || 'Inscrição enviada com sucesso.');
+                $('#formInscricao').slideUp(200);
               } else {
-                showAlert('danger', data.erro);
+                showAlert('danger', (data && data.erro) ? data.erro : 'Não foi possível concluir a inscrição.');
               }
             },
-            error: function() {
+            error: function(xhr) {
+              console.error('Erro na requisição:', xhr.responseText);
               showAlert('danger', 'Não foi possível enviar. Tente novamente.');
             },
             complete: function() {
@@ -262,3 +422,7 @@ if (count($eventos)) {
 </body>
 
 </html>
+
+
+
+

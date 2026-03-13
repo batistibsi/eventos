@@ -1,1 +1,0 @@
-alter table eventos_tarefa add column arquivos varchar;

@@ -3,6 +3,9 @@ NOME DO RESPONSÁVEL
 Nome do responsável da organização que irá assinar o TERMO DE COMPROMISSO.
 CPF DO RESPONSÁVEL
 *
+
+E-MAIL DO RESPONSÁVEL
+*
 CPF do responsável da organização que irá assinar o TERMO DE COMPROMISSO.
 NOME DA ORGANIZAÇÃO
 *

@@ -1,1 +1,0 @@
-update eventos_perfil set descricao = 'Eventos' where id_perfil = 1;

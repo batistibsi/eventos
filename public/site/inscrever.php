@@ -4,25 +4,78 @@ header('Content-Type: application/json; charset=UTF-8');
 
 include_once "../zend.php";
 
-$nome     = trim($_POST['nome'] ?? '');
-$email    = trim($_POST['email'] ?? '');
-$id_evento = (int)($_POST['id_evento'] ?? null);
-
-if ($nome === '' || $email === '' || $id_evento <= 0) {
-  //http_response_code(400);
-  echo json_encode(['success' => false, 'erro' => 'Informe nome, email e evento.'], JSON_UNESCAPED_UNICODE);
-  exit;
+function postValue($key)
+{
+  return trim($_POST[$key] ?? '');
 }
 
 $campos = [];
-$campos['nome'] = $nome;
-$campos['email'] = $email;
-$campos['id_evento'] = $id_evento;
+$campos['nome'] = postValue('nome');
+$campos['cpf_responsavel'] = postValue('cpf_responsavel');
+$campos['email'] = postValue('email');
+$campos['nome_organizacao'] = postValue('nome_organizacao');
+$campos['cnpj'] = postValue('cnpj');
+$campos['endereco'] = postValue('endereco');
+$campos['numero_colaboradores'] = (int)($_POST['numero_colaboradores'] ?? 0);
+$campos['id_evento'] = (int)($_POST['id_evento'] ?? 0);
+$campos['representante_1_nome'] = postValue('representante_1_nome');
+$campos['representante_1_email'] = postValue('representante_1_email');
+$campos['representante_1_telefone'] = postValue('representante_1_telefone');
+$campos['representante_2_nome'] = postValue('representante_2_nome');
+$campos['representante_2_email'] = postValue('representante_2_email');
+$campos['representante_2_telefone'] = postValue('representante_2_telefone');
+$campos['representante_3_nome'] = postValue('representante_3_nome');
+$campos['representante_3_email'] = postValue('representante_3_email');
+$campos['representante_3_telefone'] = postValue('representante_3_telefone');
+$campos['primeira_participacao'] = postValue('primeira_participacao');
+$campos['nome_certificado'] = postValue('nome_certificado');
+$campos['como_soube'] = postValue('como_soube');
+$campos['indicacao_organizacao'] = postValue('indicacao_organizacao');
+
+$obrigatorios = [
+  'nome' => 'nome do responsavel',
+  'cpf_responsavel' => 'CPF do responsavel',
+  'email' => 'e-mail do responsavel',
+  'nome_organizacao' => 'nome da organizacao',
+  'cnpj' => 'CNPJ',
+  'endereco' => 'endereco',
+  'representante_1_nome' => 'nome do representante 1',
+  'representante_1_email' => 'e-mail do representante 1',
+  'representante_1_telefone' => 'telefone do representante 1',
+  'primeira_participacao' => 'primeira participacao',
+  'nome_certificado' => 'nome da organizacao no certificado',
+  'como_soube' => 'como ficou sabendo da certificacao'
+];
+
+foreach ($obrigatorios as $campo => $label) {
+  if ($campos[$campo] === '') {
+    echo json_encode(['success' => false, 'erro' => 'Informe ' . $label . '.'], JSON_UNESCAPED_UNICODE);
+    exit;
+  }
+}
+
+if ($campos['numero_colaboradores'] <= 0 || $campos['id_evento'] <= 0) {
+  echo json_encode(['success' => false, 'erro' => 'Informe a quantidade de colaboradores e selecione um evento.'], JSON_UNESCAPED_UNICODE);
+  exit;
+}
+
+if (!in_array($campos['primeira_participacao'], ['sim', 'nao'], true)) {
+  echo json_encode(['success' => false, 'erro' => 'Informe corretamente se e sua primeira participacao.'], JSON_UNESCAPED_UNICODE);
+  exit;
+}
+
+$logo = $_FILES['logo_organizacao'] ?? null;
+if (!$logo || ($logo['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+  echo json_encode(['success' => false, 'erro' => 'Envie a logo da organizacao.'], JSON_UNESCAPED_UNICODE);
+  exit;
+}
+
+$campos['logo_organizacao'] = $logo;
 
 if (!Inscricao::novo($campos)) {
   echo json_encode(['success' => false, 'erro' => Inscricao::$erro], JSON_UNESCAPED_UNICODE);
   exit;
 }
 
-echo json_encode(['success' => true, 'mensagem' => 'Inscrição criada. Confirme pelo e-mail.'], JSON_UNESCAPED_UNICODE);
+echo json_encode(['success' => true, 'mensagem' => 'Inscrição criada. Logo informaremos os próximos passos.'], JSON_UNESCAPED_UNICODE);
 exit;
