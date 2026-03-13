@@ -333,7 +333,7 @@ if (count($eventos)) {
 
                 <div class="d-flex align-items-center justify-content-between mt-4 flex-wrap">
                   <small class="help mb-2 mb-md-0">
-                    Ao enviar, você concorda em receber a confirmação por e-mail.
+                    Ao enviar, você concorda em receber comunicações por e-mail.
                   </small>
                   <button type="submit" id="btnEnviar" class="btn btn-brand">
                     Enviar
