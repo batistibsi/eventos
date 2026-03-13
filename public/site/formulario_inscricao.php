@@ -292,12 +292,12 @@ if (count($eventos)) {
             </p>
             <p class="mb-3">
               <strong>Acesse o regulamento da edição 2025</strong><br>
-              <a href="https://drive.google.com/file/d/15djoXHqN02QFcBM1dvmroazq5voK4hm3/view" class="hero-link">neste link</a>
+              <a target="_blank" href="https://drive.google.com/file/d/15djoXHqN02QFcBM1dvmroazq5voK4hm3/view" class="hero-link">neste link</a>
             </p>
             <p class="mb-2"><strong>Em caso de dúvidas</strong></p>
             <p class="mb-0">
               Henrique Nascimento<br>
-              <a href="tel:+5544997399515" class="hero-contact">44 99739-9515</a>
+              <a href="https://wa.me/5544997399515?text=Ol%C3%A1%2C%20tenho%20d%C3%BAvidas%20sobre%20a%20inscri%C3%A7%C3%A3o%20para%20a%20Certifica%C3%A7%C3%A3o%20IMPACTACIM." target="_blank" rel="noopener noreferrer" class="hero-contact">44 99739-9515</a>
             </p>
           </div>
         </div>
@@ -598,7 +598,6 @@ if (count($eventos)) {
 </body>
 
 </html>
-
 
 
 
