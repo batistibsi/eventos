@@ -33,6 +33,7 @@ if (count($eventos)) {
     :root {
       --brand: #183885;
       --accent: #abca69;
+      --brand-dark: #0f255d;
       --bg: #f6f8fb;
       --card: #ffffff;
       --muted: #6c757d;
@@ -40,18 +41,31 @@ if (count($eventos)) {
 
     body {
       background: var(--bg);
+      color: #233046;
     }
 
     .hero {
-      background: radial-gradient(1200px 500px at 10% 10%, rgba(24, 56, 133, .18), transparent 60%),
-        radial-gradient(800px 400px at 90% 20%, rgba(171, 202, 105, .20), transparent 55%),
-        var(--card);
-      border-bottom: 1px solid rgba(0, 0, 0, .06);
-      padding: 44px 0 52px;
+      background:
+        radial-gradient(900px 420px at 0% 0%, rgba(171, 202, 105, .22), transparent 60%),
+        radial-gradient(820px 400px at 100% 0%, rgba(255, 255, 255, .09), transparent 55%),
+        linear-gradient(135deg, var(--brand-dark) 0%, var(--brand) 58%, #224ea6 100%);
+      color: #fff;
+      padding: 42px 0 70px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -120px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(255, 255, 255, .18) 0%, rgba(255, 255, 255, 0) 70%);
+      pointer-events: none;
     }
 
     .brand {
-      color: var(--brand);
+      color: #fff;
       font-weight: 800;
       letter-spacing: -.4px;
     }
@@ -61,11 +75,11 @@ if (count($eventos)) {
     }
 
     .badge-accent {
-      background: rgba(171, 202, 105, .22);
-      color: #2b3a16;
+      background: rgba(171, 202, 105, .18);
+      color: #f5f9e8;
       border: 1px solid rgba(171, 202, 105, .35);
       border-radius: 999px;
-      padding: .35rem .6rem;
+      padding: .45rem .8rem;
       font-weight: 700;
     }
 
@@ -139,6 +153,109 @@ if (count($eventos)) {
       box-shadow: 0 8px 18px rgba(0, 0, 0, .06);
     }
 
+    .hero-wrap {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-kicker {
+      display: inline-block;
+      margin-bottom: 16px;
+      color: rgba(255, 255, 255, .85);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .hero-title {
+      font-size: 44px;
+      line-height: 1.05;
+      font-weight: 800;
+      margin-bottom: 18px;
+      max-width: 720px;
+    }
+
+    .hero-description {
+      color: rgba(255, 255, 255, .88);
+      font-size: 17px;
+      line-height: 1.65;
+      max-width: 760px;
+      margin-bottom: 0;
+    }
+
+    .hero-panel {
+      background: rgba(255, 255, 255, .12);
+      border: 1px solid rgba(255, 255, 255, .14);
+      backdrop-filter: blur(8px);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(5, 15, 40, .18);
+      height: 100%;
+    }
+
+    .hero-panel-title {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .72);
+      margin-bottom: 12px;
+    }
+
+    .hero-panel p,
+    .hero-panel a,
+    .hero-panel strong {
+      color: #fff;
+    }
+
+    .hero-link {
+      display: inline-flex;
+      align-items: center;
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, .35);
+      padding-bottom: 2px;
+    }
+
+    .hero-link:hover {
+      color: #fff;
+      text-decoration: none;
+      border-color: rgba(255, 255, 255, .8);
+    }
+
+    .hero-contact {
+      display: inline-flex;
+      align-items: center;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .hero-contact:hover {
+      color: #fff;
+      text-decoration: none;
+      opacity: .92;
+    }
+
+    .intro-card {
+      margin-top: -34px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .intro-note {
+      background: linear-gradient(180deg, #fbfcff 0%, #f2f6fd 100%);
+      border: 1px solid rgba(24, 56, 133, .08);
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 24px;
+    }
+
+    .intro-note strong {
+      color: var(--brand);
+    }
+
     @media (max-width: 576px) {
       .hero-title {
         font-size: 34px !important;
@@ -150,17 +267,40 @@ if (count($eventos)) {
 <body>
 
   <header class="hero">
-    <div class="container">
-      <div class="d-flex align-items-center justify-content-between flex-wrap">
-        <div class="d-flex align-items-center">
-          <img src="./images/logo_header.png" alt="Logo" class="hero-logo mr-3">
-          <div>
-            <div class="brand" style="font-size:24px; line-height:1.1;">Inscreva-se no Evento</div>
-            <div class="subtitle">Preencha os dados da organização e escolha uma data disponível.</div>
+    <div class="container hero-wrap">
+      <div class="row align-items-center">
+        <div class="col-lg-8 mb-4 mb-lg-0">
+          <div class="d-flex align-items-center mb-4">
+            <img src="./images/logo_header.png" alt="Logo Instituto ACIM" class="hero-logo mr-3">
+            <div>
+              <span class="hero-kicker">Instituto ACIM</span>
+              <div class="brand" style="font-size:24px; line-height:1.1;">Inscrição Social IMPACTACIM 2026</div>
+            </div>
           </div>
+
+          <h1 class="hero-title">Certificação IMPACTACIM: Jornada de Sustentabilidade</h1>
+          <p class="hero-description">
+            A Certificação IMPACTACIM: Jornada de Sustentabilidade é um reconhecimento de metodologia própria do Instituto ACIM, voltada à organizações que atuam com projetos relacionados à temática ESG (ambiental, social e governança), assim como sua contribuição para o alcance dos Objetivos de Desenvolvimento Sustentável, demonstrando compromisso em prol da sustentabilidade.
+          </p>
         </div>
 
-        <span class="badge-accent mt-3 mt-md-0">Vagas limitadas</span>
+        <div class="col-lg-4">
+          <div class="hero-panel">
+            <div class="hero-panel-title">Informações importantes</div>
+            <p class="mb-3">
+              <span class="badge-accent">Vagas limitadas</span>
+            </p>
+            <p class="mb-3">
+              <strong>Acesse o regulamento da edição 2025</strong><br>
+              <a href="https://drive.google.com/file/d/15djoXHqN02QFcBM1dvmroazq5voK4hm3/view" class="hero-link">neste link</a>
+            </p>
+            <p class="mb-2"><strong>Em caso de dúvidas</strong></p>
+            <p class="mb-0">
+              Henrique Nascimento<br>
+              <a href="tel:+5544997399515" class="hero-contact">44 99739-9515</a>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -171,10 +311,13 @@ if (count($eventos)) {
       <div class="row justify-content-center">
         <div class="col-xl-10 col-lg-11">
 
-          <div class="card card-soft">
+          <div class="card card-soft intro-card">
             <div class="card-body p-4 p-md-5">
+              <div class="intro-note">
+                <strong>Preencha o formulário abaixo</strong> com os dados da organização e dos representantes que participarão da jornada.
+              </div>
               <h3 class="mb-1">Dados da inscrição</h3>
-              <p class="subtitle mb-4"></p>
+              <p class="subtitle mb-4">Selecione uma data disponível e envie todas as informações obrigatórias para concluir sua inscrição.</p>
 
               <div id="alerta" class="alert d-none" role="alert"></div>
 
@@ -455,8 +598,6 @@ if (count($eventos)) {
 </body>
 
 </html>
-
-
 
 
 
