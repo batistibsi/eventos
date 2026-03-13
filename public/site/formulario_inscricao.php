@@ -297,7 +297,7 @@ if (count($eventos)) {
             <p class="mb-2"><strong>Em caso de dúvidas</strong></p>
             <p class="mb-0">
               Henrique Nascimento<br>
-              <a href="https://wa.me/5544997399515?text=Ol%C3%A1%2C%20tenho%20d%C3%BAvidas%20sobre%20a%20inscri%C3%A7%C3%A3o%20para%20a%20Certifica%C3%A7%C3%A3o%20IMPACTACIM." target="_blank" rel="noopener noreferrer" class="hero-contact">44 99739-9515</a>
+              <a href="https://wa.me/5544999842554?text=Ol%C3%A1%2C%20tenho%20d%C3%BAvidas%20sobre%20a%20inscri%C3%A7%C3%A3o%20para%20a%20Certifica%C3%A7%C3%A3o%20IMPACTACIM." target="_blank" rel="noopener noreferrer" class="hero-contact">44 99984-2554</a>
             </p>
           </div>
         </div>
@@ -313,15 +313,17 @@ if (count($eventos)) {
 
           <div class="card card-soft intro-card">
             <div class="card-body p-4 p-md-5">
-              <div class="intro-note">
-                <strong>Preencha o formulário abaixo</strong> com os dados da organização e dos representantes que participarão da jornada.
-              </div>
-              <h3 class="mb-1">Dados da inscrição</h3>
-              <p class="subtitle mb-4">Selecione uma data disponível e envie todas as informações obrigatórias para concluir sua inscrição.</p>
 
               <div id="alerta" class="alert d-none" role="alert"></div>
 
               <form id="formInscricao" novalidate enctype="multipart/form-data">
+                
+                <div class="intro-note">
+                  <strong>Preencha o formulário abaixo</strong> com os dados da organização e dos representantes que participarão da jornada.
+                </div>
+                <h3 class="mb-1">Dados da inscrição</h3>
+                <p class="subtitle mb-4">Selecione uma data disponível e envie todas as informações obrigatórias para concluir sua inscrição.</p>
+
                 <div class="form-row">
                   <div class="form-group col-md-8">
                     <label class="mb-1">Nome do responsável *</label>
@@ -383,7 +385,8 @@ if (count($eventos)) {
                   </div>
                 </div>
 
-                                <hr class="my-4">                <h5 class="mb-3">Representantes</h5>
+                <hr class="my-4">
+                <h5 class="mb-3">Representantes</h5>
 
                 <div class="rep-card">
                   <div class="rep-title">Representante 1</div>
@@ -598,16 +601,3 @@ if (count($eventos)) {
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
