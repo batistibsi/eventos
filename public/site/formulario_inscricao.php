@@ -111,6 +111,24 @@ if (count($eventos)) {
       color: var(--muted);
     }
 
+    .rep-card {
+      background: linear-gradient(180deg, #fbfcff 0%, #f3f6fb 100%);
+      border: 1px solid rgba(24, 56, 133, .10);
+      border-radius: 16px;
+      padding: 18px 18px 8px;
+      margin-bottom: 18px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .75);
+    }
+
+    .rep-title {
+      color: var(--brand);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
     .hero-logo {
       height: 72px;
       width: auto;
@@ -151,24 +169,24 @@ if (count($eventos)) {
 
     <main class="container py-3">
       <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <div class="col-xl-10 col-lg-11">
 
           <div class="card card-soft">
             <div class="card-body p-4 p-md-5">
               <h3 class="mb-1">Dados da inscrição</h3>
-              <p class="subtitle mb-4">Campos com * são obrigatórios.</p>
+              <p class="subtitle mb-4"></p>
 
               <div id="alerta" class="alert d-none" role="alert"></div>
 
               <form id="formInscricao" novalidate enctype="multipart/form-data">
                 <div class="form-row">
-                  <div class="form-group col-md-6">
+                  <div class="form-group col-md-8">
                     <label class="mb-1">Nome do responsável *</label>
                     <input type="text" class="form-control" name="nome" required maxlength="120"
                       placeholder="Nome do responsável pela organização">
                     <small class="help">Nome do responsável da organização que irá assinar o termo de compromisso.</small>
                   </div>
-                  <div class="form-group col-md-6">
+                  <div class="form-group col-md-4">
                     <label class="mb-1">CPF do responsável *</label>
                     <input type="text" class="form-control" name="cpf_responsavel" required maxlength="11"
                       placeholder="Apenas numeros" pattern="[0-9]{11}" inputmode="numeric">
@@ -176,12 +194,12 @@ if (count($eventos)) {
                 </div>
 
                 <div class="form-row">
-                  <div class="form-group col-md-6">
+                  <div class="form-group col-md-5">
                     <label class="mb-1">E-mail do responsável *</label>
                     <input type="email" class="form-control" name="email" required maxlength="120"
                       placeholder="responsavel@organizacao.com.br">
                   </div>
-                  <div class="form-group col-md-6">
+                  <div class="form-group col-md-7">
                     <label class="mb-1">Nome da organização *</label>
                     <input type="text" class="form-control" name="nome_organizacao" required maxlength="150"
                       placeholder="Nome da organização">
@@ -189,13 +207,13 @@ if (count($eventos)) {
                 </div>
 
                 <div class="form-row">
-                  <div class="form-group col-md-6">
+                  <div class="form-group col-md-4">
                     <label class="mb-1">CNPJ *</label>
                     <input type="text" class="form-control" name="cnpj" required maxlength="14"
                       placeholder="Apenas numeros" pattern="[0-9]{14}" inputmode="numeric">
                     <small class="help">Informe apenas os 14 numeros do CNPJ.</small>
                   </div>
-                  <div class="form-group col-md-6">
+                  <div class="form-group col-md-8">
                     <label class="mb-1">Endereço *</label>
                     <input type="text" class="form-control" name="endereco" required maxlength="200"
                       placeholder="Rua, avenida, bairro, cidade">
@@ -203,12 +221,12 @@ if (count($eventos)) {
                 </div>
 
                 <div class="form-row">
-                  <div class="form-group col-md-6">
-                    <label class="mb-1">Número de colaboradores / voluntários *</label>
+                  <div class="form-group col-md-5">
+                    <label class="mb-1">Número de colaboradores/voluntários *</label>
                     <input type="number" class="form-control" name="numero_colaboradores" required min="1" step="1"
                       placeholder="Quantidade">
                   </div>
-                  <div class="form-group col-md-6">
+                  <div class="form-group col-md-7">
                     <label class="mb-1">Data do evento *</label>
                     <select class="form-control" name="id_evento" required>
                       <option value="">Selecione uma data...</option>
@@ -222,68 +240,75 @@ if (count($eventos)) {
                   </div>
                 </div>
 
-                <hr class="my-4">
+                                <hr class="my-4">                <h5 class="mb-3">Representantes</h5>
 
-                <h5 class="mb-3">Representantes</h5>
-
-                <div class="form-row">
-                  <div class="form-group col-md-6">
+                <div class="rep-card">
+                  <div class="rep-title">Representante 1</div>
+                  <div class="form-group">
                     <label class="mb-1">Nome completo do representante 1 *</label>
                     <input type="text" class="form-control" name="representante_1_nome" required maxlength="120"
                       placeholder="Nome completo">
                     <small class="help">Preencha corretamente, pois o nome será utilizado para emissão dos certificados de participação.</small>
                   </div>
-                  <div class="form-group col-md-6">
-                    <label class="mb-1">E-mail do representante 1 *</label>
-                    <input type="email" class="form-control" name="representante_1_email" required maxlength="120"
-                      placeholder="representante1@organizacao.com.br">
+
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label class="mb-1">Telefone do representante 1 *</label>
+                      <input type="tel" class="form-control" name="representante_1_telefone" required maxlength="20"
+                        placeholder="(00) 00000-0000">
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label class="mb-1">E-mail do representante 1 *</label>
+                      <input type="email" class="form-control" name="representante_1_email" required maxlength="120"
+                        placeholder="representante1@organizacao.com.br">
+                    </div>
                   </div>
                 </div>
 
-                <div class="form-group">
-                  <label class="mb-1">Telefone do representante 1 *</label>
-                  <input type="tel" class="form-control" name="representante_1_telefone" required maxlength="20"
-                    placeholder="(00) 00000-0000">
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group col-md-6">
+                <div class="rep-card">
+                  <div class="rep-title">Representante 2</div>
+                  <div class="form-group">
                     <label class="mb-1">Nome completo do representante 2</label>
                     <input type="text" class="form-control" name="representante_2_nome" maxlength="120"
                       placeholder="Nome completo">
                     <small class="help">Preencha corretamente, pois o nome será utilizado para emissão dos certificados de participação.</small>
                   </div>
-                  <div class="form-group col-md-6">
-                    <label class="mb-1">E-mail do representante 2</label>
-                    <input type="email" class="form-control" name="representante_2_email" maxlength="120"
-                      placeholder="representante2@organizacao.com.br">
+
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label class="mb-1">Telefone do representante 2</label>
+                      <input type="tel" class="form-control" name="representante_2_telefone" maxlength="20"
+                        placeholder="(00) 00000-0000">
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label class="mb-1">E-mail do representante 2</label>
+                      <input type="email" class="form-control" name="representante_2_email" maxlength="120"
+                        placeholder="representante2@organizacao.com.br">
+                    </div>
                   </div>
                 </div>
 
-                <div class="form-group">
-                  <label class="mb-1">Telefone do representante 2</label>
-                  <input type="tel" class="form-control" name="representante_2_telefone" maxlength="20"
-                    placeholder="(00) 00000-0000">
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group col-md-6">
+                <div class="rep-card">
+                  <div class="rep-title">Representante 3</div>
+                  <div class="form-group">
                     <label class="mb-1">Nome completo do representante 3</label>
                     <input type="text" class="form-control" name="representante_3_nome" maxlength="120"
                       placeholder="Nome completo">
                     <small class="help">Preencha corretamente, pois o nome será utilizado para emissão dos certificados de participação.</small>
                   </div>
-                  <div class="form-group col-md-6">
-                    <label class="mb-1">E-mail do representante 3</label>
-                    <input type="email" class="form-control" name="representante_3_email" maxlength="120"
-                      placeholder="representante3@organizacao.com.br">
-                  </div>
-                </div>
 
-                <div class="form-group">
-                  <label class="mb-1">Telefone do representante 3</label>
-                  <input type="tel" class="form-control" name="representante_3_telefone" maxlength="20"
-                    placeholder="(00) 00000-0000">
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label class="mb-1">Telefone do representante 3</label>
+                      <input type="tel" class="form-control" name="representante_3_telefone" maxlength="20"
+                        placeholder="(00) 00000-0000">
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label class="mb-1">E-mail do representante 3</label>
+                      <input type="email" class="form-control" name="representante_3_email" maxlength="120"
+                        placeholder="representante3@organizacao.com.br">
+                    </div>
+                  </div>
                 </div>
 
                 <hr class="my-4">
@@ -357,10 +382,18 @@ if (count($eventos)) {
       $(function() {
 
         function showAlert(type, msg) {
-          $('#alerta')
+          const alerta = $('#alerta');
+
+          alerta
             .removeClass('d-none alert-success alert-danger alert-warning')
             .addClass('alert-' + type)
             .text(msg);
+
+          if (type === 'danger') {
+            $('html, body').animate({
+              scrollTop: alerta.offset().top - 20
+            }, 300);
+          }
         }
 
         $('#formInscricao').on('submit', function(e) {
@@ -422,6 +455,18 @@ if (count($eventos)) {
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
