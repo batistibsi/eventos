@@ -18,11 +18,24 @@ class Inscricao
                 return $registros[0];
         }
 
-        public static function uniqueInscricao($email)
+        public static function uniqueInscricaoEmail($email)
         {
                 $db = Zend_Registry::get('db');
 
                 $select = "select * from eventos_inscricao where email = " . $db->quote($email) . " and status not in ('CANCELADO','ENCERRADO')";
+
+                $registros = $db->fetchAll($select);
+
+                if (count($registros) == 0) return true;
+
+                return false;
+        }
+
+        public static function uniqueInscricaoCNPJ($cnpj)
+        {
+                $db = Zend_Registry::get('db');
+
+                $select = "select * from eventos_inscricao where cnpj = " . $db->quote($cnpj) . " and status not in ('CANCELADO','ENCERRADO')";
 
                 $registros = $db->fetchAll($select);
 
@@ -108,8 +121,13 @@ class Inscricao
         {
                 $db = Zend_Registry::get('db');
 
-                if (!self::uniqueInscricao($campos['email'])) {
+                if (!self::uniqueInscricaoEmail($campos['email'])) {
                         self::$erro = 'Inscricao ja realizada para o email: ' . $campos['email'] . '!';
+                        return false;
+                }
+
+                if (!self::uniqueInscricaoCNPJ($campos['cnpj'])) {
+                        self::$erro = 'Inscricao ja realizada para o CNPJ: ' . $campos['cnpj'] . '!';
                         return false;
                 }
 
