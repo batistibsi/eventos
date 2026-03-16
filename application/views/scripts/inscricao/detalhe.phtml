@@ -155,6 +155,17 @@
         padding: 1rem;
     }
 
+    .inscricao-detalhe a.logo-preview {
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .inscricao-detalhe a.logo-preview:hover {
+        box-shadow: 0 14px 28px rgba(28, 65, 109, 0.12);
+        transform: translateY(-2px);
+    }
+
     .inscricao-detalhe .logo-preview img {
         display: block;
         max-height: 190px;
@@ -274,9 +285,9 @@
                             <div class="detalhe-valor">
                                 <? if ($logo) : ?>
                                     <? if ($logoEhImagem) : ?>
-                                        <div class="logo-preview mb-3">
+                                        <a href="<?= $logo ?>" target="_blank" class="logo-preview mb-3">
                                             <img src="<?= $logo ?>" alt="Logo da organizacao">
-                                        </div>
+                                        </a>
                                     <? else : ?>
                                         <div class="logo-preview mb-3">
                                             <div class="logo-placeholder">
@@ -285,8 +296,8 @@
                                             </div>
                                         </div>
                                     <? endif; ?>
-                                    <a href="<?= $logo ?>" target="_blank" class="btn btn-outline-primary btn-sm">
-                                        <i class="fa fa-file-o" aria-hidden="true"></i> Abrir arquivo
+                                    <a href="<?= $logo ?>" download class="btn btn-outline-primary btn-sm">
+                                        <i class="fa fa-download" aria-hidden="true"></i> Baixar arquivo
                                     </a>
                                 <? else : ?>
                                     Nao enviado
