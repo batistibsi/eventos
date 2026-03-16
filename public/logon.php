@@ -13,7 +13,7 @@ $skyn = 'padrao';
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>EVENTOS</title>
+    <title>GESTÃO DE CERTIFICAÇÃO IMPACTACIM</title>
     <!-- CPS Front-end CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -32,7 +32,7 @@ $skyn = 'padrao';
                 <div class="col-12 col-md-6 col-xl-7">
                     <div class="d-flex justify-content-center">
                         <div class="col-12 col-xl-9">
-                            <h2 class="h1 mb-4 text-center">GESTÃO DE EVENTOS</h2>
+                            <h2 class="h1 mb-4 text-center">GESTÃO DE CERTIFICAÇÃO IMPACTACIM</h2>
                             <hr class="border-primary-subtle mb-4">
                             <img class="img-fluid mb-4 rounded" loading="lazy" src="./<?= $skyn ?>/logo.png" width="700" height="457" alt="Logo do SISTEMA">
                         </div>

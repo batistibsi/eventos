@@ -145,7 +145,7 @@ class Usuario
 			. '<p>Acesse o sistema clicando no link abaixo</p>'
 			. '<p><a href="' . $link . '">' . $link . '</a></p>';
 
-		Email::enviar($email, 'Cadastro de acesso à Plataforma de Eventos confirmado', $msg);
+		Email::enviar($email, 'Cadastro de acesso à Plataforma de GESTÃO DE CERTIFICAÇÃO IMPACTACIM confirmado', $msg);
 
 		return true;
 	}
@@ -201,7 +201,7 @@ class Usuario
 	public static function emailSenha($email, $senha)
 	{
 		$msg = '<p>ATENÇÃO!</p>'
-			. '<p>Sua nova Senha de acesso à Plataforma de Eventos é:</p>'
+			. '<p>Sua nova Senha de acesso à Plataforma de GESTÃO DE CERTIFICAÇÃO IMPACTACIM é:</p>'
 			. '<p><strong>' . $senha . '</strong></p>';
 
 		Email::enviar($email, 'Mudança de senha', $msg);
