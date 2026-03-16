@@ -1,5 +1,361 @@
 <?
     $inscricao = $this->registro;
 
-    print_r($inscricao);
+    $valorOuPadrao = function ($valor, $padrao = 'Nao informado') {
+        if ($valor === null) return $padrao;
+
+        $valor = trim((string) $valor);
+        return $valor !== '' ? $valor : $padrao;
+    };
+
+    $formatarDocumento = function ($numero, $tipo = 'cpf') use ($valorOuPadrao) {
+        $numero = preg_replace('/\D/', '', (string) $numero);
+
+        if ($tipo === 'cpf' && strlen($numero) === 11) {
+            return Util::mask($numero, '###.###.###-##');
+        }
+
+        if ($tipo === 'cnpj' && strlen($numero) === 14) {
+            return Util::mask($numero, '##.###.###/####-##');
+        }
+
+        return $valorOuPadrao($numero);
+    };
+
+    $formatarTelefone = function ($telefone) use ($valorOuPadrao) {
+        $telefone = preg_replace('/\D/', '', (string) $telefone);
+
+        if ($telefone === '') return $valorOuPadrao($telefone);
+
+        return Util::mascaraTelefone($telefone);
+    };
+
+    $formatarBooleano = function ($valor) {
+        $valor = filter_var($valor, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        return $valor ? 'Sim' : 'Nao';
+    };
+
+    $representantes = [
+        [
+            'titulo' => 'Representante 1',
+            'nome' => $inscricao['representante_1_nome'] ?? null,
+            'email' => $inscricao['representante_1_email'] ?? null,
+            'telefone' => $inscricao['representante_1_telefone'] ?? null
+        ],
+        [
+            'titulo' => 'Representante 2',
+            'nome' => $inscricao['representante_2_nome'] ?? null,
+            'email' => $inscricao['representante_2_email'] ?? null,
+            'telefone' => $inscricao['representante_2_telefone'] ?? null
+        ],
+        [
+            'titulo' => 'Representante 3',
+            'nome' => $inscricao['representante_3_nome'] ?? null,
+            'email' => $inscricao['representante_3_email'] ?? null,
+            'telefone' => $inscricao['representante_3_telefone'] ?? null
+        ]
+    ];
+
+    $logo = !empty($inscricao['logo_organizacao']) ? '../../download.php?arquivo=' . urlencode($inscricao['logo_organizacao']) : null;
+    $extensaoLogo = !empty($inscricao['logo_organizacao']) ? strtolower(pathinfo($inscricao['logo_organizacao'], PATHINFO_EXTENSION)) : '';
+    $logoEhImagem = in_array($extensaoLogo, ['png', 'jpg', 'jpeg', 'gif', 'webp'], true);
 ?>
+
+<style>
+    .inscricao-detalhe {
+        color: #264061;
+    }
+
+    .inscricao-detalhe .detalhe-card {
+        background: #fff;
+        border: 1px solid #dce6f2;
+        border-radius: 14px;
+        box-shadow: 0 10px 28px rgba(28, 65, 109, 0.08);
+        height: 100%;
+    }
+
+    .inscricao-detalhe .detalhe-card-body {
+        padding: 1.35rem 1.5rem;
+    }
+
+    .inscricao-detalhe .detalhe-titulo {
+        color: #3d64ad;
+        font-size: .82rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+    }
+
+    .inscricao-detalhe .detalhe-label {
+        color: #6f86a7;
+        display: block;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        margin-bottom: .18rem;
+        text-transform: uppercase;
+    }
+
+    .inscricao-detalhe .detalhe-valor {
+        color: #1d3049;
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.45;
+        word-break: break-word;
+    }
+
+    .inscricao-detalhe .detalhe-resumo {
+        background: linear-gradient(135deg, #3d64ad, #24457d);
+        border-radius: 18px;
+        box-shadow: 0 18px 40px rgba(36, 69, 125, 0.22);
+        color: #fff;
+        overflow: hidden;
+        padding: 1.5rem;
+    }
+
+    .inscricao-detalhe .detalhe-status {
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 999px;
+        display: inline-block;
+        font-size: .8rem;
+        font-weight: 700;
+        padding: .45rem .9rem;
+        text-transform: uppercase;
+    }
+
+    .inscricao-detalhe .detalhe-metrica {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        padding: .9rem 1rem;
+    }
+
+    .inscricao-detalhe .detalhe-metrica strong {
+        display: block;
+        font-size: 1.25rem;
+        line-height: 1.2;
+    }
+
+    .inscricao-detalhe .detalhe-metrica span {
+        font-size: .78rem;
+        opacity: .88;
+        text-transform: uppercase;
+    }
+
+    .inscricao-detalhe .logo-preview {
+        align-items: center;
+        background: #f5f8fd;
+        border: 1px dashed #b8c9e2;
+        border-radius: 14px;
+        display: flex;
+        justify-content: center;
+        min-height: 220px;
+        overflow: hidden;
+        padding: 1rem;
+    }
+
+    .inscricao-detalhe .logo-preview img {
+        display: block;
+        max-height: 190px;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    .inscricao-detalhe .logo-placeholder {
+        color: #6f86a7;
+        font-size: .95rem;
+        text-align: center;
+    }
+
+    @media (max-width: 767.98px) {
+        .inscricao-detalhe .detalhe-card-body,
+        .inscricao-detalhe .detalhe-resumo {
+            padding: 1.1rem;
+        }
+    }
+</style>
+
+<div class="inscricao-detalhe">
+    <div class="d-flex justify-content-center justify-content-md-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+        <h1 class="h2 text-info mb-2 mb-md-0">Detalhe da inscricao</h1>
+        <div class="btn-toolbar">
+            <button type="button" onclick="carregarTela('../../consulta', '#content', false);" class="btn btn-primary">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar
+            </button>
+        </div>
+    </div>
+
+    <div class="detalhe-resumo mb-4">
+        <div class="row align-items-center">
+            <div class="col-12 col-lg-7 mb-3 mb-lg-0">
+                <div class="mb-2">
+                    <span class="detalhe-status"><?= $valorOuPadrao($inscricao['status'] ?? null) ?></span>
+                </div>
+                <h3 class="mb-2"><?= $valorOuPadrao($inscricao['nome_organizacao'] ?? null) ?></h3>
+                <p class="mb-0">
+                    Responsavel: <?= $valorOuPadrao($inscricao['nome'] ?? null) ?><br>
+                    E-mail: <?= $valorOuPadrao($inscricao['email'] ?? null) ?>
+                </p>
+            </div>
+            <div class="col-12 col-lg-5">
+                <div class="row">
+                    <div class="col-6 mb-2">
+                        <div class="detalhe-metrica">
+                            <span>Inscricao</span>
+                            <strong>#<?= (int) ($inscricao['id_inscricao'] ?? 0) ?></strong>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-2">
+                        <div class="detalhe-metrica">
+                            <span>Colaboradores</span>
+                            <strong><?= (int) ($inscricao['numero_colaboradores'] ?? 0) ?></strong>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="detalhe-metrica">
+                            <span>Criada em</span>
+                            <strong>
+                                <?= !empty($inscricao['created_at']) ? Util::formatData($inscricao['created_at']) . ' ' . Util::formatHora($inscricao['created_at']) : 'Nao informado' ?>
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-xl-6 mb-4">
+            <div class="detalhe-card">
+                <div class="detalhe-card-body">
+                    <div class="detalhe-titulo">Responsavel pela inscricao</div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <span class="detalhe-label">Nome</span>
+                            <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['nome'] ?? null) ?></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <span class="detalhe-label">CPF</span>
+                            <div class="detalhe-valor"><?= $formatarDocumento($inscricao['cpf_responsavel'] ?? null, 'cpf') ?></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <span class="detalhe-label">E-mail</span>
+                            <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['email'] ?? null) ?></div>
+                        </div>
+                        <div class="col-12">
+                            <span class="detalhe-label">Endereco</span>
+                            <div class="detalhe-valor"><?= nl2br($this->escape($valorOuPadrao($inscricao['endereco'] ?? null))) ?></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6 mb-4">
+            <div class="detalhe-card">
+                <div class="detalhe-card-body">
+                    <div class="detalhe-titulo">Organizacao</div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <span class="detalhe-label">Nome da organizacao</span>
+                            <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['nome_organizacao'] ?? null) ?></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <span class="detalhe-label">CNPJ</span>
+                            <div class="detalhe-valor"><?= $formatarDocumento($inscricao['cnpj'] ?? null, 'cnpj') ?></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <span class="detalhe-label">Nome no certificado</span>
+                            <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['nome_certificado'] ?? null) ?></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <span class="detalhe-label">Logo enviada</span>
+                            <div class="detalhe-valor">
+                                <? if ($logo) : ?>
+                                    <? if ($logoEhImagem) : ?>
+                                        <div class="logo-preview mb-3">
+                                            <img src="<?= $logo ?>" alt="Logo da organizacao">
+                                        </div>
+                                    <? else : ?>
+                                        <div class="logo-preview mb-3">
+                                            <div class="logo-placeholder">
+                                                Pre-visualizacao indisponivel para este formato.<br>
+                                                Abra o arquivo para visualizar o conteudo.
+                                            </div>
+                                        </div>
+                                    <? endif; ?>
+                                    <a href="<?= $logo ?>" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="fa fa-file-o" aria-hidden="true"></i> Abrir arquivo
+                                    </a>
+                                <? else : ?>
+                                    Nao enviado
+                                <? endif; ?>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <span class="detalhe-label">Primeira participacao</span>
+                            <div class="detalhe-valor mb-3"><?= $formatarBooleano($inscricao['primeira_participacao'] ?? null) ?></div>
+
+                            <span class="detalhe-label">Como soube da certificacao</span>
+                            <div class="detalhe-valor mb-3"><?= $valorOuPadrao($inscricao['como_soube'] ?? null) ?></div>
+
+                            <span class="detalhe-label">Organizacao que indicou</span>
+                            <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['indicacao_organizacao'] ?? null) ?></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="detalhe-card mb-4">
+        <div class="detalhe-card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+                <div class="detalhe-titulo mb-0">Representantes</div>
+                <small class="text-muted">Apenas os preenchidos sao exibidos com dados completos.</small>
+            </div>
+            <div class="row">
+                <? foreach ($representantes as $representante) : ?>
+                    <div class="col-12 col-lg-4 mb-3">
+                        <div class="border rounded h-100 p-3">
+                            <div class="font-weight-bold text-info mb-3"><?= $representante['titulo'] ?></div>
+                            <div class="mb-3">
+                                <span class="detalhe-label">Nome</span>
+                                <div class="detalhe-valor"><?= $valorOuPadrao($representante['nome']) ?></div>
+                            </div>
+                            <div class="mb-3">
+                                <span class="detalhe-label">E-mail</span>
+                                <div class="detalhe-valor"><?= $valorOuPadrao($representante['email']) ?></div>
+                            </div>
+                            <div>
+                                <span class="detalhe-label">Telefone</span>
+                                <div class="detalhe-valor"><?= $formatarTelefone($representante['telefone']) ?></div>
+                            </div>
+                        </div>
+                    </div>
+                <? endforeach; ?>
+            </div>
+        </div>
+    </div>
+
+    <? if (!empty($inscricao['token_confirmacao']) || !empty($inscricao['token_expira_em'])) : ?>
+        <div class="detalhe-card">
+            <div class="detalhe-card-body">
+                <div class="detalhe-titulo">Controle interno</div>
+                <div class="row">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <span class="detalhe-label">Token de confirmacao</span>
+                        <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['token_confirmacao'] ?? null) ?></div>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="detalhe-label">Expira em</span>
+                        <div class="detalhe-valor">
+                            <?= !empty($inscricao['token_expira_em']) ? Util::formatData($inscricao['token_expira_em']) . ' ' . Util::formatHora($inscricao['token_expira_em']) : 'Nao informado' ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <? endif; ?>
+</div>
