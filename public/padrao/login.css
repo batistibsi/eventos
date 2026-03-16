@@ -1,8 +1,8 @@
 body {
   font-size: 1rem;
-  color: #3d64ad;
+  color: rgb(8, 68, 68);
 }
 
 .btn{
-  background-color: #3d64ad !important;
+  background-color: rgb(8, 68, 68) !important;
 }

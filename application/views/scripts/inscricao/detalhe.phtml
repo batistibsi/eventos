@@ -274,7 +274,8 @@
                 <h3 class="mb-2"><?= $valorOuPadrao($inscricao['nome_organizacao'] ?? null) ?></h3>
                 <p class="mb-0">
                     Responsavel: <?= $valorOuPadrao($inscricao['nome'] ?? null) ?><br>
-                    E-mail: <?= $valorOuPadrao($inscricao['email'] ?? null) ?>
+                    E-mail: <?= $valorOuPadrao($inscricao['email'] ?? null) ?><br>
+                    Telefone: <?= $formatarTelefone($inscricao['telefone'] ?? null) ?>
                 </p>
             </div>
             <div class="col-12 col-lg-5">
@@ -321,6 +322,10 @@
                         <div class="col-md-6 mb-3">
                             <span class="detalhe-label">E-mail</span>
                             <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['email'] ?? null) ?></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <span class="detalhe-label">Telefone</span>
+                            <div class="detalhe-valor"><?= $formatarTelefone($inscricao['telefone'] ?? null) ?></div>
                         </div>
                         <div class="col-12">
                             <span class="detalhe-label">Endereco</span>

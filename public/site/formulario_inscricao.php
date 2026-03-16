@@ -31,9 +31,9 @@ if (count($eventos)) {
 
   <style>
     :root {
-      --brand: #183885;
+      --brand: rgb(8, 68, 68);
       --accent: #abca69;
-      --brand-dark: #0f255d;
+      --brand-dark: #063c3c;
       --bg: #f6f8fb;
       --card: #ffffff;
       --muted: #6c757d;
@@ -48,7 +48,7 @@ if (count($eventos)) {
       background:
         radial-gradient(900px 420px at 0% 0%, rgba(171, 202, 105, .22), transparent 60%),
         radial-gradient(820px 400px at 100% 0%, rgba(255, 255, 255, .09), transparent 55%),
-        linear-gradient(135deg, var(--brand-dark) 0%, var(--brand) 58%, #224ea6 100%);
+        linear-gradient(135deg, var(--brand-dark) 0%, var(--brand) 58%, #0f7c7c 100%);
       color: #fff;
       padding: 42px 0 70px;
       position: relative;
