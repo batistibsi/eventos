@@ -321,7 +321,7 @@ if (count($eventos)) {
               <span class="badge-accent">Vagas limitadas</span>
             </p>
             <p class="mb-3">
-              <strong>Acesse o regulamento da edição 2025</strong><br>
+              <strong>Acesse o regulamento da edição <?= date('Y') ?></strong><br>
               <a target="_blank" href="https://drive.google.com/file/d/15djoXHqN02QFcBM1dvmroazq5voK4hm3/view" class="hero-link">neste link</a>
             </p>
             <p class="mb-2"><strong>Em caso de dúvidas</strong></p>
