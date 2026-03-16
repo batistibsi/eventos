@@ -3,7 +3,7 @@ session_start();
 ini_set('display_errors', 0);
 include_once "./zend.php";
 
-$skyn = Zend_Registry::get('skin') ? Zend_Registry::get('skin') : 'padrao';
+$skyn = 'padrao';
 
 ?>
 

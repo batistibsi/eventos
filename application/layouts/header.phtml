@@ -35,10 +35,11 @@ $skyn = 'padrao';
   <link rel="icon" href="../../<?= $skyn ?>/favicon.ico">
   <style>
     :root {
-      --dt-primary: <?= $this->empresa['cor'] ?? '#097f8c' ?>;
+      --dt-primary: #3d64ad;
       --dt-active: color-mix(in srgb, var(--dt-primary) 80%, black 40%);
     }
   </style>
+
   <link rel="stylesheet" href=".../../../<?= $skyn ?>/principal.css?versao=1">
 
   <link href="../../img-upload/dist/css/bootstrap-imageupload.css" rel="stylesheet">
@@ -57,7 +58,7 @@ $skyn = 'padrao';
       <button type="button" id="sidebarCollapse" class="btn text-primary mr-2">
         <i class="fa fa-bars"></i>
       </button>
-      <img class="img-fluid" loading="lazy" src="<?= $this->empresa['logo'] ?>" alt="Logo do SISTEMA">
+      <img class="img-fluid" loading="lazy" src="../../<?= $skyn ?>/logo_horizontal.png" alt="Logo do SISTEMA">
     </a>
 
     <ul class="navbar-nav ml-auto mr-2">
@@ -86,12 +87,12 @@ $skyn = 'padrao';
     <nav class="sidebar active">
       <div class="sidebar-sticky">
         <ul class="nav flex-column">
-          <li class="nav-item">
+          <!--li class="nav-item">
             <a href="#" class="principal-link nav-link" data-menu-item="dashboard" data-src="../../dashboard">
               <i class="fa fa-line-chart" aria-hidden="true"></i>
               Dashboard
             </a>
-          </li>
+          </li-->
           <li class="nav-item">
             <a href="#" class="principal-link nav-link" data-menu-item="consulta" data-src="../../consulta">
               <i class="fa fa-newspaper-o" aria-hidden="true"></i>

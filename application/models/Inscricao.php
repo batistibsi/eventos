@@ -3,6 +3,21 @@ class Inscricao
 {
         public static $erro;
 
+        public static function buscaId($id_inscricao)
+        {
+                $db = Zend_Registry::get('db');
+
+                $select = "select a.* 
+                             from eventos_inscricao a
+                             where a.id_inscricao = " . $id_inscricao . ";";
+
+                $registros = $db->fetchAll($select);
+
+                if (count($registros) == 0) return true;
+
+                return $registros[0];
+        }
+
         public static function buscaToken($token)
         {
                 $db = Zend_Registry::get('db');
