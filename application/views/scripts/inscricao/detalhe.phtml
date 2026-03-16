@@ -1,5 +1,11 @@
 <?
     $inscricao = $this->registro;
+    $statusDisponiveis = isset($this->statusDisponiveis) && is_array($this->statusDisponiveis) ? $this->statusDisponiveis : [];
+    $statusAtual = strtoupper(trim((string) ($inscricao['status'] ?? '')));
+
+    if ($statusAtual !== '' && !in_array($statusAtual, $statusDisponiveis, true)) {
+        $statusDisponiveis[] = $statusAtual;
+    }
 
     $valorOuPadrao = function ($valor, $padrao = 'Nao informado') {
         if ($valor === null) return $padrao;
@@ -125,6 +131,50 @@
         text-transform: uppercase;
     }
 
+    .inscricao-detalhe .detalhe-status-form {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: .75rem;
+    }
+
+    .inscricao-detalhe .detalhe-status-form .form-control {
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 999px;
+        color: #fff;
+        font-size: .8rem;
+        flex: 0 1 220px;
+        font-weight: 700;
+        height: auto;
+        margin: 0;
+        min-width: 190px;
+        padding: .45rem 2rem .45rem .9rem;
+        text-transform: uppercase;
+    }
+
+    .inscricao-detalhe .detalhe-status-form .form-control option {
+        color: #1d3049;
+    }
+
+    .inscricao-detalhe .detalhe-status-form .btn {
+        align-items: center;
+        border-radius: 999px;
+        display: inline-flex;
+        font-size: .78rem;
+        font-weight: 700;
+        justify-content: center;
+        margin: 0;
+        min-height: calc(1.5em + .9rem + 2px);
+        white-space: nowrap;
+        padding: .45rem .9rem;
+        text-transform: uppercase;
+    }
+
+    .inscricao-detalhe .detalhe-status-form .btn i {
+        margin-right: .35rem;
+    }
+
     .inscricao-detalhe .detalhe-metrica {
         background: rgba(255, 255, 255, 0.12);
         border-radius: 14px;
@@ -184,6 +234,16 @@
         .inscricao-detalhe .detalhe-resumo {
             padding: 1.1rem;
         }
+
+        .inscricao-detalhe .detalhe-status-form {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .inscricao-detalhe .detalhe-status-form .form-control,
+        .inscricao-detalhe .detalhe-status-form .btn {
+            width: 100%;
+        }
     }
 </style>
 
@@ -191,7 +251,7 @@
     <div class="d-flex justify-content-center justify-content-md-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
         <h1 class="h2 text-info mb-2 mb-md-0">Detalhe da inscricao</h1>
         <div class="btn-toolbar">
-            <button type="button" onclick="carregarTela('../../consulta', '#content', false);" class="btn btn-primary">
+            <button type="button" onclick="carregarTela('../../inscricao', '#content', false);" class="btn btn-primary">
                 <i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar
             </button>
         </div>
@@ -201,7 +261,15 @@
         <div class="row align-items-center">
             <div class="col-12 col-lg-7 mb-3 mb-lg-0">
                 <div class="mb-2">
-                    <span class="detalhe-status"><?= $valorOuPadrao($inscricao['status'] ?? null) ?></span>
+                    <form id="form-status-inscricao" class="detalhe-status-form">
+                        <input type="hidden" name="id_inscricao" value="<?= (int) ($inscricao['id_inscricao'] ?? 0) ?>">
+                        <select name="status" id="status" class="form-control detalhe-status">
+                            <? foreach ($statusDisponiveis as $status) : ?>
+                                <option value="<?= $this->escape($status) ?>" <?= $status === $statusAtual ? 'selected' : '' ?>><?= $this->escape($status) ?></option>
+                            <? endforeach; ?>
+                        </select>
+                        <button type="submit" class="btn btn-light btn-sm salvar-status"><i class="fa fa-floppy-o" aria-hidden="true"></i>  Salvar status</button>
+                    </form>
                 </div>
                 <h3 class="mb-2"><?= $valorOuPadrao($inscricao['nome_organizacao'] ?? null) ?></h3>
                 <p class="mb-0">
@@ -370,3 +438,45 @@
         </div>
     <? endif; ?>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#form-status-inscricao').submit(function(e) {
+            e.preventDefault();
+
+            $('.salvar-status').prop('disabled', true);
+
+            $.ajax({
+                type: "POST",
+                url: "../../inscricao/alterarstatus",
+                data: $(this).serialize(),
+                success: function(data) {
+                    if (data.trim().length > 0) {
+                        swal({
+                            title: "Atencao!",
+                            text: data,
+                            type: "error"
+                        });
+                    } else {
+                        swal({
+                            title: "Sucesso!",
+                            text: "Status alterado com sucesso.",
+                            type: "success"
+                        });
+                    }
+
+                    $('.salvar-status').prop('disabled', false);
+                },
+                error: function() {
+                    $('.salvar-status').prop('disabled', false);
+
+                    swal({
+                        title: "Atencao!",
+                        text: "Nao foi possivel alterar o status.",
+                        type: "error"
+                    });
+                }
+            });
+        });
+    });
+</script>

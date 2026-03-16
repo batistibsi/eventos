@@ -3,6 +3,11 @@ class Inscricao
 {
         public static $erro;
 
+        public static function statusDisponiveis()
+        {
+                return ['CRIADO', 'CONFIRMADO', 'CANCELADO', 'ENCERRADO'];
+        }
+
         public static function buscaId($id_inscricao)
         {
                 $db = Zend_Registry::get('db');
@@ -246,5 +251,40 @@ class Inscricao
                 $registros = $db->fetchAll($select);
 
                 return $registros;
+        }
+
+        public static function alterarStatus($id_inscricao, $status)
+        {
+                $db = Zend_Registry::get('db');
+
+                $id_inscricao = (int) $id_inscricao;
+                $status = strtoupper(trim((string) $status));
+
+                if ($id_inscricao <= 0) {
+                        self::$erro = 'Inscricao nao informada.';
+                        return false;
+                }
+
+                if (!in_array($status, self::statusDisponiveis(), true)) {
+                        self::$erro = 'Status invalido.';
+                        return false;
+                }
+
+                $atual = self::buscaId($id_inscricao);
+
+                if (!$atual || !is_array($atual)) {
+                        self::$erro = 'Inscricao nao encontrada.';
+                        return false;
+                }
+
+                try {
+                        $where = $db->quoteInto('id_inscricao = ?', $id_inscricao);
+                        $db->update('eventos_inscricao', ['status' => $status], $where);
+                } catch (Exception $e) {
+                        self::$erro = 'Nao foi possivel atualizar o status.';
+                        return false;
+                }
+
+                return true;
         }
 }
