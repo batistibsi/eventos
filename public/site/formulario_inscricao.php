@@ -310,7 +310,7 @@ if (count($eventos)) {
 
           <h1 class="hero-title">Certificação IMPACTACIM: Jornada de Sustentabilidade</h1>
           <p class="hero-description">
-            A Certificação IMPACTACIM: Jornada de Sustentabilidade é um reconhecimento de metodologia própria do Instituto ACIM, voltada à organizações que atuam com projetos relacionados à temática ESG (ambiental, social e governança), assim como sua contribuição para o alcance dos Objetivos de Desenvolvimento Sustentável, demonstrando compromisso em prol da sustentabilidade.
+            A Certificação IMPACTACIM: Jornada de Sustentabilidade é um reconhecimento de metodologia própria do Instituto ACIM, voltada à organizações que atuam com projetos relacionados a temática ESG (ambiental, social e governança), assim como sua contribuição para o alcance dos Objetivos de Desenvolvimento Sustentável, demonstrando compromisso em prol da sustentabilidade.
           </p>
         </div>
 
@@ -410,7 +410,7 @@ if (count($eventos)) {
                       placeholder="Quantidade">
                   </div>
                   <div class="form-group col-md-7">
-                    <label class="mb-1">Data do evento *</label>
+                    <label class="mb-1">Turma *</label>
                     <select class="form-control" name="id_evento" required>
                       <option value="">Selecione uma data...</option>
                       <?php foreach ($eventos as $evento): ?>
@@ -419,7 +419,7 @@ if (count($eventos)) {
                         </option>
                       <?php endforeach; ?>
                     </select>
-                    <small class="help">As datas disponíveis para o evento.</small>
+                    <small class="help">Turmas disponíveis.</small>
                   </div>
                 </div>
 
