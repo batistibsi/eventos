@@ -13,6 +13,7 @@ $campos = [];
 $campos['nome'] = postValue('nome');
 $campos['cpf_responsavel'] = postValue('cpf_responsavel');
 $campos['email'] = postValue('email');
+$campos['telefone'] = postValue('telefone');
 $campos['nome_organizacao'] = postValue('nome_organizacao');
 $campos['cnpj'] = postValue('cnpj');
 $campos['endereco'] = postValue('endereco');
@@ -33,18 +34,19 @@ $campos['como_soube'] = postValue('como_soube');
 $campos['indicacao_organizacao'] = postValue('indicacao_organizacao');
 
 $obrigatorios = [
-  'nome' => 'nome do responsavel',
-  'cpf_responsavel' => 'CPF do responsavel',
-  'email' => 'e-mail do responsavel',
-  'nome_organizacao' => 'nome da organizacao',
+  'nome' => 'nome do responsável',
+  'cpf_responsavel' => 'CPF do responsável',
+  'email' => 'e-mail do responsável',
+  'telefone' => 'telefone do responsável',
+  'nome_organizacao' => 'nome da organização',
   'cnpj' => 'CNPJ',
   'endereco' => 'endereco',
   'representante_1_nome' => 'nome do representante 1',
   'representante_1_email' => 'e-mail do representante 1',
   'representante_1_telefone' => 'telefone do representante 1',
-  'primeira_participacao' => 'primeira participacao',
-  'nome_certificado' => 'nome da organizacao no certificado',
-  'como_soube' => 'como ficou sabendo da certificacao'
+  'primeira_participacao' => 'primeira participação',
+  'nome_certificado' => 'nome da organização no certificado',
+  'como_soube' => 'como ficou sabendo da certificação'
 ];
 
 foreach ($obrigatorios as $campo => $label) {

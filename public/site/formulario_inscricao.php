@@ -360,29 +360,10 @@ if (count($eventos)) {
                   <strong>Preencha o formulário abaixo</strong> com os dados da organização e dos representantes que participarão da jornada.
                 </div>
                 <h3 class="mb-1">Dados da inscrição</h3>
-                <p class="subtitle mb-4">Selecione uma data disponível e envie todas as informações obrigatórias para concluir sua inscrição.</p>
+                <p class="subtitle mb-4">Selecione uma turma disponível e envie todas as informações obrigatórias para concluir sua inscrição.</p>
 
                 <div class="form-row">
-                  <div class="form-group col-md-8">
-                    <label class="mb-1">Nome do responsável *</label>
-                    <input type="text" class="form-control" name="nome" required maxlength="120"
-                      placeholder="Nome do responsável pela organização">
-                    <small class="help">Nome do responsável da organização que irá assinar o termo de compromisso.</small>
-                  </div>
-                  <div class="form-group col-md-4">
-                    <label class="mb-1">CPF do responsável *</label>
-                    <input type="text" class="form-control" name="cpf_responsavel" required maxlength="11"
-                      placeholder="Apenas numeros" pattern="[0-9]{11}" inputmode="numeric">
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group col-md-5">
-                    <label class="mb-1">E-mail do responsável *</label>
-                    <input type="email" class="form-control" name="email" required maxlength="120"
-                      placeholder="responsavel@organizacao.com.br">
-                  </div>
-                  <div class="form-group col-md-7">
+                  <div class="form-group col-md-12">
                     <label class="mb-1">Nome da organização *</label>
                     <input type="text" class="form-control" name="nome_organizacao" required maxlength="150"
                       placeholder="Nome da organização">
@@ -401,6 +382,33 @@ if (count($eventos)) {
                     <input type="text" class="form-control" name="endereco" required maxlength="200"
                       placeholder="Rua, avenida, bairro, cidade">
                   </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-md-8">
+                    <label class="mb-1">Nome do responsável *</label>
+                    <input type="text" class="form-control" name="nome" required maxlength="120"
+                      placeholder="Nome do responsável pela organização">
+                    <small class="help">Nome do responsável da organização que irá assinar o termo de compromisso.</small>
+                  </div>
+                  <div class="form-group col-md-4">
+                    <label class="mb-1">CPF do responsável *</label>
+                    <input type="text" class="form-control" name="cpf_responsavel" required maxlength="11"
+                      placeholder="Apenas numeros" pattern="[0-9]{11}" inputmode="numeric">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label class="mb-1">E-mail do responsável *</label>
+                    <input type="email" class="form-control" name="email" required maxlength="120"
+                      placeholder="responsavel@organizacao.com.br">
+                  </div>
+                  <div class="form-group col-md-6">
+                      <label class="mb-1">Telefone do responsável *</label>
+                      <input required type="tel" class="form-control" name="telefone" maxlength="20"
+                        placeholder="(00) 00000-0000">
+                    </div>
                 </div>
 
                 <div class="form-row">

@@ -181,6 +181,7 @@ class Inscricao
                                 'id_evento' => $campos['id_evento'],
                                 'nome' => $campos['nome'],
                                 'email' => $campos['email'],
+                                'telefone' => $campos['telefone'],
                                 'cpf_responsavel' => $campos['cpf_responsavel'],
                                 'nome_organizacao' => $campos['nome_organizacao'],
                                 'cnpj' => $campos['cnpj'],

@@ -1,0 +1,1 @@
+alter table eventos_inscricao add column telefone varchar(20);
