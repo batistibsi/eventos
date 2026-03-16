@@ -5,7 +5,7 @@ class Inscricao
 
         public static function statusDisponiveis()
         {
-                return ['CRIADO', 'CONFIRMADO', 'CANCELADO', 'ENCERRADO'];
+                return ['CRIADO', 'CONFIRMADO', 'DUPLICADO', 'CANCELADO', 'ENCERRADO'];
         }
 
         public static function buscaId($id_inscricao)
@@ -42,7 +42,7 @@ class Inscricao
         {
                 $db = Zend_Registry::get('db');
 
-                $select = "select * from eventos_inscricao where email = " . $db->quote($email) . " and status not in ('CANCELADO','ENCERRADO')";
+                $select = "select * from eventos_inscricao where email = " . $db->quote($email) . " and status not in ('DUPLICADO','CANCELADO','ENCERRADO')";
 
                 $registros = $db->fetchAll($select);
 
@@ -55,7 +55,7 @@ class Inscricao
         {
                 $db = Zend_Registry::get('db');
 
-                $select = "select * from eventos_inscricao where cnpj = " . $db->quote($cnpj) . " and status not in ('CANCELADO','ENCERRADO')";
+                $select = "select * from eventos_inscricao where cnpj = " . $db->quote($cnpj) . " and status not in ('DUPLICADO','CANCELADO','ENCERRADO')";
 
                 $registros = $db->fetchAll($select);
 
@@ -232,7 +232,7 @@ class Inscricao
 
                 Email::enviar($campos['email'], 'Solicitacao de inscricao', $msg);
                 */
-                
+
                 return $registros[0]['id_inscricao'];
         }
 

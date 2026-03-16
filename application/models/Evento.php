@@ -41,7 +41,7 @@ class Evento
                 $select = "select count(*) as inscritos 
                                 from eventos_inscricao 
                                 where id_evento = " . $id_evento . " 
-                                and status not in ('CANCELADO','ENCERRADO');";
+                                and status not in ('DUPLICADO','CANCELADO','ENCERRADO');";
 
                 $registros = $db->fetchAll($select);
                 $inscritos = $registros[0]['inscritos'];
