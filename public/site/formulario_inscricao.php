@@ -333,20 +333,20 @@ if (count($eventos)) {
               <span class="badge-accent">Vagas limitadas</span>
             </p>
             <p class="mb-3">
-              <strong>Acesse o regulamento da edição <?= date('Y') ?></strong><br>
+              <strong>Acesse o edital <?= date('Y') ?> </strong>
               <a target="_blank" href="https://drive.google.com/file/d/15djoXHqN02QFcBM1dvmroazq5voK4hm3/view" class="hero-link">neste link</a>
             </p>
-            <p class="mb-2"><strong>Em caso de dúvidas</strong></p>
+            <p class="mb-2"><strong>Em caso de dúvidas:</strong></p>
             <p class="mb-0">
-              Henrique Nascimento<br>
-              <a href="https://wa.me/5544999842554?text=Ol%C3%A1%2C%20tenho%20d%C3%BAvidas%20sobre%20a%20inscri%C3%A7%C3%A3o%20para%20a%20Certifica%C3%A7%C3%A3o%20IMPACTACIM." target="_blank" rel="noopener noreferrer" class="hero-contact" aria-label="Falar no WhatsApp com Henrique Nascimento">
+              Kellen Oliveira<br>
+              <a href="https://wa.me/5544998530909?text=Ol%C3%A1%2C%20tenho%20d%C3%BAvidas%20sobre%20a%20inscri%C3%A7%C3%A3o%20para%20a%20Certifica%C3%A7%C3%A3o%20IMPACTACIM." target="_blank" rel="noopener noreferrer" class="hero-contact" aria-label="Falar no WhatsApp com Kellen Oliveira">
                 <span class="hero-contact-icon" aria-hidden="true">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="false">
                     <path fill="currentColor" d="M17.47 14.38c-.27-.13-1.58-.78-1.82-.87c-.24-.09-.42-.13-.6.14c-.17.26-.68.87-.83 1.05c-.15.17-.31.2-.57.07c-.27-.13-1.12-.41-2.14-1.32c-.79-.7-1.33-1.57-1.48-1.84c-.15-.26-.02-.41.11-.54c.12-.12.26-.31.39-.46c.13-.15.17-.26.26-.44c.09-.17.04-.33-.02-.46c-.07-.13-.6-1.45-.82-1.98c-.22-.52-.44-.45-.6-.46h-.51c-.17 0-.46.07-.7.33c-.24.26-.92.9-.92 2.19c0 1.29.94 2.54 1.07 2.71c.13.17 1.85 2.82 4.47 3.95c.62.27 1.12.43 1.5.55c.63.2 1.21.17 1.67.1c.51-.08 1.58-.65 1.8-1.25c.22-.61.22-1.13.15-1.24c-.06-.11-.24-.17-.5-.3Z" />
                     <path fill="currentColor" d="M12.04 2C6.55 2 2.08 6.46 2.08 11.95c0 1.75.46 3.46 1.33 4.96L2 22l5.21-1.37a9.9 9.9 0 0 0 4.82 1.24h.01c5.49 0 9.96-4.46 9.96-9.95A9.88 9.88 0 0 0 19.09 4.9A9.91 9.91 0 0 0 12.04 2Zm0 18.18h-.01a8.22 8.22 0 0 1-4.19-1.15l-.3-.18l-3.09.81l.83-3.01l-.19-.31a8.2 8.2 0 0 1-1.27-4.39c0-4.54 3.69-8.24 8.23-8.24a8.18 8.18 0 0 1 5.84 2.42a8.17 8.17 0 0 1 2.41 5.82c0 4.54-3.69 8.23-8.22 8.23Z" />
                   </svg>
                 </span>
-                <span>44 99984-2554</span>
+                <span>44 99853-0909</span>
               </a>
             </p>
           </div>
