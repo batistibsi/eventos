@@ -279,6 +279,18 @@ if (count($eventos)) {
       color: var(--brand);
     }
 
+    .consent-box {
+      background: linear-gradient(180deg, #fbfcff 0%, #f2f6fd 100%);
+      border: 1px solid rgba(24, 56, 133, .08);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 24px;
+    }
+
+    .consent-box p:last-child {
+      margin-bottom: 0;
+    }
+
     @media (max-width: 576px) {
       .hero-title {
         font-size: 34px !important;
@@ -356,47 +368,75 @@ if (count($eventos)) {
 
               <form id="formInscricao" novalidate enctype="multipart/form-data">
 
-                <div class="intro-note">
-                  <strong>Preencha o formulário abaixo</strong> com os dados da organização e dos representantes que participarão da jornada.
-                </div>
-                <h3 class="mb-1">Dados da inscrição</h3>
-                <p class="subtitle mb-4">Selecione uma turma disponível e envie todas as informações obrigatórias para concluir sua inscrição.</p>
+                <div class="consent-box">
+                  <h3 class="mb-3">Confirmação de consentimento</h3>
+                  <p>
+                    Em conformidade com a LGPD (Lei Geral de Proteção de Dados - Lei Nº 13.709), tenho ciência que as informações acima serão utilizadas pelo Instituto ACIM para realizar confirmação de inscrição na Certificação 2025.
+                  </p>
+                  <p>
+                    Informamos que ao concordar com a solicitação abaixo, serão fornecidos ao Instituto ACIM alguns dados pessoais tais como, nome completo, e-mail e telefone para efetuar contato com o(s) inscritos(s) no edital, quando necessário, motivo pelo qual manifesto a minha concordância, preenchendo os campos abaixo.
+                  </p>
 
-                <div class="form-row">
-                  <div class="form-group col-md-12">
-                    <label class="mb-1">Nome da organização *</label>
-                    <input type="text" class="form-control" name="nome_organizacao" required maxlength="150"
-                      placeholder="Nome da organização">
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group col-md-4">
-                    <label class="mb-1">CNPJ *</label>
-                    <input type="text" class="form-control" name="cnpj" required maxlength="14"
-                      placeholder="Apenas numeros" pattern="[0-9]{14}" inputmode="numeric">
-                    <small class="help">Informe apenas os 14 numeros do CNPJ.</small>
-                  </div>
-                  <div class="form-group col-md-8">
-                    <label class="mb-1">Endereço *</label>
-                    <input type="text" class="form-control" name="endereco" required maxlength="200"
-                      placeholder="Rua, avenida, bairro, cidade">
+                  <div class="form-group mb-0 mt-4">
+                    <label class="mb-2 d-block">Você concorda com o uso dos dados informados? *</label>
+                    <div class="custom-control custom-radio mb-2">
+                      <input type="radio" id="lgpd_concordo" name="lgpd_consentimento" value="sim" class="custom-control-input" required>
+                      <label class="custom-control-label" for="lgpd_concordo">Sim, concordo</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                      <input type="radio" id="lgpd_nao_concordo" name="lgpd_consentimento" value="nao" class="custom-control-input" required>
+                      <label class="custom-control-label" for="lgpd_nao_concordo">Não, não concordo</label>
+                    </div>
                   </div>
                 </div>
 
-                <div class="form-row">
-                  <div class="form-group col-md-8">
-                    <label class="mb-1">Nome do responsável *</label>
-                    <input type="text" class="form-control" name="nome" required maxlength="120"
-                      placeholder="Nome do responsável pela organização">
-                    <small class="help">Nome do responsável da organização que irá assinar o termo de compromisso.</small>
-                  </div>
-                  <div class="form-group col-md-4">
-                    <label class="mb-1">CPF do responsável *</label>
-                    <input type="text" class="form-control" name="cpf_responsavel" required maxlength="11"
-                      placeholder="Apenas numeros" pattern="[0-9]{11}" inputmode="numeric">
-                  </div>
+                <div id="mensagemNaoConcorda" class="alert alert-warning d-none" role="alert">
+                  Agradecemos seu interesse. Pela não aceitação do uso dos dados informados, não será possível realizar a inscrição.
                 </div>
+
+                <div id="camposFormulario" class="d-none">
+                  <div class="intro-note">
+                    <strong>Preencha o formulário abaixo</strong> com os dados da organização e dos representantes que participarão da jornada.
+                  </div>
+                  <h3 class="mb-1">Dados da inscrição</h3>
+                  <p class="subtitle mb-4">Selecione uma turma disponível e envie todas as informações obrigatórias para concluir sua inscrição.</p>
+
+                  <div class="form-row">
+                    <div class="form-group col-md-12">
+                      <label class="mb-1">Nome da organização *</label>
+                      <input type="text" class="form-control" name="nome_organizacao" required maxlength="150"
+                        placeholder="Nome da organização">
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group col-md-4">
+                      <label class="mb-1">CNPJ *</label>
+                      <input type="text" class="form-control" name="cnpj" required maxlength="14"
+                        placeholder="Apenas numeros" pattern="[0-9]{14}" inputmode="numeric">
+                      <small class="help">Informe apenas os 14 numeros do CNPJ.</small>
+                    </div>
+                    <div class="form-group col-md-8">
+                      <label class="mb-1">Endereço *</label>
+                      <input type="text" class="form-control" name="endereco" required maxlength="200"
+                        placeholder="Rua, avenida, bairro, cidade">
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group col-md-8">
+                      <label class="mb-1">Nome do responsável *</label>
+                      <input type="text" class="form-control" name="nome" required maxlength="120"
+                        placeholder="Nome do responsável pela organização">
+                      <small class="help">Nome do responsável da organização que irá assinar o termo de compromisso.</small>
+                    </div>
+                    <div class="form-group col-md-4">
+                      <label class="mb-1">CPF do responsável *</label>
+                      <input type="text" class="form-control" name="cpf_responsavel" required maxlength="11"
+                        placeholder="Apenas numeros" pattern="[0-9]{11}" inputmode="numeric">
+                    </div>
+                  </div>
+ 
 
                 <div class="form-row">
                   <div class="form-group col-md-6">
@@ -548,13 +588,14 @@ if (count($eventos)) {
                     placeholder="Se sim, deixe o contato aqui."></textarea>
                 </div>
 
-                <div class="d-flex align-items-center justify-content-between mt-4 flex-wrap">
-                  <small class="help mb-2 mb-md-0">
-                    Ao enviar, você concorda em receber comunicações por e-mail.
-                  </small>
-                  <button type="submit" id="btnEnviar" class="btn btn-brand">
-                    Enviar
-                  </button>
+                  <div class="d-flex align-items-center justify-content-between mt-4 flex-wrap">
+                    <small class="help mb-2 mb-md-0">
+                      Ao enviar, você concorda em receber comunicações por e-mail.
+                    </small>
+                    <button type="submit" id="btnEnviar" class="btn btn-brand">
+                      Enviar
+                    </button>
+                  </div>
                 </div>
               </form>
 
@@ -572,6 +613,29 @@ if (count($eventos)) {
 
     <script>
       $(function() {
+        const camposFormulario = $('#camposFormulario');
+        const mensagemNaoConcorda = $('#mensagemNaoConcorda');
+        const camposObrigatorios = camposFormulario.find(':input').not('[type="button"], [type="submit"], [type="reset"], [disabled]');
+
+        function atualizarConsentimento() {
+          const consentimento = $('input[name="lgpd_consentimento"]:checked').val();
+
+          if (consentimento === 'sim') {
+            mensagemNaoConcorda.addClass('d-none');
+            camposFormulario.removeClass('d-none');
+            camposObrigatorios.prop('disabled', false);
+            return;
+          }
+
+          camposFormulario.addClass('d-none');
+          camposObrigatorios.prop('disabled', true);
+
+          if (consentimento === 'nao') {
+            mensagemNaoConcorda.removeClass('d-none');
+          } else {
+            mensagemNaoConcorda.addClass('d-none');
+          }
+        }
 
         function showAlert(type, msg) {
           const alerta = $('#alerta');
@@ -587,6 +651,9 @@ if (count($eventos)) {
             }, 300);
           }
         }
+
+        $('input[name="lgpd_consentimento"]').on('change', atualizarConsentimento);
+        atualizarConsentimento();
 
         $('#formInscricao').on('submit', function(e) {
           e.preventDefault();
