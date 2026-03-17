@@ -615,6 +615,7 @@ if (count($eventos)) {
       $(function() {
         const camposFormulario = $('#camposFormulario');
         const mensagemNaoConcorda = $('#mensagemNaoConcorda');
+        const btnEnviar = $('#btnEnviar');
         const camposObrigatorios = camposFormulario.find(':input').not('[type="button"], [type="submit"], [type="reset"], [disabled]');
 
         function atualizarConsentimento() {
@@ -624,11 +625,13 @@ if (count($eventos)) {
             mensagemNaoConcorda.addClass('d-none');
             camposFormulario.removeClass('d-none');
             camposObrigatorios.prop('disabled', false);
+            btnEnviar.prop('disabled', false);
             return;
           }
 
           camposFormulario.addClass('d-none');
           camposObrigatorios.prop('disabled', true);
+          btnEnviar.prop('disabled', true);
 
           if (consentimento === 'nao') {
             mensagemNaoConcorda.removeClass('d-none');
@@ -659,6 +662,13 @@ if (count($eventos)) {
           e.preventDefault();
 
           const form = this;
+          const consentimento = $('input[name="lgpd_consentimento"]:checked').val();
+
+          if (consentimento !== 'sim') {
+            showAlert('warning', 'Para prosseguir com a inscrição, é necessário concordar com o uso dos dados informados.');
+            return;
+          }
+
           if (!form.checkValidity()) {
             form.reportValidity();
             return;
@@ -666,7 +676,7 @@ if (count($eventos)) {
 
           const dados = new FormData(form);
 
-          $('#btnEnviar').prop('disabled', true).text('Enviando...');
+          btnEnviar.prop('disabled', true).text('Enviando...');
 
           $.ajax({
             url: './inscrever.php',
@@ -700,7 +710,7 @@ if (count($eventos)) {
               showAlert('danger', 'Não foi possível enviar. Tente novamente.');
             },
             complete: function() {
-              $('#btnEnviar').prop('disabled', false).text('Enviar inscrição');
+              btnEnviar.prop('disabled', false).text('Enviar inscrição');
             }
           });
         });
