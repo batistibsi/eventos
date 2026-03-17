@@ -123,6 +123,23 @@ if (count($eventos)) {
     .help {
       font-size: 12.5px;
       color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group .form-control,
+    .form-group .form-control-file {
+      margin-top: auto;
+    }
+
+    @media (min-width: 768px) {
+      .form-row .help {
+        min-height: 2.7em;
+      }
     }
 
     .rep-card {
@@ -379,6 +396,7 @@ if (count($eventos)) {
 
                   <div class="form-group mb-0 mt-4">
                     <label class="mb-2 d-block">Você concorda com o uso dos dados informados? *</label>
+                    <small class="help d-block mb-2">Sua concordância é necessária para que o Instituto ACIM possa processar a inscrição e entrar em contato quando necessário.</small>
                     <div class="custom-control custom-radio mb-2">
                       <input type="radio" id="lgpd_concordo" name="lgpd_consentimento" value="sim" class="custom-control-input" required>
                       <label class="custom-control-label" for="lgpd_concordo">Sim, concordo</label>
@@ -402,191 +420,206 @@ if (count($eventos)) {
                   <p class="subtitle mb-4">Selecione uma turma disponível e envie todas as informações obrigatórias para concluir sua inscrição.</p>
 
                   <div class="form-row">
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-8">
                       <label class="mb-1">Nome da organização *</label>
+                      <small class="help d-block mb-2">Informe o nome oficial da organização responsável pela inscrição.</small>
                       <input type="text" class="form-control" name="nome_organizacao" required maxlength="150"
                         placeholder="Nome da organização">
+                    </div>
+                    <div class="form-group col-md-4">
+                      <label class="mb-1">CNPJ *</label>
+                      <small class="help d-block mb-2">Informe apenas os 14 numeros do CNPJ, sem pontos, barras ou traços.</small>
+                      <input type="text" class="form-control" name="cnpj" required maxlength="14"
+                        placeholder="Apenas numeros" pattern="[0-9]{14}" inputmode="numeric">
                     </div>
                   </div>
 
                   <div class="form-row">
-                    <div class="form-group col-md-4">
-                      <label class="mb-1">CNPJ *</label>
-                      <input type="text" class="form-control" name="cnpj" required maxlength="14"
-                        placeholder="Apenas numeros" pattern="[0-9]{14}" inputmode="numeric">
-                      <small class="help">Informe apenas os 14 numeros do CNPJ.</small>
-                    </div>
                     <div class="form-group col-md-8">
                       <label class="mb-1">Endereço *</label>
+                      <small class="help d-block mb-2">Preencha com rua, numero, bairro, cidade e demais informações relevantes.</small>
                       <input type="text" class="form-control" name="endereco" required maxlength="200"
                         placeholder="Rua, avenida, bairro, cidade">
+                    </div>
+                    <div class="form-group col-md-4">
+                      <label class="mb-1">Colaboradores/voluntários *</label>
+                      <small class="help d-block mb-2">Informe a quantidade total de colaboradores e/ou voluntários da organização.</small>
+                      <input type="number" class="form-control" name="numero_colaboradores" required min="1" step="1"
+                        placeholder="Quantidade">
                     </div>
                   </div>
 
                   <div class="form-row">
                     <div class="form-group col-md-8">
                       <label class="mb-1">Nome do responsável *</label>
+                      <small class="help d-block mb-2">Nome do responsável da organização que irá assinar o termo de compromisso.</small>
                       <input type="text" class="form-control" name="nome" required maxlength="120"
                         placeholder="Nome do responsável pela organização">
-                      <small class="help">Nome do responsável da organização que irá assinar o termo de compromisso.</small>
                     </div>
                     <div class="form-group col-md-4">
                       <label class="mb-1">CPF do responsável *</label>
+                      <small class="help d-block mb-2">Informe apenas os 11 numeros do CPF do responsável, sem pontuação.</small>
                       <input type="text" class="form-control" name="cpf_responsavel" required maxlength="11"
                         placeholder="Apenas numeros" pattern="[0-9]{11}" inputmode="numeric">
                     </div>
                   </div>
- 
 
-                <div class="form-row">
-                  <div class="form-group col-md-6">
-                    <label class="mb-1">E-mail do responsável *</label>
-                    <input type="email" class="form-control" name="email" required maxlength="120"
-                      placeholder="responsavel@organizacao.com.br">
-                  </div>
-                  <div class="form-group col-md-6">
+                  <div class="form-row">
+                    <div class="form-group col-md-8">
+                      <label class="mb-1">E-mail do responsável *</label>
+                      <small class="help d-block mb-2">Utilize um e-mail válido para receber confirmações e comunicados da inscrição.</small>
+                      <input type="email" class="form-control" name="email" required maxlength="120"
+                        placeholder="responsavel@organizacao.com.br">
+                    </div>
+                    <div class="form-group col-md-4">
                       <label class="mb-1">Telefone do responsável *</label>
+                      <small class="help d-block mb-2">Informe um telefone com DDD para contato com o responsável pela inscrição.</small>
                       <input required type="tel" class="form-control" name="telefone" maxlength="20"
                         placeholder="(00) 00000-0000">
                     </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group col-md-5">
-                    <label class="mb-1">Número de colaboradores/voluntários *</label>
-                    <input type="number" class="form-control" name="numero_colaboradores" required min="1" step="1"
-                      placeholder="Quantidade">
                   </div>
-                  <div class="form-group col-md-7">
-                    <label class="mb-1">Turma *</label>
-                    <select class="form-control" name="id_evento" required>
-                      <option value="">Selecione uma data...</option>
-                      <?php foreach ($eventos as $evento): ?>
-                        <option value="<?= $evento['id_evento'] ?>">
-                          <?= htmlspecialchars($evento['label'], ENT_QUOTES, 'UTF-8') ?>
-                        </option>
-                      <?php endforeach; ?>
+
+                  <div class="rep-card">
+                    <div class="rep-title">Turma da participação</div>
+                    <div class="form-group mb-0">
+                      <label class="mb-1">ESCOLHA A TURMA QUE IRÁ PARTICIPAR *</label>
+                      <small class="help d-block mb-2">Selecione uma das turmas disponíveis para participação da organização.</small>
+                      <select class="form-control" name="id_evento" required>
+                        <option value="">Selecione uma data...</option>
+                        <?php foreach ($eventos as $evento): ?>
+                          <option value="<?= $evento['id_evento'] ?>">
+                            <?= htmlspecialchars($evento['label'], ENT_QUOTES, 'UTF-8') ?>
+                          </option>
+                        <?php endforeach; ?>
+                      </select>
+                    </div>
+                  </div>
+
+                  <hr class="my-4">
+                  <h5 class="mb-3">Representantes</h5>
+
+                  <div class="rep-card">
+                    <div class="rep-title">Representante 1</div>
+                    <div class="form-group">
+                      <label class="mb-1">Nome completo do representante 1 *</label>
+                      <small class="help d-block mb-2">Preencha corretamente, pois o nome será utilizado para emissão dos certificados de participação.</small>
+                      <input type="text" class="form-control" name="representante_1_nome" required maxlength="120"
+                        placeholder="Nome completo">
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label class="mb-1">Telefone do representante 1 *</label>
+                        <small class="help d-block mb-2">Informe um telefone com DDD para contato direto com o representante.</small>
+                        <input type="tel" class="form-control" name="representante_1_telefone" required maxlength="20"
+                          placeholder="(00) 00000-0000">
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label class="mb-1">E-mail do representante 1 *</label>
+                        <small class="help d-block mb-2">Utilize um e-mail válido para envio de informações e materiais do evento.</small>
+                        <input type="email" class="form-control" name="representante_1_email" required maxlength="120"
+                          placeholder="representante1@organizacao.com.br">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rep-card">
+                    <div class="rep-title">Representante 2</div>
+                    <div class="form-group">
+                      <label class="mb-1">Nome completo do representante 2</label>
+                      <small class="help d-block mb-2">Preencha corretamente, pois o nome será utilizado para emissão dos certificados de participação.</small>
+                      <input type="text" class="form-control" name="representante_2_nome" maxlength="120"
+                        placeholder="Nome completo">
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label class="mb-1">Telefone do representante 2</label>
+                        <small class="help d-block mb-2">Informe um telefone com DDD caso este representante também participe da comunicação.</small>
+                        <input type="tel" class="form-control" name="representante_2_telefone" maxlength="20"
+                          placeholder="(00) 00000-0000">
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label class="mb-1">E-mail do representante 2</label>
+                        <small class="help d-block mb-2">Utilize um e-mail válido para compartilhar orientações e atualizações do evento.</small>
+                        <input type="email" class="form-control" name="representante_2_email" maxlength="120"
+                          placeholder="representante2@organizacao.com.br">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rep-card">
+                    <div class="rep-title">Representante 3</div>
+                    <div class="form-group">
+                      <label class="mb-1">Nome completo do representante 3</label>
+                      <small class="help d-block mb-2">Preencha corretamente, pois o nome será utilizado para emissão dos certificados de participação.</small>
+                      <input type="text" class="form-control" name="representante_3_nome" maxlength="120"
+                        placeholder="Nome completo">
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label class="mb-1">Telefone do representante 3</label>
+                        <small class="help d-block mb-2">Informe um telefone com DDD caso este representante precise receber contato.</small>
+                        <input type="tel" class="form-control" name="representante_3_telefone" maxlength="20"
+                          placeholder="(00) 00000-0000">
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label class="mb-1">E-mail do representante 3</label>
+                        <small class="help d-block mb-2">Utilize um e-mail válido para envio de comunicados, se houver participação.</small>
+                        <input type="email" class="form-control" name="representante_3_email" maxlength="120"
+                          placeholder="representante3@organizacao.com.br">
+                      </div>
+                    </div>
+                  </div>
+
+                  <hr class="my-4">
+
+                  <div class="form-group">
+                    <label class="mb-2 d-block">É sua primeira participação? *</label>
+                    <small class="help d-block mb-2">Informe se a organização já participou de edições anteriores da certificação.</small>
+                    <div class="custom-control custom-radio mb-2">
+                      <input type="radio" id="primeira_participacao_sim" name="primeira_participacao" value="sim" class="custom-control-input" required>
+                      <label class="custom-control-label" for="primeira_participacao_sim">Sim, será minha primeira vez participando.</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                      <input type="radio" id="primeira_participacao_nao" name="primeira_participacao" value="nao" class="custom-control-input" required>
+                      <label class="custom-control-label" for="primeira_participacao_nao">Não, já participei em edições anteriores.</label>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="mb-1">Nome da organização no certificado *</label>
+                    <small class="help d-block mb-2">Informe como o nome da organização deve aparecer no certificado e no troféu.</small>
+                    <input type="text" class="form-control" name="nome_certificado" required maxlength="150"
+                      placeholder="Como o nome deve aparecer no certificado e troféu">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="mb-1">Logo da organização *</label>
+                    <small class="help d-block mb-2">Anexe a logo da organização em PDF ou imagem, com tamanho máximo de 10 MB.</small>
+                    <input type="file" class="form-control-file" name="logo_organizacao" required accept=".pdf,image/*">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="mb-1">Como ficou sabendo da certificação? *</label>
+                    <small class="help d-block mb-2">Selecione o canal pelo qual a organização conheceu a Certificação IMPACTACIM.</small>
+                    <select class="form-control" name="como_soube" required>
+                      <option value="">Selecione...</option>
+                      <option value="E-mail">E-mail</option>
+                      <option value="Redes Sociais">Redes Sociais</option>
+                      <option value="Eventos do Instituto ACIM">Eventos do Instituto ACIM</option>
+                      <option value="Participante de edições anteriores">Participante de edições anteriores</option>
+                      <option value="Outro">Outro</option>
                     </select>
-                    <small class="help">Turmas disponíveis.</small>
                   </div>
-                </div>
 
-                <hr class="my-4">
-                <h5 class="mb-3">Representantes</h5>
-
-                <div class="rep-card">
-                  <div class="rep-title">Representante 1</div>
                   <div class="form-group">
-                    <label class="mb-1">Nome completo do representante 1 *</label>
-                    <input type="text" class="form-control" name="representante_1_nome" required maxlength="120"
-                      placeholder="Nome completo">
-                    <small class="help">Preencha corretamente, pois o nome será utilizado para emissão dos certificados de participação.</small>
+                    <label class="mb-1">Gostaria de indicar alguma organização para participar?</label>
+                    <small class="help d-block mb-2">Se desejar, informe o nome e o contato de outra organização que possa se interessar pela certificação.</small>
+                    <textarea class="form-control" name="indicacao_organizacao" rows="4" maxlength="500"
+                      placeholder="Se sim, deixe o contato aqui."></textarea>
                   </div>
-
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label class="mb-1">Telefone do representante 1 *</label>
-                      <input type="tel" class="form-control" name="representante_1_telefone" required maxlength="20"
-                        placeholder="(00) 00000-0000">
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label class="mb-1">E-mail do representante 1 *</label>
-                      <input type="email" class="form-control" name="representante_1_email" required maxlength="120"
-                        placeholder="representante1@organizacao.com.br">
-                    </div>
-                  </div>
-                </div>
-
-                <div class="rep-card">
-                  <div class="rep-title">Representante 2</div>
-                  <div class="form-group">
-                    <label class="mb-1">Nome completo do representante 2</label>
-                    <input type="text" class="form-control" name="representante_2_nome" maxlength="120"
-                      placeholder="Nome completo">
-                    <small class="help">Preencha corretamente, pois o nome será utilizado para emissão dos certificados de participação.</small>
-                  </div>
-
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label class="mb-1">Telefone do representante 2</label>
-                      <input type="tel" class="form-control" name="representante_2_telefone" maxlength="20"
-                        placeholder="(00) 00000-0000">
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label class="mb-1">E-mail do representante 2</label>
-                      <input type="email" class="form-control" name="representante_2_email" maxlength="120"
-                        placeholder="representante2@organizacao.com.br">
-                    </div>
-                  </div>
-                </div>
-
-                <div class="rep-card">
-                  <div class="rep-title">Representante 3</div>
-                  <div class="form-group">
-                    <label class="mb-1">Nome completo do representante 3</label>
-                    <input type="text" class="form-control" name="representante_3_nome" maxlength="120"
-                      placeholder="Nome completo">
-                    <small class="help">Preencha corretamente, pois o nome será utilizado para emissão dos certificados de participação.</small>
-                  </div>
-
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label class="mb-1">Telefone do representante 3</label>
-                      <input type="tel" class="form-control" name="representante_3_telefone" maxlength="20"
-                        placeholder="(00) 00000-0000">
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label class="mb-1">E-mail do representante 3</label>
-                      <input type="email" class="form-control" name="representante_3_email" maxlength="120"
-                        placeholder="representante3@organizacao.com.br">
-                    </div>
-                  </div>
-                </div>
-
-                <hr class="my-4">
-
-                <div class="form-group">
-                  <label class="mb-2 d-block">É sua primeira participação? *</label>
-                  <div class="custom-control custom-radio mb-2">
-                    <input type="radio" id="primeira_participacao_sim" name="primeira_participacao" value="sim" class="custom-control-input" required>
-                    <label class="custom-control-label" for="primeira_participacao_sim">Sim, será minha primeira vez participando.</label>
-                  </div>
-                  <div class="custom-control custom-radio">
-                    <input type="radio" id="primeira_participacao_nao" name="primeira_participacao" value="nao" class="custom-control-input" required>
-                    <label class="custom-control-label" for="primeira_participacao_nao">Não, já participei em edições anteriores.</label>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label class="mb-1">Nome da organização no certificado *</label>
-                  <input type="text" class="form-control" name="nome_certificado" required maxlength="150"
-                    placeholder="Como o nome deve aparecer no certificado e troféu">
-                  <small class="help">Informe como o nome da empresa deve aparecer nos materiais.</small>
-                </div>
-
-                <div class="form-group">
-                  <label class="mb-1">Logo da organização *</label>
-                  <input type="file" class="form-control-file" name="logo_organizacao" required accept=".pdf,image/*">
-                  <small class="help">Anexe a logo da organização. Arquivos aceitos: PDF ou imagem até 10 MB.</small>
-                </div>
-
-                <div class="form-group">
-                  <label class="mb-1">Como ficou sabendo da certificação? *</label>
-                  <select class="form-control" name="como_soube" required>
-                    <option value="">Selecione...</option>
-                    <option value="E-mail">E-mail</option>
-                    <option value="Redes Sociais">Redes Sociais</option>
-                    <option value="Eventos do Instituto ACIM">Eventos do Instituto ACIM</option>
-                    <option value="Participante de edições anteriores">Participante de edições anteriores</option>
-                    <option value="Outro">Outro</option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label class="mb-1">Gostaria de indicar alguma organização para participar?</label>
-                  <textarea class="form-control" name="indicacao_organizacao" rows="4" maxlength="500"
-                    placeholder="Se sim, deixe o contato aqui."></textarea>
-                </div>
 
                   <div class="d-flex align-items-center justify-content-between mt-4 flex-wrap">
                     <small class="help mb-2 mb-md-0">
