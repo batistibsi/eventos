@@ -12,6 +12,36 @@ if (count($eventos)) {
   }
 }
 
+function formatarDataHoraEvento($valor)
+{
+  if (empty($valor)) {
+    return '-';
+  }
+
+  $timestamp = strtotime($valor);
+
+  if ($timestamp === false) {
+    return htmlspecialchars($valor, ENT_QUOTES, 'UTF-8');
+  }
+
+  $meses = [
+    1 => 'Jan',
+    2 => 'Fev',
+    3 => 'Mar',
+    4 => 'Abr',
+    5 => 'Mai',
+    6 => 'Jun',
+    7 => 'Jul',
+    8 => 'Ago',
+    9 => 'Set',
+    10 => 'Out',
+    11 => 'Nov',
+    12 => 'Dez',
+  ];
+
+  return date('d', $timestamp) . ' ' . $meses[(int) date('n', $timestamp)];
+}
+
 ?>
 <!doctype html>
 <html lang="pt-br">
@@ -153,10 +183,10 @@ if (count($eventos)) {
 
     .rep-title {
       color: var(--brand);
-      font-size: 13px;
+      font-size: 1.15rem;
       font-weight: 800;
-      letter-spacing: .04em;
-      text-transform: uppercase;
+      letter-spacing: -.01em;
+      text-transform: none;
       margin-bottom: 14px;
     }
 
@@ -320,6 +350,99 @@ if (count($eventos)) {
       text-align: center;
       padding: 28px 15px 36px;
     }
+
+    .turma-table-wrap {
+      border: 1px solid rgba(24, 56, 133, .10);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 12px 28px rgba(8, 68, 68, .08);
+    }
+
+    .turma-table {
+      margin-bottom: 0;
+    }
+
+    .turma-table thead th {
+      background: #f2f6fd;
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      border-top: 0;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .turma-table tbody tr {
+      transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+
+    .turma-table tbody tr:hover {
+      background: #f8fbf5;
+    }
+
+    .turma-table td {
+      vertical-align: middle;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .turma-radio-cell {
+      width: 72px;
+      text-align: center;
+    }
+
+    .turma-radio {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: 2px solid rgba(8, 68, 68, .28);
+      background: #fff;
+      display: inline-grid;
+      place-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(8, 68, 68, .08);
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    .turma-radio::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      transform: scale(0);
+      transition: transform .16s ease;
+      background: #fff;
+    }
+
+    .turma-radio:hover {
+      border-color: var(--brand);
+      transform: scale(1.04);
+    }
+
+    .turma-radio:checked {
+      background: linear-gradient(135deg, var(--brand), #0f7c7c);
+      border-color: var(--brand);
+      box-shadow: 0 8px 18px rgba(8, 68, 68, .18);
+    }
+
+    .turma-radio:checked::before {
+      transform: scale(1);
+    }
+
+    .turma-table tbody tr.turma-selecionada {
+      background: linear-gradient(90deg, rgba(171, 202, 105, .16), rgba(8, 68, 68, .05));
+      box-shadow: inset 4px 0 0 var(--accent);
+    }
+
+    .turma-table tbody tr.turma-selecionada td {
+      color: var(--brand-dark);
+      font-weight: 700;
+    }
   </style>
 </head>
 
@@ -482,16 +605,39 @@ if (count($eventos)) {
                   <div class="rep-card">
                     <div class="rep-title">Turma da participação</div>
                     <div class="form-group mb-0">
-                      <label class="mb-1">ESCOLHA A TURMA QUE IRÁ PARTICIPAR *</label>
                       <small class="help d-block mb-2">Selecione uma das turmas disponíveis para participação da organização.</small>
-                      <select class="form-control" name="id_evento" required>
-                        <option value="">Selecione uma data...</option>
-                        <?php foreach ($eventos as $evento): ?>
-                          <option value="<?= $evento['id_evento'] ?>">
-                            <?= htmlspecialchars($evento['label'], ENT_QUOTES, 'UTF-8') ?>
-                          </option>
-                        <?php endforeach; ?>
-                      </select>
+                      <div class="table-responsive turma-table-wrap">
+                        <table class="table turma-table">
+                          <thead>
+                            <tr>
+                              <th></th>
+                              <th>Turma</th>
+                              <th>Observação</th>
+                              <th>Treinamento D1</th>
+                              <th>Treinamento D2</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <?php foreach ($eventos as $evento): ?>
+                              <tr>
+                                <td class="turma-radio-cell">
+                                  <input
+                                    type="radio"
+                                    class="turma-radio"
+                                    name="id_evento"
+                                    value="<?= htmlspecialchars($evento['id_evento'], ENT_QUOTES, 'UTF-8') ?>"
+                                    required
+                                    aria-label="Selecionar turma <?= htmlspecialchars($evento['titulo'], ENT_QUOTES, 'UTF-8') ?>">
+                                </td>
+                                <td><?= htmlspecialchars($evento['titulo'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= !empty($evento['observacao']) ? nl2br(htmlspecialchars($evento['observacao'], ENT_QUOTES, 'UTF-8')) : '-' ?></td>
+                                <td><?= formatarDataHoraEvento($evento['data_hora'] ?? null) ?></td>
+                                <td><?= formatarDataHoraEvento($evento['data_hora_2'] ?? null) ?></td>
+                              </tr>
+                            <?php endforeach; ?>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
 
@@ -690,6 +836,11 @@ if (count($eventos)) {
 
         $('input[name="lgpd_consentimento"]').on('change', atualizarConsentimento);
         atualizarConsentimento();
+
+        $(document).on('change', 'input[name="id_evento"]', function() {
+          $('.turma-table tbody tr').removeClass('turma-selecionada');
+          $(this).closest('tr').addClass('turma-selecionada');
+        });
 
         $('#formInscricao').on('submit', function(e) {
           e.preventDefault();

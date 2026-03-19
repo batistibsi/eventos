@@ -1,0 +1,113 @@
+<? $registro = $this->registro; ?>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+	<h1 class="h2 text-info">Evento</h1>
+	<div class="btn-toolbar mb-2 mb-md-0">
+		<div class="btn-group mr-2">
+			<button type="button" onclick="carregarTela('../../evento')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
+		</div>
+	</div>
+</div>
+<form id="formulario">
+	<input name="id_evento" type="hidden" value="<?= $registro ? $registro['id_evento'] : '' ?>" id="id_evento">
+	<div class="row">
+		<div class="form-group col-md-8">
+			<span><label for="titulo">Titulo: </label></span>
+			<input class="form-control" name="titulo" type="text" value="<?= $registro ? $this->escape($registro['titulo']) : '' ?>" id="titulo">
+		</div>
+		<div class="form-group col-md-4">
+			<span><label for="limite_vagas">Limite de vagas: </label></span>
+			<input class="form-control" name="limite_vagas" type="number" min="1" value="<?= $registro && $registro['limite_vagas'] !== null ? (int) $registro['limite_vagas'] : '' ?>" id="limite_vagas">
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="form-group col-md-4">
+			<span><label for="data_hora">Data/hora principal: </label></span>
+			<input class="form-control" name="data_hora" type="datetime-local" value="<?= $registro && !empty($registro['data_hora']) ? date('Y-m-d\TH:i', strtotime($registro['data_hora'])) : '' ?>" id="data_hora">
+		</div>
+		<div class="form-group col-md-4">
+			<span><label for="data_hora_2">Segunda data/hora: </label></span>
+			<input class="form-control" name="data_hora_2" type="datetime-local" value="<?= $registro && !empty($registro['data_hora_2']) ? date('Y-m-d\TH:i', strtotime($registro['data_hora_2'])) : '' ?>" id="data_hora_2">
+		</div>
+		<div class="form-group col-md-4">
+			<span><label for="auditoria">Auditoria: </label></span>
+			<input class="form-control" name="auditoria" type="datetime-local" value="<?= $registro && !empty($registro['auditoria']) ? date('Y-m-d\TH:i', strtotime($registro['auditoria'])) : '' ?>" id="auditoria">
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="form-group col-md-12">
+			<span><label for="observacao">Observacao: </label></span>
+			<textarea class="form-control" name="observacao" id="observacao" rows="4"><?= $registro && !empty($registro['observacao']) ? $this->escape($registro['observacao']) : '' ?></textarea>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="form-group col-md-12 text-right">
+			<button class="btn btn-success salvar"><span class="glyphicon glyphicon-floppy-disk"></span><i class="fa fa-floppy-o fa-lg"></i> Salvar</button>
+		</div>
+	</div>
+</form>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#titulo').focus();
+
+		$("#formulario").submit(function(e) {
+			e.preventDefault();
+
+			var erro = "";
+			var titulo = $('#titulo').val().trim();
+			var dataHora = $('#data_hora').val().trim();
+			var limiteVagas = $('#limite_vagas').val().trim();
+
+			if (titulo.length < 1) {
+				erro = 'Informe um titulo valido para o evento.';
+			}
+
+			if (erro === "" && dataHora === "") {
+				erro = 'Informe a data e hora principal do evento.';
+			}
+
+			if (erro === "" && limiteVagas !== "" && parseInt(limiteVagas, 10) < 1) {
+				erro = 'Informe um limite de vagas valido.';
+			}
+
+			if (erro !== "") {
+				swal({
+					title: "Atencao!",
+					text: erro,
+					type: "error"
+				});
+				return false;
+			}
+
+			$('.salvar').hide();
+			$.ajax({
+				type: "POST",
+				url: "../../evento/salvar",
+				data: $("#formulario").serialize(),
+				success: function(data) {
+					if (data.trim().length > 0) {
+						$('.salvar').show();
+						swal({
+							title: "Atencao!",
+							text: data,
+							type: "error"
+						});
+					} else {
+						carregarTela('../../evento');
+					}
+				},
+				error: function() {
+					$('.salvar').show();
+					swal({
+						title: "Atencao!",
+						text: "Nao foi possivel salvar o evento.",
+						type: "error"
+					});
+				}
+			});
+		});
+	});
+</script>
