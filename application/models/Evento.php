@@ -83,7 +83,7 @@ class Evento
                 }
                 $select = "select a.* 
                         from eventos_evento a " . $where . "
-                        order by a.data_hora desc";
+                        order by a.titulo asc";
 
                 $registros = $db->fetchAll($select);
 

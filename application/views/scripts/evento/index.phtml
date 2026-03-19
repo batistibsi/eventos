@@ -12,9 +12,10 @@
 		<thead>
 			<tr>
 				<th></th>
-				<th class="text-left">TITULO</th>
-				<th class="text-left">DATA PRINCIPAL</th>
-				<th class="text-left">SEGUNDA DATA</th>
+				<th class="text-left">TURMA</th>
+				<th class="text-left">OBSERVAÇÃO</th>
+				<th class="text-left">TREINAMENTO D1</th>
+				<th class="text-left">TREINAMENTO D2</th>
 				<th class="text-left">AUDITORIA</th>
 				<th class="text-left">LIMITE</th>
 			</tr>
@@ -31,6 +32,7 @@
 							</div>
 						</td>
 						<td class="text-left align-middle"><?= $this->escape($value['titulo']) ?></td>
+						<td class="text-left align-middle"><?= $this->escape($value['observacao']) ?></td>
 						<td class="text-left align-middle"><?= Util::formatData($value['data_hora']) ?> <?= Util::formatHora($value['data_hora']) ?></td>
 						<td class="text-left align-middle"><?= !empty($value['data_hora_2']) ? Util::formatData($value['data_hora_2']) . ' ' . Util::formatHora($value['data_hora_2']) : '-' ?></td>
 						<td class="text-left align-middle"><?= !empty($value['auditoria']) ? Util::formatData($value['auditoria']) . ' ' . Util::formatHora($value['auditoria']) : '-' ?></td>
@@ -53,7 +55,7 @@
 				targets: [0]
 			}],
 			"order": [
-				[2, 'desc']
+				[1, 'asc']
 			]
 		});
 	});
