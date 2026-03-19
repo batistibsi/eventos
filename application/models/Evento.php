@@ -104,13 +104,13 @@ class Evento
                 $titulo = isset($campos['titulo']) ? trim((string) $campos['titulo']) : '';
 
                 if (strlen($titulo) < 1) {
-                        self::$erro = 'Informe um titulo valido para o evento.';
+                        self::$erro = 'Informe uma turma válida para o evento.';
                         return false;
                 }
 
                 $dataHora = self::normalizarDataHora(isset($campos['data_hora']) ? $campos['data_hora'] : null);
                 if (!$dataHora) {
-                        self::$erro = 'Informe a data e hora principal do evento.';
+                        self::$erro = 'Informe o Treinamento D1 do evento.';
                         return false;
                 }
 
@@ -127,7 +127,7 @@ class Evento
                 }
 
                 $limiteVagas = isset($campos['limite_vagas']) && $campos['limite_vagas'] !== '' ? (int) $campos['limite_vagas'] : null;
-                if ($limiteVagas !== null && $limiteVagas < 1) {
+                if ($limiteVagas === null || $limiteVagas < 1) {
                         self::$erro = 'Informe um limite de vagas valido.';
                         return false;
                 }

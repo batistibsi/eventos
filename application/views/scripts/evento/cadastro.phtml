@@ -7,26 +7,26 @@
 		</div>
 	</div>
 </div>
-<form id="formulario">
+<form id="formulario" novalidate>
 	<input name="id_evento" type="hidden" value="<?= $registro ? $registro['id_evento'] : '' ?>" id="id_evento">
 	<div class="row">
 		<div class="form-group col-md-8">
-			<span><label for="titulo">Titulo: </label></span>
-			<input class="form-control" name="titulo" type="text" value="<?= $registro ? $this->escape($registro['titulo']) : '' ?>" id="titulo">
+			<span><label for="titulo">Turma: </label></span>
+			<input class="form-control" name="titulo" type="text" value="<?= $registro ? $this->escape($registro['titulo']) : '' ?>" id="titulo" required>
 		</div>
 		<div class="form-group col-md-4">
 			<span><label for="limite_vagas">Limite de vagas: </label></span>
-			<input class="form-control" name="limite_vagas" type="number" min="1" value="<?= $registro && $registro['limite_vagas'] !== null ? (int) $registro['limite_vagas'] : '' ?>" id="limite_vagas">
+			<input class="form-control" name="limite_vagas" type="number" min="1" max="20" value="<?= $registro && $registro['limite_vagas'] !== null ? (int) $registro['limite_vagas'] : '' ?>" id="limite_vagas" required>
 		</div>
 	</div>
 
 	<div class="row">
 		<div class="form-group col-md-4">
-			<span><label for="data_hora">Data/hora principal: </label></span>
-			<input class="form-control" name="data_hora" type="datetime-local" value="<?= $registro && !empty($registro['data_hora']) ? date('Y-m-d\TH:i', strtotime($registro['data_hora'])) : '' ?>" id="data_hora">
+			<span><label for="data_hora">Treinamento D1: </label></span>
+			<input class="form-control" name="data_hora" type="datetime-local" value="<?= $registro && !empty($registro['data_hora']) ? date('Y-m-d\TH:i', strtotime($registro['data_hora'])) : '' ?>" id="data_hora" required>
 		</div>
 		<div class="form-group col-md-4">
-			<span><label for="data_hora_2">Segunda data/hora: </label></span>
+			<span><label for="data_hora_2">Treinamento D2: </label></span>
 			<input class="form-control" name="data_hora_2" type="datetime-local" value="<?= $registro && !empty($registro['data_hora_2']) ? date('Y-m-d\TH:i', strtotime($registro['data_hora_2'])) : '' ?>" id="data_hora_2">
 		</div>
 		<div class="form-group col-md-4">
@@ -56,29 +56,8 @@
 		$("#formulario").submit(function(e) {
 			e.preventDefault();
 
-			var erro = "";
-			var titulo = $('#titulo').val().trim();
-			var dataHora = $('#data_hora').val().trim();
-			var limiteVagas = $('#limite_vagas').val().trim();
-
-			if (titulo.length < 1) {
-				erro = 'Informe um titulo valido para o evento.';
-			}
-
-			if (erro === "" && dataHora === "") {
-				erro = 'Informe a data e hora principal do evento.';
-			}
-
-			if (erro === "" && limiteVagas !== "" && parseInt(limiteVagas, 10) < 1) {
-				erro = 'Informe um limite de vagas valido.';
-			}
-
-			if (erro !== "") {
-				swal({
-					title: "Atencao!",
-					text: erro,
-					type: "error"
-				});
+			if (!this.checkValidity()) {
+				this.reportValidity();
 				return false;
 			}
 
