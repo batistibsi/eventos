@@ -474,7 +474,7 @@ function formatarDataHoraEvento($valor)
             </p>
             <p class="mb-3">
               <strong>Acesse o edital <?= date('Y') ?> </strong>
-              <a target="_blank" href="https://drive.google.com/file/d/15djoXHqN02QFcBM1dvmroazq5voK4hm3/view" class="hero-link">neste link</a>
+              <a target="_blank" href="https://docs.google.com/document/d/10gieVrHcRgXZAGxRnXcqEPjfaDJfNyildg333RTXAJI/edit?usp=sharing" class="hero-link">neste link</a>
             </p>
             <p class="mb-2"><strong>Em caso de dúvidas:</strong></p>
             <p class="mb-0">
