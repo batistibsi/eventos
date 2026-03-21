@@ -56,6 +56,8 @@
  	// Desativa autodescoberta para evitar que o Dropzone inicialize 2x
  	Dropzone.autoDiscover = false;
 
+ 	var paginaDefault = 'inscricao';
+
  	const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
  	function openFullscreen() {
@@ -204,7 +206,7 @@
 
  		$(function() {
  			let last_src = localStorage.getItem('last_src');
- 			let last_menu = 'dashboard';
+ 			let last_menu = paginaDefault;
  			if (last_src) {
  				history.replaceState({
  					src: last_src,
@@ -214,10 +216,10 @@
  				last_menu = localStorage.getItem('last_menu');
  			} else {
  				history.replaceState({
- 					src: '../../dashboard',
+ 					src: '../../' + paginaDefault,
  					content: '#content'
  				}, '', '');
- 				carregarTela('../../dashboard', '#content', false);
+ 				carregarTela('../../' + paginaDefault, '#content', false);
  			}
  			$('[data-menu-item="' + last_menu + '"]').addClass('active');
  		});

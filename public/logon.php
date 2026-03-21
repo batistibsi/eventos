@@ -40,7 +40,7 @@ $skyn = 'padrao';
                 </div>
                 <div class="col-12 col-md-6 col-xl-5">
                     <div class="card border-0 shadow rounded">
-                        <div class="card-body p-3 p-md-4 p-xl-5">                            
+                        <div class="card-body p-3 p-md-4 p-xl-5">
                             <div class="row">
                                 <div class="col-12">
                                     <div class="h1 mb-1">
@@ -124,7 +124,7 @@ $skyn = 'padrao';
 </html>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
 <script>
     $(document).ready(function() {
         $("form").on('submit', function(e) {
@@ -139,5 +139,8 @@ $skyn = 'padrao';
                 return;
             }
         });
+
+        localStorage.setItem('last_src', '');
+        localStorage.setItem('last_content', '');
     });
 </script>
