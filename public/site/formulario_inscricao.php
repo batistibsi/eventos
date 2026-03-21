@@ -443,6 +443,93 @@ function formatarDataHoraEvento($valor)
       color: var(--brand-dark);
       font-weight: 700;
     }
+
+    @media (max-width: 767.98px) {
+      .turma-table-wrap {
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        overflow: visible;
+      }
+
+      .turma-table,
+      .turma-table thead,
+      .turma-table tbody,
+      .turma-table tr,
+      .turma-table th,
+      .turma-table td {
+        display: block;
+      }
+
+      .turma-table {
+        background: transparent;
+      }
+
+      .turma-table thead {
+        display: none;
+      }
+
+      .turma-table tbody tr {
+        margin-bottom: 14px;
+        padding: 16px 16px 14px;
+        border: 1px solid rgba(24, 56, 133, .10);
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 12px 28px rgba(8, 68, 68, .08);
+      }
+
+      .turma-table tbody tr:last-child {
+        margin-bottom: 0;
+      }
+
+      .turma-table td {
+        border-top: 0;
+        padding: 0;
+        text-align: left;
+        text-transform: none;
+      }
+
+      .turma-radio-cell {
+        width: 100%;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+
+      .turma-table td[data-label] {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 9px 0;
+        border-top: 1px solid rgba(24, 56, 133, .08);
+      }
+
+      .turma-table td[data-label]::before {
+        content: attr(data-label);
+        flex: 0 0 42%;
+        max-width: 140px;
+        color: var(--brand);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+      }
+
+      .turma-cell-value {
+        flex: 1 1 auto;
+        min-width: 0;
+        text-align: right;
+        font-size: 14px;
+        line-height: 1.45;
+        word-break: break-word;
+      }
+
+      .turma-table tbody tr.turma-selecionada {
+        box-shadow: inset 4px 0 0 var(--accent), 0 14px 30px rgba(8, 68, 68, .12);
+      }
+    }
   </style>
 </head>
 
@@ -629,10 +716,10 @@ function formatarDataHoraEvento($valor)
                                     required
                                     aria-label="Selecionar turma <?= htmlspecialchars($evento['titulo'], ENT_QUOTES, 'UTF-8') ?>">
                                 </td>
-                                <td><?= htmlspecialchars($evento['titulo'], ENT_QUOTES, 'UTF-8') ?></td>
-                                <td><?= !empty($evento['observacao']) ? nl2br(htmlspecialchars($evento['observacao'], ENT_QUOTES, 'UTF-8')) : '-' ?></td>
-                                <td><?= formatarDataHoraEvento($evento['data_hora'] ?? null) ?></td>
-                                <td><?= formatarDataHoraEvento($evento['data_hora_2'] ?? null) ?></td>
+                                <td data-label="Turma"><span class="turma-cell-value"><?= htmlspecialchars($evento['titulo'], ENT_QUOTES, 'UTF-8') ?></span></td>
+                                <td data-label="Observação"><span class="turma-cell-value"><?= !empty($evento['observacao']) ? nl2br(htmlspecialchars($evento['observacao'], ENT_QUOTES, 'UTF-8')) : '-' ?></span></td>
+                                <td data-label="Treinamento D1"><span class="turma-cell-value"><?= formatarDataHoraEvento($evento['data_hora'] ?? null) ?></span></td>
+                                <td data-label="Treinamento D2"><span class="turma-cell-value"><?= formatarDataHoraEvento($evento['data_hora_2'] ?? null) ?></span></td>
                               </tr>
                             <?php endforeach; ?>
                           </tbody>
