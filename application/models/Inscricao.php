@@ -12,8 +12,14 @@ class Inscricao
         {
                 $db = Zend_Registry::get('db');
 
-                $select = "select a.* 
+                $select = "select a.*,
+                                    b.titulo as evento_titulo,
+                                    b.observacao as evento_observacao,
+                                    b.data_hora as evento_data_hora,
+                                    b.data_hora_2 as evento_data_hora_2,
+                                    b.limite_vagas as evento_limite_vagas
                              from eventos_inscricao a
+                             left join eventos_evento b on b.id_evento = a.id_evento
                              where a.id_inscricao = " . $id_inscricao . ";";
 
                 $registros = $db->fetchAll($select);

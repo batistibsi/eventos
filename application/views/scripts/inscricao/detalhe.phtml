@@ -7,7 +7,7 @@
         $statusDisponiveis[] = $statusAtual;
     }
 
-    $valorOuPadrao = function ($valor, $padrao = 'Nao informado') {
+    $valorOuPadrao = function ($valor, $padrao = 'Não informado') {
         if ($valor === null) return $padrao;
 
         $valor = trim((string) $valor);
@@ -38,7 +38,15 @@
 
     $formatarBooleano = function ($valor) {
         $valor = filter_var($valor, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-        return $valor ? 'Sim' : 'Nao';
+        return $valor ? 'Sim' : 'Não';
+    };
+
+    $formatarDataHora = function ($valor) {
+        if (empty($valor)) {
+            return 'Não informado';
+        }
+
+        return Util::formatData($valor) . ' ' . Util::formatHora($valor);
     };
 
     $representantes = [
@@ -82,6 +90,36 @@
 
     .inscricao-detalhe .detalhe-card-body {
         padding: 1.35rem 1.5rem;
+    }
+
+    .inscricao-detalhe .detalhe-evento-box {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 14px;
+        padding: .85rem .95rem;
+    }
+
+    .inscricao-detalhe .detalhe-evento-box .detalhe-titulo {
+        margin-bottom: .65rem;
+        color: rgba(255, 255, 255, 0.78);
+    }
+
+    .inscricao-detalhe .detalhe-evento-box .detalhe-label {
+        color: rgba(255, 255, 255, 0.72);
+    }
+
+    .inscricao-detalhe .detalhe-evento-box .detalhe-valor {
+        color: #fff;
+    }
+
+    .inscricao-detalhe .detalhe-evento-grid {
+        display: grid;
+        gap: 1px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .inscricao-detalhe .detalhe-evento-item {
+        min-width: 0;
     }
 
     .inscricao-detalhe .detalhe-titulo {
@@ -138,22 +176,28 @@
         gap: .75rem;
     }
 
-    .inscricao-detalhe .detalhe-status-form .form-control {
+    .inscricao-detalhe .detalhe-status-select {
+        -webkit-appearance: none;
+        appearance: none;
         background: rgba(255, 255, 255, 0.18);
         border: 1px solid rgba(255, 255, 255, 0.22);
+        box-sizing: border-box;
         border-radius: 999px;
         color: #fff;
         font-size: .8rem;
         flex: 0 1 220px;
         font-weight: 700;
-        height: auto;
+        height: 2.1rem;
+        line-height: 1;
         margin: 0;
         min-width: 190px;
-        padding: .45rem 2rem .45rem .9rem;
+        min-height: 0;
+        padding: 0 2rem 0 .9rem;
         text-transform: uppercase;
+        vertical-align: middle;
     }
 
-    .inscricao-detalhe .detalhe-status-form .form-control option {
+    .inscricao-detalhe .detalhe-status-select option {
         color: #1d3049;
     }
 
@@ -178,17 +222,32 @@
     .inscricao-detalhe .detalhe-metrica {
         background: rgba(255, 255, 255, 0.12);
         border-radius: 14px;
-        padding: .9rem 1rem;
+        padding: .7rem .85rem;
+    }
+
+    .inscricao-detalhe .detalhe-metricas-grid {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        display: grid;
+        gap: 1px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        overflow: hidden;
+    }
+
+    .inscricao-detalhe .detalhe-metricas-grid .detalhe-metrica {
+        background: transparent;
+        border-radius: 0;
+        min-height: 100%;
     }
 
     .inscricao-detalhe .detalhe-metrica strong {
         display: block;
-        font-size: 1.25rem;
+        font-size: 1.1rem;
         line-height: 1.2;
     }
 
     .inscricao-detalhe .detalhe-metrica span {
-        font-size: .78rem;
+        font-size: .72rem;
         opacity: .88;
         text-transform: uppercase;
     }
@@ -235,21 +294,57 @@
             padding: 1.1rem;
         }
 
-        .inscricao-detalhe .detalhe-status-form {
-            align-items: stretch;
-            flex-direction: column;
+        .inscricao-detalhe .detalhe-metricas-grid {
+            grid-template-columns: 1fr;
         }
 
-        .inscricao-detalhe .detalhe-status-form .form-control,
+        .inscricao-detalhe .detalhe-evento-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .inscricao-detalhe .detalhe-status-form {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: .45rem;
+        }
+
+        .inscricao-detalhe .detalhe-status-select,
         .inscricao-detalhe .detalhe-status-form .btn {
+            max-width: 100%;
+        }
+
+        .inscricao-detalhe .detalhe-status-select {
+            background: #fff;
+            border: 1px solid rgba(36, 69, 125, 0.2);
+            border-radius: 10px;
+            color: #1d3049;
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            height: 2.25rem;
+            line-height: normal;
+            min-width: 0;
+            padding: .2rem 2rem .2rem .7rem;
             width: 100%;
+        }
+
+        .inscricao-detalhe .detalhe-status-form .btn {
+            font-size: .74rem;
+            min-height: 2.1rem;
+            padding: .35rem .85rem;
+            width: 100%;
+        }
+
+        .inscricao-detalhe .detalhe-status-select {
+            background-position: right .7rem center;
+            background-size: 10px;
         }
     }
 </style>
 
 <div class="inscricao-detalhe">
     <div class="d-flex justify-content-center justify-content-md-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-        <h1 class="h2 text-info mb-2 mb-md-0">Detalhe da inscricao</h1>
+        <h1 class="h2 text-info mb-2 mb-md-0">Detalhe da inscrição</h1>
         <div class="btn-toolbar">
             <button type="button" onclick="carregarTela('../../inscricao', '#content', false);" class="btn btn-primary">
                 <i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar
@@ -258,12 +353,12 @@
     </div>
 
     <div class="detalhe-resumo mb-4">
-        <div class="row align-items-center">
+        <div class="row align-items-start">
             <div class="col-12 col-lg-7 mb-3 mb-lg-0">
                 <div class="mb-2">
                     <form id="form-status-inscricao" class="detalhe-status-form">
                         <input type="hidden" name="id_inscricao" value="<?= (int) ($inscricao['id_inscricao'] ?? 0) ?>">
-                        <select name="status" id="status" class="form-control detalhe-status">
+                        <select name="status" id="status" class="detalhe-status detalhe-status-select">
                             <? foreach ($statusDisponiveis as $status) : ?>
                                 <option value="<?= $this->escape($status) ?>" <?= $status === $statusAtual ? 'selected' : '' ?>><?= $this->escape($status) ?></option>
                             <? endforeach; ?>
@@ -273,31 +368,44 @@
                 </div>
                 <h3 class="mb-2"><?= $valorOuPadrao($inscricao['nome_organizacao'] ?? null) ?></h3>
                 <p class="mb-0">
-                    Responsavel: <?= $valorOuPadrao($inscricao['nome'] ?? null) ?><br>
+                    Responsável: <?= $valorOuPadrao($inscricao['nome'] ?? null) ?><br>
                     E-mail: <?= $valorOuPadrao($inscricao['email'] ?? null) ?><br>
                     Telefone: <?= $formatarTelefone($inscricao['telefone'] ?? null) ?>
                 </p>
             </div>
             <div class="col-12 col-lg-5">
                 <div class="row">
-                    <div class="col-6 mb-2">
-                        <div class="detalhe-metrica">
-                            <span>Inscricao</span>
-                            <strong>#<?= (int) ($inscricao['id_inscricao'] ?? 0) ?></strong>
-                        </div>
-                    </div>
-                    <div class="col-6 mb-2">
-                        <div class="detalhe-metrica">
-                            <span>Colaboradores</span>
-                            <strong><?= (int) ($inscricao['numero_colaboradores'] ?? 0) ?></strong>
+                    <div class="col-12 mb-2">
+                        <div class="detalhe-metricas-grid">
+                            <div class="detalhe-metrica">
+                                <span>Inscrição</span>
+                                <strong>#<?= (int) ($inscricao['id_inscricao'] ?? 0) ?></strong>
+                            </div>
+                            <div class="detalhe-metrica">
+                                <span>Colaboradores</span>
+                                <strong><?= (int) ($inscricao['numero_colaboradores'] ?? 0) ?></strong>
+                            </div>
+                            <div class="detalhe-metrica">
+                                <span>Criada em</span>
+                                <strong>
+                                    <?= !empty($inscricao['created_at']) ? Util::formatData($inscricao['created_at']) . ' ' . Util::formatHora($inscricao['created_at']) : 'Não informado' ?>
+                                </strong>
+                            </div>
                         </div>
                     </div>
                     <div class="col-12">
-                        <div class="detalhe-metrica">
-                            <span>Criada em</span>
-                            <strong>
-                                <?= !empty($inscricao['created_at']) ? Util::formatData($inscricao['created_at']) . ' ' . Util::formatHora($inscricao['created_at']) : 'Nao informado' ?>
-                            </strong>
+                        <div class="detalhe-evento-box">
+                            <div class="detalhe-titulo">Turma da inscrição</div>
+                            <div class="detalhe-evento-grid">
+                                <div class="detalhe-evento-item">
+                                    <span class="detalhe-label">Turma</span>
+                                    <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['evento_titulo'] ?? null) ?></div>
+                                </div>
+                                <div class="detalhe-evento-item">
+                                    <span class="detalhe-label">Observação</span>
+                                    <div class="detalhe-valor"><?= nl2br($this->escape($valorOuPadrao($inscricao['evento_observacao'] ?? null))) ?></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -309,7 +417,7 @@
         <div class="col-12 col-xl-6 mb-4">
             <div class="detalhe-card">
                 <div class="detalhe-card-body">
-                    <div class="detalhe-titulo">Responsavel pela inscricao</div>
+                    <div class="detalhe-titulo">Responsável pela inscrição</div>
                     <div class="row">
                         <div class="col-12 mb-3">
                             <span class="detalhe-label">Nome</span>
@@ -328,7 +436,7 @@
                             <div class="detalhe-valor"><?= $formatarTelefone($inscricao['telefone'] ?? null) ?></div>
                         </div>
                         <div class="col-12">
-                            <span class="detalhe-label">Endereco</span>
+                            <span class="detalhe-label">Endereço</span>
                             <div class="detalhe-valor"><?= nl2br($this->escape($valorOuPadrao($inscricao['endereco'] ?? null))) ?></div>
                         </div>
                     </div>
@@ -339,10 +447,10 @@
         <div class="col-12 col-xl-6 mb-4">
             <div class="detalhe-card">
                 <div class="detalhe-card-body">
-                    <div class="detalhe-titulo">Organizacao</div>
+                    <div class="detalhe-titulo">Organização</div>
                     <div class="row">
                         <div class="col-12 mb-3">
-                            <span class="detalhe-label">Nome da organizacao</span>
+                            <span class="detalhe-label">Nome da organização</span>
                             <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['nome_organizacao'] ?? null) ?></div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -359,13 +467,13 @@
                                 <? if ($logo) : ?>
                                     <? if ($logoEhImagem) : ?>
                                         <a href="<?= $logo ?>" target="_blank" class="logo-preview mb-3">
-                                            <img src="<?= $logo ?>" alt="Logo da organizacao">
+                                            <img src="<?= $logo ?>" alt="Logo da organização">
                                         </a>
                                     <? else : ?>
                                         <div class="logo-preview mb-3">
                                             <div class="logo-placeholder">
-                                                Pre-visualizacao indisponivel para este formato.<br>
-                                                Abra o arquivo para visualizar o conteudo.
+                                                Pré-visualização indisponível para este formato.<br>
+                                                Abra o arquivo para visualizar o conteúdo.
                                             </div>
                                         </div>
                                     <? endif; ?>
@@ -373,18 +481,18 @@
                                         <i class="fa fa-download" aria-hidden="true"></i> Baixar arquivo
                                     </a>
                                 <? else : ?>
-                                    Nao enviado
+                                    Não enviado
                                 <? endif; ?>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <span class="detalhe-label">Primeira participacao</span>
+                            <span class="detalhe-label">Primeira participação</span>
                             <div class="detalhe-valor mb-3"><?= $formatarBooleano($inscricao['primeira_participacao'] ?? null) ?></div>
 
-                            <span class="detalhe-label">Como soube da certificacao</span>
+                            <span class="detalhe-label">Como soube da certificação</span>
                             <div class="detalhe-valor mb-3"><?= $valorOuPadrao($inscricao['como_soube'] ?? null) ?></div>
 
-                            <span class="detalhe-label">Organizacao que indicou</span>
+                            <span class="detalhe-label">Organização que indicou</span>
                             <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['indicacao_organizacao'] ?? null) ?></div>
                         </div>
                     </div>
@@ -429,13 +537,13 @@
                 <div class="detalhe-titulo">Controle interno</div>
                 <div class="row">
                     <div class="col-md-6 mb-3 mb-md-0">
-                        <span class="detalhe-label">Token de confirmacao</span>
+                        <span class="detalhe-label">Token de confirmação</span>
                         <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['token_confirmacao'] ?? null) ?></div>
                     </div>
                     <div class="col-md-6">
                         <span class="detalhe-label">Expira em</span>
                         <div class="detalhe-valor">
-                            <?= !empty($inscricao['token_expira_em']) ? Util::formatData($inscricao['token_expira_em']) . ' ' . Util::formatHora($inscricao['token_expira_em']) : 'Nao informado' ?>
+                            <?= !empty($inscricao['token_expira_em']) ? Util::formatData($inscricao['token_expira_em']) . ' ' . Util::formatHora($inscricao['token_expira_em']) : 'Não informado' ?>
                         </div>
                     </div>
                 </div>
@@ -458,7 +566,7 @@
                 success: function(data) {
                     if (data.trim().length > 0) {
                         swal({
-                            title: "Atencao!",
+                            title: "Atenção!",
                             text: data,
                             type: "error"
                         });
@@ -476,8 +584,8 @@
                     $('.salvar-status').prop('disabled', false);
 
                     swal({
-                        title: "Atencao!",
-                        text: "Nao foi possivel alterar o status.",
+                        title: "Atenção!",
+                        text: "Não foi possível alterar o status.",
                         type: "error"
                     });
                 }
