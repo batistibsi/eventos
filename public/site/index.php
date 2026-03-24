@@ -432,14 +432,14 @@ Participar da Certificação
 
 <div class="redes">
 
-<a href="https://instagram.com/instituto.acim">
+<a href="https://instagram.com/instituto.acim" target="_blank">
 Instagram</a>
 
-<a href="https://www.facebook.com/profile.php?id=61564453792982">
+<a href="https://www.facebook.com/profile.php?id=61564453792982" target="_blank">
 Facebook
 </a>
 
-<a href="https://www.linkedin.com/in/instituto-acim-de-responsabilidade-social-64237b1b6/">
+<a href="https://www.linkedin.com/in/instituto-acim-de-responsabilidade-social-64237b1b6/" target="_blank">
 LinkedIn
 </a>
 
