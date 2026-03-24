@@ -115,7 +115,7 @@ margin-bottom:50px;
 
 .section-title h2{
 font-size:32px;
-color:#0f3d4c;
+color:#14454E;
 }
 
 .section-title h1{
@@ -123,7 +123,17 @@ font-size:32px;
 color:#ffffff;
 }
 
+.section-title h4{
+font-size:18px;
+color:#ffffff;
+}
+
+
 /* SOBRE */
+
+.sobre-1{
+background:#f5f7fa;
+}
 
 .sobre p{
 max-width:800px;
@@ -132,6 +142,10 @@ text-align:center;
 }
 
 /* PILARES */
+
+.pilares-1{
+background-color: rgb(8, 68, 68);
+}
 
 .grid{
 display:grid;
@@ -160,12 +174,16 @@ background:#f5f7fa;
 /* CERTIFICAÇÃO */
 
 .certificacao{
-background:#0f3d4c;
+background-color: rgb(8, 68, 68);
+/* background:#0f3d4c; 8,68,68 */
 color:white;
 }
 
 .certificacao p{
+margin:auto;
 margin-bottom:15px;
+text-align:center;
+max-width:800px;
 }
 
 .btn{
@@ -175,6 +193,7 @@ color:white;
 padding:14px 30px;
 border-radius:30px;
 text-decoration:none;
+margin:auto;
 margin-top:20px;
 }
 
@@ -193,10 +212,29 @@ text-decoration:none;
 font-weight:500;
 }
 
+
+/* https://www.freepik.com/icon/facebook_3955011#fromView=search&page=1&position=6&uuid=6eaf609a-2853-47ad-a153-9111449f348d */
+/* https://www.freepik.com/icon/linkedin_4494498#fromView=search&page=1&position=3&uuid=6eaf609a-2853-47ad-a153-9111449f348d */
+/* https://www.freepik.com/icon/social_15707749#fromView=search&page=1&position=19&uuid=6eaf609a-2853-47ad-a153-9111449f348d */
+
+
+.face img{
+height:15px;
+}
+
+.lkd img{
+height:15px;
+}
+
+.insta img{
+height:15px;
+}
+
+
 /* FOOTER */
 
 footer{
-background:#0f3d4c;
+background:rgb(8, 68, 68);
 color:white;
 text-align:center;
 padding:25px;
@@ -227,7 +265,7 @@ font-size:26px;
 <nav>
 
 <div class="logo">
-<img src="./images/logo_header.png" alt="Logo">
+<img src="./images/logo_header.png">
 </div>
 
 <div class="menu">
@@ -252,14 +290,14 @@ font-size:26px;
 <div class="slide" style="background-image:url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f')"></div>
 
 <div class="hero-text">
-<h1>Responsabilidade Social que transforma Maringá</h1>
+<h1>INSTITUTO ACIM Responsabilidade Social que transforma Maringá</h1>
 </div>
 
 </section>
 
 <!-- QUEM SOMOS -->
 
-<section id="quem" class="sobre">
+<section id="sobre-1" class="sobre">
 
 <div class="container">
 
@@ -277,12 +315,12 @@ O Instituto ACIM é uma entidade sem fins lucrativos vinculada à Associação C
 
 <!-- PILARES -->
 
-<section>
+<section id="pilares-1" class="pilares-1">
 
 <div class="container">
 
 <div class="section-title">
-<h2>Pilares Culturais</h2>
+<h1>Pilares Culturais</h1>
 </div>
 
 <div class="grid">
@@ -361,23 +399,18 @@ O Instituto ACIM é uma entidade sem fins lucrativos vinculada à Associação C
 <h1>Certificação IMPACTACIM</h1>
 </div>
 
-<p>
-A Certificação IMPACTACIM reconhece práticas ESG realizadas por empresas e organizações brasileiras.
-</p>
+<p>A Certificação IMPACTACIM reconhece práticas ESG realizadas por empresas e organizações brasileiras.
+Empresas podem submeter de 1 a 15 práticas relacionadas aos pilares ESG:</p>
+<h4><p>ambiental, social e governança.</p></h4>
+<p>As orgnizações podem ser classificadas em quatro categorias: Iniciante, Bronze, Prata e Ouro</p>
 
-<p>
-Empresas podem submeter de 1 a 15 práticas relacionadas aos pilares ESG: ambiental, social e governança.
-</p>
 
-<p>
-As organizações podem ser classificadas em quatro categorias: Iniciante, Bronze, Prata e Ouro.
-</p>
+<h3><p>Quer fazer parte?</p></h3>
 
-<h3>Quer fazer parte?</h3>
 
-<a class="btn" href="./formulario_inscricao.php" target="_blank">
+<p><a class="btn" href="./formulario_inscricao.php" target="_blank">
 Participar da Certificação
-</a>
+</a></p>
 
 </div>
 
@@ -399,7 +432,8 @@ Participar da Certificação
 
 <div class="redes">
 
-<a href="https://instagram.com/instituto.acim">Instagram</a>
+<a href="https://instagram.com/instituto.acim">
+Instagram</a>
 
 <a href="https://www.facebook.com/profile.php?id=61564453792982">
 Facebook
@@ -417,7 +451,7 @@ LinkedIn
 
 <footer>
 
-<p>© <?= date('Y') ?> Instituto ACIM - Todos os direitos reservados</p>
+<p>© <?=date('Y')?> Instituto ACIM - Todos os direitos reservados</p>
 
 </footer>
 
