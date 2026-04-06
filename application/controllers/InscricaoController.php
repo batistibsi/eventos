@@ -1,4 +1,6 @@
 <?php
+if (Zend_Registry::get('permissao') != 1) exit();
+
 class InscricaoController extends Zend_Controller_Action
 {
 

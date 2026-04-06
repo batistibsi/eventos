@@ -64,16 +64,16 @@ class UsuarioController extends Zend_Controller_Action
 		$email = !empty($_REQUEST["email"]) ? $_REQUEST["email"] : null;
 		$nome = !empty($_REQUEST["nome"]) ? $_REQUEST["nome"] : null;
 		$senha = !empty($_REQUEST["senha"]) ? md5($_REQUEST["senha"]) : null;
-		$confirmSenha = !empty($_REQUEST["confirm_senha"]) ? md5($_REQUEST["confirm_senha"]) : null;
+		$confirm_senha = !empty($_REQUEST["confirm_senha"]) ? md5($_REQUEST["confirm_senha"]) : null;
 
-		$idPerfil = (int) !empty($_REQUEST["id_perfil"]) ? $_REQUEST["id_perfil"] : null;
+		$id_perfil = (int) !empty($_REQUEST["id_perfil"]) ? $_REQUEST["id_perfil"] : null;
 
 		$ativo = true;
 
 		if (!$id_usuario) {
-			$result = Usuario::insert($email, $nome, $idPerfil, $ativo, $senha, $confirmSenha);
+			$result = Usuario::insert($email, $nome, $id_perfil, $ativo, $senha, $confirm_senha);
 		} else {
-			$result = Usuario::update($email, $nome, $idPerfil, $ativo, $senha, $id_usuario, $confirmSenha);
+			$result = Usuario::update($email, $nome, $id_perfil, $ativo, $senha, $id_usuario, $confirm_senha);
 		}
 
 		if (!$result) echo Usuario::$erro;

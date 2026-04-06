@@ -226,7 +226,7 @@ class Usuario
 		return true;
 	}
 
-	public static function lista($id_perfil = '1,2')
+	public static function lista()
 	{
 
 		$db = Zend_Registry::get('db');
@@ -235,7 +235,8 @@ class Usuario
 					eventos_perfil.descricao as descricao_perfil
 				  from eventos_usuario
 				  left join eventos_perfil on eventos_usuario.id_perfil = eventos_perfil.id_perfil
-				   where eventos_usuario.ativo and eventos_perfil.id_perfil in(" . $id_perfil . ") and eventos_usuario.id_usuario <> 1
+				   where eventos_usuario.ativo
+				   and eventos_usuario.id_usuario <> 1
 				  order by eventos_usuario.nome";
 
 		$retorno = $db->fetchAll($select);
@@ -263,31 +264,13 @@ class Usuario
 		return $retorno;
 	}
 
-	public static function pesquisar($parametro)
-	{
-
-		$db = Zend_Registry::get('db');
-
-		$select = "select 'u'||a.id_usuario as id_entidade, 						
-							a.nome as tag, 
-							'u'||a.id_usuario as id, 
-							a.nome,
-							'Usuario' as tipo
-				  from eventos_usuario a
-				  where a.ativo
-				  and REPLACE(upper(unaccent(a.nome)),'''',' ') like '" . strtoupper(Util::tirarAcentos($parametro)) . "%'
-				  order by a.nome";
-
-		$retorno = $db->fetchAll($select);
-
-		return $retorno;
-	}
-
 	public static function comboPerfil()
 	{
 		$db = Zend_Registry::get('db');
 
-		$select = "select * from eventos_perfil where id_perfil <= 2 order by id_perfil";
+		$select = "select a.* 
+					from eventos_perfil a
+					order by a.id_perfil";
 
 		$retorno = $db->fetchAll($select);
 

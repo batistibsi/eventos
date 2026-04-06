@@ -87,20 +87,22 @@ $skyn = 'padrao';
     <nav class="sidebar active">
       <div class="sidebar-sticky">
         <ul class="nav flex-column">
-          <!--li class="nav-item">
-            <a href="#" class="principal-link nav-link" data-menu-item="dashboard" data-src="../../dashboard">
-              <i class="fa fa-line-chart" aria-hidden="true"></i>
-              Dashboard
-            </a>
-          </li-->
-          <li class="nav-item">
-            <a href="#" class="principal-link nav-link" data-menu-item="inscricao" data-src="../../inscricao">
-              <i class="fa fa-newspaper-o" aria-hidden="true"></i>
-              Inscrições
-            </a>
-          </li>
-        </ul>
-        <ul class="nav flex-column mb-2">
+          <? if ($this->permissao == 1 || $this->permissao == 3): ?>
+            <li class="nav-item">
+              <a href="#" class="principal-link nav-link" data-menu-item="dashboard" data-src="../../dashboard">
+                <i class="fa fa-line-chart" aria-hidden="true"></i>
+                Dashboard
+              </a>
+            </li>
+          <? endif; ?>
+          <? if ($this->permissao == 1): ?>
+            <li class="nav-item">
+              <a href="#" class="principal-link nav-link" data-menu-item="inscricao" data-src="../../inscricao">
+                <i class="fa fa-newspaper-o" aria-hidden="true"></i>
+                Inscrições
+              </a>
+            </li>
+          <? endif; ?>
           <? if ($this->permissao == 1): ?>
             <li class="nav-item">
               <a href="#" class="principal-link nav-link" data-menu-item="evento" data-src="../../evento">
@@ -108,6 +110,32 @@ $skyn = 'padrao';
                 Eventos
               </a>
             </li>
+          <? endif; ?>
+          <? if ($this->permissao == 1 || $this->permissao == 3): ?>
+            <li class="nav-item">
+              <a href="#" class="principal-link nav-link" data-menu-item="projeto" data-src="../../projeto">
+                <i class="fa fa-archive" aria-hidden="true"></i>
+                Projetos
+              </a>
+            </li>
+          <? endif; ?>
+          <? if ($this->permissao == 1 || $this->permissao == 2): ?>
+            <li class="nav-item">
+              <a href="#" class="principal-link nav-link" data-menu-item="auditoria" data-src="../../auditoria">
+                <i class="fa fa-balance-scale" aria-hidden="true"></i>
+                Auditoria
+              </a>
+            </li>
+          <? endif; ?>
+          <? if ($this->permissao == 1): ?>
+            <li class="nav-item">
+              <a href="#" class="principal-link nav-link" data-menu-item="cadastro" data-src="../../cadastro">
+                <i class="fa fa-cog" aria-hidden="true"></i>
+                Cadastros
+              </a>
+            </li>
+          <? endif; ?>
+          <? if ($this->permissao == 1): ?>
             <li class="nav-item">
               <a href="#" class="principal-link nav-link" data-menu-item="usuario" data-src="../../usuario">
                 <i class="fa fa-user-circle-o" aria-hidden="true"></i>
