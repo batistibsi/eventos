@@ -1,7 +1,6 @@
 <?php
 class Usuario
 {
-
 	public static $erro;
 
 	public function __construct() {}

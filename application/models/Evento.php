@@ -3,6 +3,30 @@ class Evento
 {
         public static $erro;
 
+        public static function normalizarData($data)
+        {
+                if ($data === null || trim((string) $data) === '') {
+                        return null;
+                }
+
+                $data = trim((string) $data);
+                $formatos = ['Y-m-d', 'd/m/Y'];
+
+                foreach ($formatos as $formato) {
+                        $valor = DateTime::createFromFormat($formato, $data);
+                        if ($valor instanceof DateTime) {
+                                return $valor->format('Y-m-d');
+                        }
+                }
+
+                try {
+                        $valor = new DateTime($data);
+                        return $valor->format('Y-m-d');
+                } catch (Exception $e) {
+                        return false;
+                }
+        }
+
         public static function normalizarDataHora($dataHora)
         {
                 if ($dataHora === null || trim((string) $dataHora) === '') {
@@ -132,12 +156,47 @@ class Evento
                         return false;
                 }
 
+                $dataInscricao = self::normalizarData(isset($campos['data_inscricao']) ? $campos['data_inscricao'] : null);
+                if (!$dataInscricao) {
+                        self::$erro = 'Informe a data de inscricao do evento.';
+                        return false;
+                }
+
+                $dataSubmissao = self::normalizarData(isset($campos['data_submissao']) ? $campos['data_submissao'] : null);
+                if (!$dataSubmissao) {
+                        self::$erro = 'Informe a data de submissao do evento.';
+                        return false;
+                }
+
+                $dataCorrecao = self::normalizarData(isset($campos['data_correcao']) ? $campos['data_correcao'] : null);
+                if (!$dataCorrecao) {
+                        self::$erro = 'Informe a data de correcao do evento.';
+                        return false;
+                }
+
+                $dataResultado = self::normalizarData(isset($campos['data_resultado']) ? $campos['data_resultado'] : null);
+                if (!$dataResultado) {
+                        self::$erro = 'Informe a data de resultado do evento.';
+                        return false;
+                }
+
+                $dataSummit = self::normalizarData(isset($campos['data_summit']) ? $campos['data_summit'] : null);
+                if (!$dataSummit) {
+                        self::$erro = 'Informe a data de summit do evento.';
+                        return false;
+                }
+
                 return array(
                         'titulo' => $titulo,
                         'data_hora' => $dataHora,
                         'limite_vagas' => $limiteVagas,
                         'data_hora_2' => $dataHora2,
                         'auditoria' => $auditoria,
+                        'data_inscricao' => $dataInscricao,
+                        'data_submissao' => $dataSubmissao,
+                        'data_correcao' => $dataCorrecao,
+                        'data_resultado' => $dataResultado,
+                        'data_summit' => $dataSummit,
                         'observacao' => isset($campos['observacao']) && trim((string) $campos['observacao']) !== '' ? trim((string) $campos['observacao']) : null
                 );
         }
