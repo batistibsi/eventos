@@ -1,12 +1,73 @@
 <?php
 if (Zend_Registry::get('permissao') != 1 && Zend_Registry::get('permissao') != 3) exit();
+
 class ProjetoController extends Zend_Controller_Action
 {
 	public function indexAction()
 	{
-		// Passando o usuário logado para a view
 		$this->view->usuario = Zend_Registry::get('usuario');
-		$this->view->idUsuario = Zend_Registry::get('id_usuario');
+		$this->view->id_usuario = Zend_Registry::get('id_usuario');
 		$this->view->permissao = Zend_Registry::get('permissao');
+		$this->view->registros = Projeto::lista(Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+	}
+
+	public function cadastroAction()
+	{
+		$this->view->usuario = Zend_Registry::get('usuario');
+		$this->view->id_usuario = Zend_Registry::get('id_usuario');
+		$this->view->permissao = Zend_Registry::get('permissao');
+
+		$idProjeto = isset($_REQUEST['id_projeto']) ? (int) $_REQUEST['id_projeto'] : 0;
+
+		$this->view->registro = $idProjeto ? Projeto::buscaId($idProjeto, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao')) : false;
+		$this->view->usuarios = Usuario::lista();
+		$this->view->eventos = Evento::lista();
+	}
+
+	public function salvarAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+
+		$idProjeto = isset($_REQUEST['id_projeto']) ? (int) $_REQUEST['id_projeto'] : 0;
+		$campos = [];
+		$campos['id_usuario'] = isset($_REQUEST['id_usuario']) ? (int) $_REQUEST['id_usuario'] : 0;
+		$campos['id_evento'] = isset($_REQUEST['id_evento']) ? (int) $_REQUEST['id_evento'] : 0;
+		$campos['status_projeto'] = isset($_REQUEST['status_projeto']) ? (int) $_REQUEST['status_projeto'] : 0;
+		$campos['nome'] = !empty($_REQUEST['nome']) ? $_REQUEST['nome'] : null;
+		$campos['data_inicializacao'] = !empty($_REQUEST['data_inicializacao']) ? $_REQUEST['data_inicializacao'] : null;
+		$campos['data_finalizacao'] = !empty($_REQUEST['data_finalizacao']) ? $_REQUEST['data_finalizacao'] : null;
+		$campos['justificativa'] = !empty($_REQUEST['justificativa']) ? $_REQUEST['justificativa'] : null;
+		$campos['area_atuacao'] = !empty($_REQUEST['area_atuacao']) ? $_REQUEST['area_atuacao'] : null;
+		$campos['objetivos'] = !empty($_REQUEST['objetivos']) ? $_REQUEST['objetivos'] : null;
+		$campos['ods_principal'] = !empty($_REQUEST['ods_principal']) ? $_REQUEST['ods_principal'] : null;
+		$campos['demais_ods_relacionados'] = isset($_REQUEST['demais_ods_relacionados']) ? $_REQUEST['demais_ods_relacionados'] : array();
+
+		if (!$idProjeto) {
+			$result = Projeto::insert($campos, Zend_Registry::get('permissao'), Zend_Registry::get('id_usuario'), isset($_FILES['evidencias']) ? $_FILES['evidencias'] : null);
+		} else {
+			$result = Projeto::update($idProjeto, $campos, Zend_Registry::get('permissao'), Zend_Registry::get('id_usuario'), isset($_FILES['evidencias']) ? $_FILES['evidencias'] : null);
+		}
+
+		if (!$result) echo Projeto::$erro;
+	}
+
+	public function removerAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+
+		$idProjeto = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
+		$result = Projeto::delete($idProjeto, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+
+		if (!$result) echo Projeto::$erro;
+	}
+
+	public function removerarquivoAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+
+		$idProjetoArquivo = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
+		$result = Projeto::removerArquivo($idProjetoArquivo, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+
+		if (!$result) echo Projeto::$erro;
 	}
 }

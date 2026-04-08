@@ -1,10 +1,60 @@
- <div class="d-flex justify-content-center justify-content-md-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-     <h2 class="h2 text-info">Projetos</h2>
- </div>
- <main class="col-sm-12 col-md-12 m-0">
- </main>
- <script type="text/javascript">
-     $(document).ready(function() {
+<div class="d-flex justify-content-center justify-content-md-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+	<h1 class="h2 text-info">Projetos</h1>
+	<div class="btn-toolbar mb-2 mb-md-0">
+		<div class="btn-group mr-2">
+			<button type="button" onclick="carregarTela('../../projeto/cadastro')" class="btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i> Novo Projeto</button>
+		</div>
+	</div>
+</div>
 
-     });
- </script>
+<div class="table-responsive">
+	<table class="table table-hover" id="table_projetos">
+		<thead>
+			<tr>
+				<th></th>
+				<th class="text-left">PROJETO</th>
+				<th class="text-left">USUARIO</th>
+				<th class="text-left">EVENTO</th>
+				<th class="text-left">DATA EVENTO</th>
+				<th class="text-left">STATUS</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?
+			if (count($this->registros) > 0): foreach ($this->registros as $value):
+			?>
+					<tr>
+						<td class="text-center" width="60px">
+							<div class="btn-group">
+								<a class="btn btn-primary" href="#" onclick="carregarTela('../../projeto/cadastro?id_projeto=<?= $value['id_projeto'] ?>')"><i class="fa fa-pencil-square-o"></i></a>
+								<a class="btn btn-danger" href="#" onclick="remover('projeto',<?= $value['id_projeto'] ?>,'<?= $this->escape($value['nome']) ?>')"><i class="fa fa-trash-o"></i></a>
+							</div>
+						</td>
+						<td class="text-left align-middle"><?= $this->escape($value['nome']) ?></td>
+						<td class="text-left align-middle"><?= $this->escape($value['nome_usuario']) ?></td>
+						<td class="text-left align-middle"><?= $this->escape($value['titulo_evento']) ?></td>
+						<td class="text-left align-middle"><?= !empty($value['data_hora']) ? Util::formatData($value['data_hora']) . ' ' . Util::formatHora($value['data_hora']) : '-' ?></td>
+						<td class="text-left align-middle"><?= (int) $value['status_projeto'] ?></td>
+					</tr>
+			<? endforeach;
+			endif; ?>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#table_projetos').DataTable({
+			language: {
+				url: 'https://cdn.datatables.net/plug-ins/1.10.19/i18n/Portuguese-Brasil.json'
+			},
+			"columnDefs": [{
+				orderable: false,
+				targets: [0]
+			}],
+			"order": [
+				[1, 'asc']
+			]
+		});
+	});
+</script>

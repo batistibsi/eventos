@@ -1,0 +1,732 @@
+<? $registro = $this->registro; ?>
+<? $odsRelacionados = $registro && !empty($registro['demais_ods_relacionados']) ? array_map('trim', explode(',', $registro['demais_ods_relacionados'])) : array(); ?>
+<style>
+	.projeto-form {
+		padding: 0 0 20px;
+	}
+
+	.projeto-section {
+		border: 1px solid #e5edf6;
+		border-radius: 16px;
+		padding: 20px 20px 8px;
+		margin-bottom: 22px;
+		background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+	}
+
+	.projeto-section-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		margin-bottom: 18px;
+		padding-bottom: 12px;
+		border-bottom: 1px solid #e9f0f7;
+	}
+
+	.projeto-section-title {
+		color: #264061;
+		font-size: 1.02rem;
+		font-weight: 700;
+		margin: 0;
+	}
+
+	.projeto-section-subtitle {
+		color: #70849d;
+		font-size: .88rem;
+		margin: 4px 0 0;
+	}
+
+	.projeto-form .form-group > span > label,
+	.projeto-form .form-group > label {
+		color: inherit;
+		font-size: 1rem;
+		font-weight: 700;
+		margin-bottom: 6px;
+	}
+
+	.projeto-form .form-control,
+	.projeto-form .select2-container--bootstrap4 .select2-selection {
+		border-color: #cfdae8;
+		border-radius: 0;
+		box-shadow: none;
+		color: inherit;
+		font-size: 1rem;
+		font-family: inherit;
+	}
+
+	.projeto-form textarea.form-control {
+		min-height: 120px;
+	}
+
+	.projeto-form .select2-container--bootstrap4 .select2-selection__rendered,
+	.projeto-form .select2-container--bootstrap4 .select2-selection__placeholder {
+		color: inherit;
+		font-size: 1rem;
+		font-family: inherit;
+	}
+
+	.projeto-form .form-control:focus,
+	.projeto-form .select2-container--bootstrap4.select2-container--focus .select2-selection {
+		border-color: #5d8bb9;
+		box-shadow: 0 0 0 .18rem rgba(93, 139, 185, .14);
+	}
+
+	.ods-grid {
+		display: grid;
+		gap: 12px;
+		grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+	}
+
+	.ods-option {
+		margin: 0;
+	}
+
+	.ods-option input {
+		position: absolute;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.ods-card {
+		border: 2px solid #d7e2ef;
+		border-radius: 14px;
+		cursor: pointer;
+		display: block;
+		overflow: hidden;
+		padding: 8px;
+		position: relative;
+		transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease, background-color .18s ease;
+		background: #fff;
+	}
+
+	.ods-card:hover {
+		border-color: #5d8bb9;
+		box-shadow: 0 10px 22px rgba(61, 100, 173, .12);
+		transform: translateY(-2px);
+	}
+
+	.ods-card img {
+		display: block;
+		width: 100%;
+		height: auto;
+		border-radius: 10px;
+		transition: transform .18s ease, filter .18s ease;
+	}
+
+	.ods-card span {
+		display: block;
+		text-align: center;
+		font-size: 12px;
+		font-weight: 700;
+		color: #3d64ad;
+		margin-top: 8px;
+	}
+
+	.ods-card::after {
+		content: "";
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		width: 24px;
+		height: 24px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, .92);
+		border: 2px solid #c7d6e6;
+		box-shadow: 0 4px 10px rgba(23, 43, 77, .12);
+		transition: all .18s ease;
+	}
+
+	.ods-option input:checked + .ods-card {
+		border-color: #2f8f46;
+		box-shadow: 0 16px 34px rgba(47, 143, 70, .28);
+		background: linear-gradient(180deg, #f3fbf4 0%, #e3f5e7 100%);
+		transform: translateY(-3px);
+	}
+
+	.ods-option input:checked + .ods-card img {
+		transform: scale(1.02);
+		filter: saturate(1.08) contrast(1.04);
+	}
+
+	.ods-option input:checked + .ods-card::after {
+		content: "\2713";
+		color: #fff;
+		font-size: 14px;
+		font-weight: 700;
+		line-height: 20px;
+		text-align: center;
+		background: #2f8f46;
+		border-color: #2f8f46;
+	}
+
+	.area-atuacao-group {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+
+	.area-atuacao-option {
+		margin: 0;
+	}
+
+	.area-atuacao-option input {
+		position: absolute;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.area-atuacao-card {
+		background: #fff;
+		border: 2px solid #d7e2ef;
+		border-radius: 12px;
+		cursor: pointer;
+		display: block;
+		font-weight: 700;
+		padding: 12px 16px;
+		transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease, background-color .18s ease;
+	}
+
+	.area-atuacao-card:hover {
+		border-color: #5d8bb9;
+		box-shadow: 0 10px 22px rgba(61, 100, 173, .12);
+		transform: translateY(-1px);
+	}
+
+	.area-atuacao-card.area-ambiental {
+		color: #2d7a3e;
+		border-color: #bfdcc7;
+		background: linear-gradient(180deg, #f8fdf9 0%, #eef8f1 100%);
+	}
+
+	.area-atuacao-card.area-social {
+		color: #b13b6c;
+		border-color: #ecc5d5;
+		background: linear-gradient(180deg, #fff8fb 0%, #fff0f5 100%);
+	}
+
+	.area-atuacao-card.area-governanca {
+		color: #7a5a1f;
+		border-color: #e7d7b4;
+		background: linear-gradient(180deg, #fffdf8 0%, #faf5e8 100%);
+	}
+
+	.area-atuacao-option input:checked + .area-atuacao-card.area-ambiental {
+		background: linear-gradient(180deg, #f3fbf4 0%, #e3f5e7 100%);
+		border-color: #2f8f46;
+		box-shadow: 0 12px 26px rgba(47, 143, 70, .22);
+		color: #1f6a34;
+	}
+
+	.area-atuacao-option input:checked + .area-atuacao-card.area-social {
+		background: linear-gradient(180deg, #fff4f8 0%, #ffe6ef 100%);
+		border-color: #d45488;
+		box-shadow: 0 12px 26px rgba(212, 84, 136, .22);
+		color: #9f2e5d;
+	}
+
+	.area-atuacao-option input:checked + .area-atuacao-card.area-governanca {
+		background: linear-gradient(180deg, #fff9ed 0%, #fceecb 100%);
+		border-color: #c49a3a;
+		box-shadow: 0 12px 26px rgba(196, 154, 58, .22);
+		color: #7a5a1f;
+	}
+
+	.upload-box {
+		background: #f8fbff;
+		border: 2px dashed #b8c9e2;
+		border-radius: 14px;
+		padding: 18px;
+	}
+
+	.upload-list a {
+		word-break: break-word;
+	}
+
+	#projeto-dropzone {
+		background: #f8fbff;
+		border: 2px dashed #b8c9e2;
+		border-radius: 14px;
+		padding: 18px;
+		min-height: 180px;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+		gap: 16px;
+		align-items: start;
+	}
+
+	#projeto-dropzone .dz-message {
+		margin: 0;
+		color: #56708f;
+		font-weight: 600;
+		grid-column: 1 / -1;
+		padding: 28px 12px;
+		text-align: center;
+	}
+
+	#projeto-dropzone .dz-preview .dz-remove {
+		color: #c0392b;
+		font-weight: 700;
+		text-decoration: none;
+	}
+
+	#projeto-dropzone .dz-preview .dz-filename,
+	#projeto-dropzone .dz-preview .dz-filename span {
+		background: transparent !important;
+	}
+
+	#projeto-dropzone .dz-preview:hover .dz-filename,
+	#projeto-dropzone .dz-preview:hover .dz-filename span {
+		background: transparent !important;
+	}
+
+	#projeto-dropzone .dz-preview {
+		background: #fff;
+		border: 1px solid #d9e4f0;
+		border-radius: 16px;
+		box-shadow: 0 10px 24px rgba(38, 64, 97, .08);
+		margin: 0;
+		padding: 12px 12px 16px;
+		width: 100%;
+		min-height: 220px;
+	}
+
+	#projeto-dropzone .dz-preview .dz-image {
+		align-items: center;
+		background: linear-gradient(180deg, #f7f9fc 0%, #eef3f8 100%);
+		border-radius: 14px;
+		display: flex;
+		height: 120px;
+		justify-content: center;
+		margin-bottom: 12px;
+		overflow: hidden;
+		width: 100%;
+	}
+
+	#projeto-dropzone .dz-preview .dz-image img {
+		height: 100%;
+		object-fit: cover;
+		width: 100%;
+	}
+
+	#projeto-dropzone .dz-preview .dz-details {
+		position: static;
+		opacity: 1;
+		padding: 0;
+		min-height: 54px;
+		text-align: left;
+	}
+
+	#projeto-dropzone .dz-preview .dz-size {
+		background: transparent;
+		color: #5f7592;
+		font-size: .82rem;
+		font-weight: 700;
+		margin-bottom: 6px;
+	}
+
+	#projeto-dropzone .dz-preview .dz-size span {
+		background: transparent !important;
+		padding: 0;
+	}
+
+	#projeto-dropzone .dz-preview .dz-filename {
+		display: block;
+		color: #264061;
+		font-size: .9rem;
+		font-weight: 600;
+		line-height: 1.35;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		word-break: break-word;
+		white-space: normal;
+	}
+
+	#projeto-dropzone .dz-preview .dz-filename span {
+		background: transparent !important;
+		display: block;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: normal;
+		word-break: break-word;
+	}
+
+	#projeto-dropzone .dz-preview .dz-success-mark,
+	#projeto-dropzone .dz-preview .dz-error-mark,
+	#projeto-dropzone .dz-preview .dz-error-message,
+	#projeto-dropzone .dz-preview .dz-progress {
+		display: none !important;
+	}
+
+	#projeto-dropzone .dz-preview .dz-remove {
+		display: inline-block;
+		margin-top: 10px;
+	}
+
+	@media (max-width: 767.98px) {
+		#projeto-dropzone {
+			grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		}
+	}
+
+	.upload-heading {
+		display: block;
+		font-size: 1rem;
+		font-weight: 700;
+		color: #264061;
+		margin-bottom: 4px;
+	}
+
+	.upload-subtitle {
+		color: #5f7592;
+		font-size: .92rem;
+		line-height: 1.5;
+		margin-bottom: 6px;
+	}
+
+	.upload-highlight {
+		color: #2f8f46;
+		font-size: .88rem;
+		font-weight: 700;
+		letter-spacing: .01em;
+		margin-bottom: 14px;
+	}
+
+	@media (max-width: 767.98px) {
+		.projeto-form {
+			padding: 0 0 32px;
+		}
+
+		.projeto-section {
+			padding: 16px 16px 10px;
+		}
+
+		.projeto-section-header {
+			display: block;
+		}
+	}
+</style>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+	<h1 class="h2 text-info">Projeto</h1>
+	<div class="btn-toolbar mb-2 mb-md-0">
+		<div class="btn-group mr-2">
+			<button type="button" onclick="carregarTela('../../projeto')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
+		</div>
+	</div>
+</div>
+<form id="formulario" class="projeto-form" novalidate>
+	<input name="id_projeto" type="hidden" value="<?= $registro ? $registro['id_projeto'] : '' ?>" id="id_projeto">
+	<? if ($this->permissao != 1): ?>
+		<input name="id_usuario" type="hidden" value="<?= (int) $this->id_usuario ?>" id="id_usuario">
+	<? endif; ?>
+
+	<div class="projeto-section">
+		<div class="projeto-section-header">
+			<div>
+				<h2 class="projeto-section-title">Vinculos E Status</h2>
+				<p class="projeto-section-subtitle">Associe o projeto ao usuario, ao evento e ao status atual.</p>
+			</div>
+		</div>
+		<div class="row">
+			<? if ($this->permissao == 1): ?>
+				<div class="form-group col-md-4">
+					<span><label for="status_projeto">Status: </label></span>
+					<input class="form-control" name="status_projeto" type="number" min="0" value="<?= $registro ? (int) $registro['status_projeto'] : 0 ?>" id="status_projeto" required>
+				</div>
+				<div class="form-group col-md-4">
+					<span><label for="id_usuario">Usuario: </label></span>
+					<select class="form-control" name="id_usuario" id="id_usuario" required>
+						<option value="">Selecione</option>
+						<? foreach ($this->usuarios as $usuario): ?>
+							<option value="<?= (int) $usuario['id_usuario'] ?>" <?= $registro && (int) $registro['id_usuario'] === (int) $usuario['id_usuario'] ? 'selected' : '' ?>><?= $this->escape($usuario['nome']) ?></option>
+						<? endforeach; ?>
+					</select>
+				</div>
+				<div class="form-group col-md-4">
+			<? else: ?>
+				<div class="form-group col-md-4">
+					<span><label for="status_projeto">Status: </label></span>
+					<input class="form-control" name="status_projeto" type="number" min="0" value="<?= $registro ? (int) $registro['status_projeto'] : 0 ?>" id="status_projeto" required>
+				</div>
+				<div class="form-group col-md-8">
+			<? endif; ?>
+				<span><label for="id_evento">Evento: </label></span>
+				<select class="form-control" name="id_evento" id="id_evento" required>
+					<option value="">Selecione</option>
+					<? foreach ($this->eventos as $evento): ?>
+						<option value="<?= (int) $evento['id_evento'] ?>" <?= $registro && (int) $registro['id_evento'] === (int) $evento['id_evento'] ? 'selected' : '' ?>><?= $this->escape($evento['label']) ?></option>
+					<? endforeach; ?>
+				</select>
+			</div>
+		</div>
+	</div>
+
+	<div class="projeto-section">
+		<div class="row">
+			<div class="form-group col-md-12">
+				<span><label for="nome">Nome do projeto: </label></span>
+				<input class="form-control" name="nome" type="text" value="<?= $registro ? $this->escape($registro['nome']) : '' ?>" id="nome" required>
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col-md-6">
+				<span><label for="data_inicializacao">Data da inicializacao: </label></span>
+				<input class="form-control" name="data_inicializacao" type="date" value="<?= $registro && !empty($registro['data_inicializacao']) ? date('Y-m-d', strtotime($registro['data_inicializacao'])) : '' ?>" id="data_inicializacao" required>
+			</div>
+			<div class="form-group col-md-6">
+				<span><label for="data_finalizacao">Data da finalizacao: </label></span>
+				<input class="form-control" name="data_finalizacao" type="date" value="<?= $registro && !empty($registro['data_finalizacao']) ? date('Y-m-d', strtotime($registro['data_finalizacao'])) : '' ?>" id="data_finalizacao" required>
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col-md-12">
+				<span><label for="justificativa">Justificativa do projeto: </label></span>
+				<textarea class="form-control" name="justificativa" id="justificativa" rows="4" required><?= $registro && !empty($registro['justificativa']) ? $this->escape($registro['justificativa']) : '' ?></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="projeto-section">
+		<div class="projeto-section-header">
+			<div>
+				<h2 class="projeto-section-title">Classificacao E Objetivos</h2>
+				<p class="projeto-section-subtitle">Defina a area de atuacao, os ODS e os objetivos vinculados ao projeto.</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col-md-12">
+				<span><label>Area de atuacao: </label></span>
+				<div class="area-atuacao-group">
+				<label class="area-atuacao-option" for="area_atuacao_ambiental">
+					<input type="radio" name="area_atuacao" id="area_atuacao_ambiental" value="Ambiental" <?= $registro && $registro['area_atuacao'] === 'Ambiental' ? 'checked' : '' ?> required>
+					<span class="area-atuacao-card area-ambiental"><i class="fa fa-leaf" aria-hidden="true"></i> Ambiental</span>
+				</label>
+				<label class="area-atuacao-option" for="area_atuacao_social">
+					<input type="radio" name="area_atuacao" id="area_atuacao_social" value="Social" <?= $registro && $registro['area_atuacao'] === 'Social' ? 'checked' : '' ?> required>
+					<span class="area-atuacao-card area-social"><i class="fa fa-heart" aria-hidden="true"></i> Social</span>
+				</label>
+				<label class="area-atuacao-option" for="area_atuacao_governanca">
+					<input type="radio" name="area_atuacao" id="area_atuacao_governanca" value="Governanca" <?= $registro && $registro['area_atuacao'] === 'Governanca' ? 'checked' : '' ?> required>
+					<span class="area-atuacao-card area-governanca"><i class="fa fa-university" aria-hidden="true"></i> Governanca</span>
+				</label>
+			</div>
+		</div>
+		</div>
+		<div class="row">
+			<div class="form-group col-md-12">
+				<span><label>ODS principal do projeto: </label></span>
+				<div class="ods-grid">
+					<? for ($i = 1; $i <= 17; $i++): $ods = 'ODS ' . $i; ?>
+						<label class="ods-option" for="ods_principal_<?= $i ?>">
+							<input type="radio" name="ods_principal" id="ods_principal_<?= $i ?>" value="<?= $ods ?>" <?= $registro && $registro['ods_principal'] === $ods ? 'checked' : '' ?> required>
+							<span class="ods-card">
+								<img src="../../objetivos/<?= $i ?>.png" alt="<?= $ods ?>">
+								<span><?= $ods ?></span>
+							</span>
+						</label>
+					<? endfor; ?>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col-md-12">
+				<span><label for="objetivos">Objetivo(s) do projeto: </label></span>
+				<textarea class="form-control" name="objetivos" id="objetivos" rows="4" required><?= $registro && !empty($registro['objetivos']) ? $this->escape($registro['objetivos']) : '' ?></textarea>
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col-md-12">
+				<span><label>Demais ODS relacionados com o projeto: </label></span>
+				<div class="ods-grid">
+					<? for ($i = 1; $i <= 17; $i++): $ods = 'ODS ' . $i; ?>
+						<label class="ods-option" for="demais_ods_relacionados_<?= $i ?>">
+							<input type="checkbox" name="demais_ods_relacionados[]" value="<?= $ods ?>" id="demais_ods_relacionados_<?= $i ?>" <?= in_array($ods, $odsRelacionados, true) ? 'checked' : '' ?>>
+							<span class="ods-card">
+								<img src="../../objetivos/<?= $i ?>.png" alt="<?= $ods ?>">
+								<span><?= $ods ?></span>
+							</span>
+						</label>
+					<? endfor; ?>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="projeto-section">
+		<div class="projeto-section-header">
+			<div>
+				<h2 class="projeto-section-title">Evidencias</h2>
+				<p class="projeto-section-subtitle">Anexe materiais que comprovem os resultados e a execucao do projeto.</p>
+				<p class="projeto-section-subtitle">Evidencia qualitativa sao observacoes e descricoes detalhadas que nao podem ser expressas numericamente, focando em caracteristicas e contextos subjetivos.</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col-md-12">
+				<label class="upload-heading">Anexe a evidencia qualitativa do projeto:</label>
+				<div class="upload-subtitle">Exemplos: fotos, videos, depoimentos, documentos, planilhas, entre outros.</div>
+				<div class="upload-highlight">Faca upload de ate 5 arquivos aceitos. O tamanho maximo e de 100 MB por item.</div>
+				<div id="projeto-dropzone" class="dropzone">
+					<div class="dz-message">
+						Arraste arquivos aqui ou clique para selecionar.<br>
+						<small>Voce pode visualizar e remover os uploads antes de salvar.</small>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row mt-4 mb-3">
+		<div class="form-group col-md-12 text-right">
+			<button class="btn btn-success salvar"><span class="glyphicon glyphicon-floppy-disk"></span><i class="fa fa-floppy-o fa-lg"></i> Salvar</button>
+		</div>
+	</div>
+</form>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#nome').focus();
+		$('select#id_usuario, select#id_evento').select2({
+			theme: 'bootstrap4',
+			language: 'pt-BR',
+			width: '100%'
+		});
+
+		var arquivosExistentes = <?= $registro && !empty($registro['arquivos']) ? count($registro['arquivos']) : 0 ?>;
+		var dropzone = new Dropzone('#projeto-dropzone', {
+			url: '#',
+			autoProcessQueue: false,
+			uploadMultiple: true,
+			parallelUploads: 5,
+			maxFiles: 5,
+			maxFilesize: 100,
+			addRemoveLinks: true,
+			paramName: 'evidencias',
+			clickable: true,
+			acceptedFiles: '.pdf,.png,.jpg,.jpeg,.gif,.webp,.mp4,.mov,.avi,.wmv,.mp3,.wav,.txt,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.zip,.rar',
+			dictDefaultMessage: 'Arraste arquivos aqui ou clique para selecionar',
+			dictRemoveFile: 'Remover',
+			dictFileTooBig: 'Arquivo muito grande. Tamanho maximo: 100 MB.',
+			dictInvalidFileType: 'Tipo de arquivo nao permitido.',
+			init: function() {
+				var dz = this;
+				<? if ($registro && !empty($registro['arquivos'])): ?>
+					<? foreach ($registro['arquivos'] as $arquivo): ?>
+						(function() {
+							var mockFile = {
+								name: <?= json_encode($arquivo['nome_original']) ?>,
+								size: <?= (int) ($arquivo['tamanho_bytes'] ?: 0) ?>,
+								accepted: true,
+								existing: true,
+								serverId: <?= (int) $arquivo['id_projeto_arquivo'] ?>,
+								url: '../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>'
+							};
+							dz.emit('addedfile', mockFile);
+							dz.emit('complete', mockFile);
+							if (mockFile.previewElement) {
+								$(mockFile.previewElement).addClass('dz-success dz-complete dz-existing-file');
+								$(mockFile.previewElement).find('.dz-filename span').wrap('<a target="_blank" href="' + mockFile.url + '"></a>');
+							}
+							dz.files.push(mockFile);
+						})();
+					<? endforeach; ?>
+				<? endif; ?>
+
+				dz.on('maxfilesexceeded', function(file) {
+					dz.removeFile(file);
+					swal({
+						title: 'Atencao!',
+						text: 'O projeto pode ter no maximo 5 arquivos de evidencia.',
+						type: 'error'
+					});
+				});
+
+				dz.on('removedfile', function(file) {
+					if (!file || !file.existing || !file.serverId) {
+						return;
+					}
+
+					$.ajax({
+						type: 'POST',
+						url: '../../projeto/removerarquivo',
+						data: { id: file.serverId },
+						success: function(data) {
+							if (data.trim().length > 0) {
+								swal({
+									title: 'Atencao!',
+									text: data,
+									type: 'error'
+								});
+								carregarTela('../../projeto/cadastro?id_projeto=' + $('#id_projeto').val());
+							} else {
+								arquivosExistentes = Math.max(0, arquivosExistentes - 1);
+							}
+						},
+						error: function() {
+							swal({
+								title: 'Atencao!',
+								text: 'Nao foi possivel remover o arquivo.',
+								type: 'error'
+							});
+							carregarTela('../../projeto/cadastro?id_projeto=' + $('#id_projeto').val());
+						}
+					});
+				});
+			}
+		});
+
+		$("#formulario").submit(function(e) {
+			e.preventDefault();
+
+			if (!this.checkValidity()) {
+				this.reportValidity();
+				return false;
+			}
+
+			var arquivosSelecionados = dropzone.getAcceptedFiles().filter(function(file) {
+				return !file.existing;
+			}).length;
+			if ((arquivosSelecionados + arquivosExistentes) > 5) {
+				swal({
+					title: "Atencao!",
+					text: "O projeto pode ter no maximo 5 arquivos de evidencia.",
+					type: "error"
+				});
+				return false;
+			}
+
+			$('.salvar').hide();
+			var formData = new FormData(this);
+			dropzone.getAcceptedFiles().forEach(function(file) {
+				if (!file.existing) {
+					formData.append('evidencias[]', file, file.name);
+				}
+			});
+			$.ajax({
+				type: "POST",
+				url: "../../projeto/salvar",
+				data: formData,
+				processData: false,
+				contentType: false,
+				success: function(data) {
+					if (data.trim().length > 0) {
+						$('.salvar').show();
+						swal({
+							title: "Atencao!",
+							text: data,
+							type: "error"
+						});
+					} else {
+						carregarTela('../../projeto');
+					}
+				},
+				error: function() {
+					$('.salvar').show();
+					swal({
+						title: "Atencao!",
+						text: "Nao foi possivel salvar o projeto.",
+						type: "error"
+					});
+				}
+			});
+		});
+	});
+</script>
