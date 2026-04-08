@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-center justify-content-md-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
     <h1 class="h2 text-info">Inscrições</h1>
-    <form id="form_consulta" class="form-inline text-right">
+    <form id="form_inscricao" class="form-inline text-right">
         <div class="form-group">
             <input style="min-width:240px; background:#fff" class="form-control text-center shadow" type="text" id="periodo" readonly>
             <input type='hidden' id="inicio" value="<?= Util::formatData($this->inicio) ?>" />
@@ -10,7 +10,7 @@
 </div>
 
 <div class="table-responsive">
-    <table class="table table-bordered table-hover table-striped w-100" id="tabela_consulta">
+    <table class="table table-bordered table-hover table-striped w-100" id="tabela_inscricao">
         <thead>
             <tr>
                 <th></th>
@@ -108,10 +108,10 @@
         }, function(start, end) {
             let inicio = start.format('YYYY-MM-DD');
             let fim = end.format('YYYY-MM-DD');
-            carregarTela('../../consulta?inicio=' + inicio + '&fim=' + fim);
+            carregarTela('../../inscricao?inicio=' + inicio + '&fim=' + fim);
         });
 
-        let tabela_consulta = $('#tabela_consulta').DataTable({
+        let tabela_inscricao = $('#tabela_inscricao').DataTable({
             orderCellsTop: true,
             fixedHeader: true,
             language: {
@@ -185,10 +185,10 @@
             ]
         });
 
-        $('#tabela_consulta thead tr:eq(1) th').each(function(i) {
+        $('#tabela_inscricao thead tr:eq(1) th').each(function(i) {
             $('input', this).on('keyup change', function() {
-                if (tabela_consulta.column(i).search() !== this.value) {
-                    tabela_consulta.column(i).search(this.value).draw();
+                if (tabela_inscricao.column(i).search() !== this.value) {
+                    tabela_inscricao.column(i).search(this.value).draw();
                 }
             });
         });
