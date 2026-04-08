@@ -75,277 +75,10 @@
     $logoEhImagem = in_array($extensaoLogo, ['png', 'jpg', 'jpeg', 'gif', 'webp'], true);
 ?>
 
-<style>
-    .inscricao-detalhe {
-        color: #264061;
-    }
-
-    .inscricao-detalhe .detalhe-card {
-        background: #fff;
-        border: 1px solid #dce6f2;
-        border-radius: 14px;
-        box-shadow: 0 10px 28px rgba(28, 65, 109, 0.08);
-        height: 100%;
-    }
-
-    .inscricao-detalhe .detalhe-card-body {
-        padding: 1.35rem 1.5rem;
-    }
-
-    .inscricao-detalhe .detalhe-evento-box {
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 14px;
-        padding: .85rem .95rem;
-    }
-
-    .inscricao-detalhe .detalhe-evento-box .detalhe-titulo {
-        margin-bottom: .65rem;
-        color: rgba(255, 255, 255, 0.78);
-    }
-
-    .inscricao-detalhe .detalhe-evento-box .detalhe-label {
-        color: rgba(255, 255, 255, 0.72);
-    }
-
-    .inscricao-detalhe .detalhe-evento-box .detalhe-valor {
-        color: #fff;
-    }
-
-    .inscricao-detalhe .detalhe-evento-grid {
-        display: grid;
-        gap: 1px;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .inscricao-detalhe .detalhe-evento-item {
-        min-width: 0;
-    }
-
-    .inscricao-detalhe .detalhe-titulo {
-        color: #3d64ad;
-        font-size: .82rem;
-        font-weight: 700;
-        letter-spacing: .08em;
-        margin-bottom: 1rem;
-        text-transform: uppercase;
-    }
-
-    .inscricao-detalhe .detalhe-label {
-        color: #6f86a7;
-        display: block;
-        font-size: .72rem;
-        font-weight: 700;
-        letter-spacing: .06em;
-        margin-bottom: .18rem;
-        text-transform: uppercase;
-    }
-
-    .inscricao-detalhe .detalhe-valor {
-        color: #1d3049;
-        font-size: 1rem;
-        font-weight: 600;
-        line-height: 1.45;
-        word-break: break-word;
-    }
-
-    .inscricao-detalhe .detalhe-resumo {
-        background: linear-gradient(135deg, #3d64ad, #24457d);
-        border-radius: 18px;
-        box-shadow: 0 18px 40px rgba(36, 69, 125, 0.22);
-        color: #fff;
-        overflow: hidden;
-        padding: 1.5rem;
-    }
-
-    .inscricao-detalhe .detalhe-status {
-        background: rgba(255, 255, 255, 0.18);
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        border-radius: 999px;
-        display: inline-block;
-        font-size: .8rem;
-        font-weight: 700;
-        padding: .45rem .9rem;
-        text-transform: uppercase;
-    }
-
-    .inscricao-detalhe .detalhe-status-form {
-        display: flex;
-        align-items: center;
-        flex-wrap: nowrap;
-        gap: .75rem;
-    }
-
-    .inscricao-detalhe .detalhe-status-select {
-        -webkit-appearance: none;
-        appearance: none;
-        background: rgba(255, 255, 255, 0.18);
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        box-sizing: border-box;
-        border-radius: 999px;
-        color: #fff;
-        font-size: .8rem;
-        flex: 0 1 220px;
-        font-weight: 700;
-        height: 2.1rem;
-        line-height: 1;
-        margin: 0;
-        min-width: 190px;
-        min-height: 0;
-        padding: 0 2rem 0 .9rem;
-        text-transform: uppercase;
-        vertical-align: middle;
-    }
-
-    .inscricao-detalhe .detalhe-status-select option {
-        color: #1d3049;
-    }
-
-    .inscricao-detalhe .detalhe-status-form .btn {
-        align-items: center;
-        border-radius: 999px;
-        display: inline-flex;
-        font-size: .78rem;
-        font-weight: 700;
-        justify-content: center;
-        margin: 0;
-        min-height: calc(1.5em + .9rem + 2px);
-        white-space: nowrap;
-        padding: .45rem .9rem;
-        text-transform: uppercase;
-    }
-
-    .inscricao-detalhe .detalhe-status-form .btn i {
-        margin-right: .35rem;
-    }
-
-    .inscricao-detalhe .detalhe-metrica {
-        background: rgba(255, 255, 255, 0.12);
-        border-radius: 14px;
-        padding: .7rem .85rem;
-    }
-
-    .inscricao-detalhe .detalhe-metricas-grid {
-        background: rgba(255, 255, 255, 0.12);
-        border-radius: 14px;
-        display: grid;
-        gap: 1px;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        overflow: hidden;
-    }
-
-    .inscricao-detalhe .detalhe-metricas-grid .detalhe-metrica {
-        background: transparent;
-        border-radius: 0;
-        min-height: 100%;
-    }
-
-    .inscricao-detalhe .detalhe-metrica strong {
-        display: block;
-        font-size: 1.1rem;
-        line-height: 1.2;
-    }
-
-    .inscricao-detalhe .detalhe-metrica span {
-        font-size: .72rem;
-        opacity: .88;
-        text-transform: uppercase;
-    }
-
-    .inscricao-detalhe .logo-preview {
-        align-items: center;
-        background: #f5f8fd;
-        border: 1px dashed #b8c9e2;
-        border-radius: 14px;
-        display: flex;
-        justify-content: center;
-        min-height: 220px;
-        overflow: hidden;
-        padding: 1rem;
-    }
-
-    .inscricao-detalhe a.logo-preview {
-        cursor: pointer;
-        text-decoration: none;
-        transition: transform .18s ease, box-shadow .18s ease;
-    }
-
-    .inscricao-detalhe a.logo-preview:hover {
-        box-shadow: 0 14px 28px rgba(28, 65, 109, 0.12);
-        transform: translateY(-2px);
-    }
-
-    .inscricao-detalhe .logo-preview img {
-        display: block;
-        max-height: 190px;
-        max-width: 100%;
-        object-fit: contain;
-    }
-
-    .inscricao-detalhe .logo-placeholder {
-        color: #6f86a7;
-        font-size: .95rem;
-        text-align: center;
-    }
-
-    @media (max-width: 767.98px) {
-        .inscricao-detalhe .detalhe-card-body,
-        .inscricao-detalhe .detalhe-resumo {
-            padding: 1.1rem;
-        }
-
-        .inscricao-detalhe .detalhe-metricas-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .inscricao-detalhe .detalhe-evento-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .inscricao-detalhe .detalhe-status-form {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: .45rem;
-        }
-
-        .inscricao-detalhe .detalhe-status-select,
-        .inscricao-detalhe .detalhe-status-form .btn {
-            max-width: 100%;
-        }
-
-        .inscricao-detalhe .detalhe-status-select {
-            background: #fff;
-            border: 1px solid rgba(36, 69, 125, 0.2);
-            border-radius: 10px;
-            color: #1d3049;
-            display: block;
-            font-size: 16px;
-            font-weight: 600;
-            height: 2.25rem;
-            line-height: normal;
-            min-width: 0;
-            padding: .2rem 2rem .2rem .7rem;
-            width: 100%;
-        }
-
-        .inscricao-detalhe .detalhe-status-form .btn {
-            font-size: .74rem;
-            min-height: 2.1rem;
-            padding: .35rem .85rem;
-            width: 100%;
-        }
-
-        .inscricao-detalhe .detalhe-status-select {
-            background-position: right .7rem center;
-            background-size: 10px;
-        }
-    }
-</style>
-
-<div class="inscricao-detalhe">
-    <div class="d-flex justify-content-center justify-content-md-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+<div class="content-page inscricao-detalhe">
+    <div class="content-page__header">
         <h1 class="h2 text-info mb-2 mb-md-0">Detalhe da inscrição</h1>
-        <div class="btn-toolbar">
+        <div class="content-page__toolbar">
             <button type="button" onclick="carregarTela('../../inscricao', '#content', false);" class="btn btn-primary">
                 <i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar
             </button>
@@ -395,14 +128,14 @@
                     </div>
                     <div class="col-12">
                         <div class="detalhe-evento-box">
-                            <div class="detalhe-titulo">Turma da inscrição</div>
+                            <div class="section-title">Turma da inscrição</div>
                             <div class="detalhe-evento-grid">
                                 <div class="detalhe-evento-item">
-                                    <span class="detalhe-label">Turma</span>
+                                    <span class="field-label">Turma</span>
                                     <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['evento_titulo'] ?? null) ?></div>
                                 </div>
                                 <div class="detalhe-evento-item">
-                                    <span class="detalhe-label">Observação</span>
+                                    <span class="field-label">Observação</span>
                                     <div class="detalhe-valor"><?= nl2br($this->escape($valorOuPadrao($inscricao['evento_observacao'] ?? null))) ?></div>
                                 </div>
                             </div>
@@ -417,26 +150,26 @@
         <div class="col-12 col-xl-6 mb-4">
             <div class="detalhe-card">
                 <div class="detalhe-card-body">
-                    <div class="detalhe-titulo">Responsável pela inscrição</div>
+                    <div class="section-title">Responsável pela inscrição</div>
                     <div class="row">
                         <div class="col-12 mb-3">
-                            <span class="detalhe-label">Nome</span>
+                            <span class="field-label">Nome</span>
                             <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['nome'] ?? null) ?></div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <span class="detalhe-label">CPF</span>
+                            <span class="field-label">CPF</span>
                             <div class="detalhe-valor"><?= $formatarDocumento($inscricao['cpf_responsavel'] ?? null, 'cpf') ?></div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <span class="detalhe-label">E-mail</span>
+                            <span class="field-label">E-mail</span>
                             <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['email'] ?? null) ?></div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <span class="detalhe-label">Telefone</span>
+                            <span class="field-label">Telefone</span>
                             <div class="detalhe-valor"><?= $formatarTelefone($inscricao['telefone'] ?? null) ?></div>
                         </div>
                         <div class="col-12">
-                            <span class="detalhe-label">Endereço</span>
+                            <span class="field-label">Endereço</span>
                             <div class="detalhe-valor"><?= nl2br($this->escape($valorOuPadrao($inscricao['endereco'] ?? null))) ?></div>
                         </div>
                     </div>
@@ -447,22 +180,22 @@
         <div class="col-12 col-xl-6 mb-4">
             <div class="detalhe-card">
                 <div class="detalhe-card-body">
-                    <div class="detalhe-titulo">Organização</div>
+                    <div class="section-title">Organização</div>
                     <div class="row">
                         <div class="col-12 mb-3">
-                            <span class="detalhe-label">Nome da organização</span>
+                            <span class="field-label">Nome da organização</span>
                             <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['nome_organizacao'] ?? null) ?></div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <span class="detalhe-label">CNPJ</span>
+                            <span class="field-label">CNPJ</span>
                             <div class="detalhe-valor"><?= $formatarDocumento($inscricao['cnpj'] ?? null, 'cnpj') ?></div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <span class="detalhe-label">Nome no certificado</span>
+                            <span class="field-label">Nome no certificado</span>
                             <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['nome_certificado'] ?? null) ?></div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <span class="detalhe-label">Logo enviada</span>
+                            <span class="field-label">Logo enviada</span>
                             <div class="detalhe-valor">
                                 <? if ($logo) : ?>
                                     <? if ($logoEhImagem) : ?>
@@ -486,13 +219,13 @@
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <span class="detalhe-label">Primeira participação</span>
+                            <span class="field-label">Primeira participação</span>
                             <div class="detalhe-valor mb-3"><?= $formatarBooleano($inscricao['primeira_participacao'] ?? null) ?></div>
 
-                            <span class="detalhe-label">Como soube da certificação</span>
+                            <span class="field-label">Como soube da certificação</span>
                             <div class="detalhe-valor mb-3"><?= $valorOuPadrao($inscricao['como_soube'] ?? null) ?></div>
 
-                            <span class="detalhe-label">Organização que indicou</span>
+                            <span class="field-label">Organização que indicou</span>
                             <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['indicacao_organizacao'] ?? null) ?></div>
                         </div>
                     </div>
@@ -504,7 +237,7 @@
     <div class="detalhe-card mb-4">
         <div class="detalhe-card-body">
             <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
-                <div class="detalhe-titulo mb-0">Representantes</div>
+                <div class="section-title mb-0">Representantes</div>
                 <small class="text-muted"></small>
             </div>
             <div class="row">
@@ -513,15 +246,15 @@
                         <div class="border rounded h-100 p-3">
                             <div class="font-weight-bold text-info mb-3"><?= $representante['titulo'] ?></div>
                             <div class="mb-3">
-                                <span class="detalhe-label">Nome</span>
+                                <span class="field-label">Nome</span>
                                 <div class="detalhe-valor"><?= $valorOuPadrao($representante['nome']) ?></div>
                             </div>
                             <div class="mb-3">
-                                <span class="detalhe-label">E-mail</span>
+                                <span class="field-label">E-mail</span>
                                 <div class="detalhe-valor"><?= $valorOuPadrao($representante['email']) ?></div>
                             </div>
                             <div>
-                                <span class="detalhe-label">Telefone</span>
+                                <span class="field-label">Telefone</span>
                                 <div class="detalhe-valor"><?= $formatarTelefone($representante['telefone']) ?></div>
                             </div>
                         </div>
@@ -534,14 +267,14 @@
     <? if (!empty($inscricao['token_confirmacao']) || !empty($inscricao['token_expira_em'])) : ?>
         <div class="detalhe-card">
             <div class="detalhe-card-body">
-                <div class="detalhe-titulo">Controle interno</div>
+                <div class="section-title">Controle interno</div>
                 <div class="row">
                     <div class="col-md-6 mb-3 mb-md-0">
-                        <span class="detalhe-label">Token de confirmação</span>
+                        <span class="field-label">Token de confirmação</span>
                         <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['token_confirmacao'] ?? null) ?></div>
                     </div>
                     <div class="col-md-6">
-                        <span class="detalhe-label">Expira em</span>
+                        <span class="field-label">Expira em</span>
                         <div class="detalhe-valor">
                             <?= !empty($inscricao['token_expira_em']) ? Util::formatData($inscricao['token_expira_em']) . ' ' . Util::formatHora($inscricao['token_expira_em']) : 'Não informado' ?>
                         </div>

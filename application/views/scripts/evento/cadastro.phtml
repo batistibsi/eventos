@@ -1,14 +1,14 @@
 <? $registro = $this->registro; ?>
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-	<h1 class="h2 text-info">Evento</h1>
-	<div class="btn-toolbar mb-2 mb-md-0">
-		<div class="btn-group mr-2">
+<div class="content-page">
+	<div class="content-page__header">
+		<h1 class="content-page__title">Evento</h1>
+		<div class="content-page__toolbar">
 			<button type="button" onclick="carregarTela('../../evento')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
 		</div>
 	</div>
-</div>
 <form id="formulario" novalidate>
 	<input name="id_evento" type="hidden" value="<?= $registro ? $registro['id_evento'] : '' ?>" id="id_evento">
+	<div class="section-card">
 	<div class="row">
 		<div class="form-group col-md-8">
 			<span><label for="titulo">Turma: </label></span>
@@ -34,7 +34,9 @@
 			<input class="form-control" name="auditoria" type="datetime-local" value="<?= $registro && !empty($registro['auditoria']) ? date('Y-m-d\TH:i', strtotime($registro['auditoria'])) : '' ?>" id="auditoria">
 		</div>
 	</div>
+	</div>
 
+	<div class="section-card">
 	<div class="row">
 		<div class="form-group col-md-12">
 			<span><label for="observacao">Observacao: </label></span>
@@ -67,13 +69,15 @@
 			<input class="form-control" name="data_summit" type="date" value="<?= $registro && !empty($registro['data_summit']) ? date('Y-m-d', strtotime($registro['data_summit'])) : '' ?>" id="data_summit" required>
 		</div>
 	</div>
+	</div>
 
 	<div class="row">
-		<div class="form-group col-md-12 text-right">
+		<div class="form-group col-md-12 section-actions">
 			<button class="btn btn-success salvar"><span class="glyphicon glyphicon-floppy-disk"></span><i class="fa fa-floppy-o fa-lg"></i> Salvar</button>
 		</div>
 	</div>
 </form>
+</div>
 
 <script type="text/javascript">
 	$(document).ready(function() {
