@@ -56,11 +56,9 @@ class CadastroController extends Zend_Controller_Action
 
 		$campos = array(
 			'material_titulo' => $_REQUEST['material_titulo'] ?? null,
-			'material_video_principal_titulo' => $_REQUEST['material_video_principal_titulo'] ?? null,
 			'material_video_principal_link' => $_REQUEST['material_video_principal_link'] ?? null,
 			'material_videos_secundarios' => $_REQUEST['material_videos_secundarios'] ?? null,
 			'material_arquivos' => $_REQUEST['material_arquivos'] ?? null,
-			'material_links_topo' => $_REQUEST['material_links_topo'] ?? null,
 			'material_links_lista' => $_REQUEST['material_links_lista'] ?? null
 		);
 

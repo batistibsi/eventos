@@ -29,7 +29,6 @@ $videoPrincipalLink = trim((string) ($config['material_video_principal_link'] ??
 $videos = $parseLinhas($config['material_videos_secundarios'] ?? '', 6);
 $arquivos = $parseLinhas($config['material_arquivos'] ?? '', 4);
 $links = $parseLinhas($config['material_links_lista'] ?? '');
-$linksTopo = preg_split('/\r\n|\r|\n/', (string) ($config['material_links_topo'] ?? ''));
 
 $normalizarYoutube = function ($url) {
     $url = trim((string) $url);
@@ -59,22 +58,14 @@ $videoPrincipalEmbed = $normalizarYoutube($videoPrincipalLink);
     </div>
 
     <div class="material-page section-card">
-        <div class="material-page__header-note">
-            <? foreach ($linksTopo as $linhaTopo): ?>
-                <? if (trim((string) $linhaTopo) !== ''): ?>
-                    <div><?= $this->escape($linhaTopo) ?></div>
-                <? endif; ?>
-            <? endforeach; ?>
-        </div>
-
         <div class="material-layout">
             <div class="material-main-card">
                 <? if ($videoPrincipalEmbed): ?>
                     <div class="material-embed">
-                        <iframe src="<?= $this->escape($videoPrincipalEmbed) ?>" title="<?= $this->escape($config['material_video_principal_titulo'] ?? 'Video principal') ?>" allowfullscreen></iframe>
+                        <iframe src="<?= $this->escape($videoPrincipalEmbed) ?>" title="Video principal" allowfullscreen></iframe>
                     </div>
                 <? else: ?>
-                    <button type="button" class="material-main-placeholder" disabled><?= $this->escape($config['material_video_principal_titulo'] ?? 'Video principal') ?></button>
+                    <button type="button" class="material-main-placeholder" disabled>Video principal</button>
                 <? endif; ?>
             </div>
 

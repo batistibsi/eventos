@@ -17,11 +17,9 @@ class Config
         {
                 return array(
                         'material_titulo' => 'Material de apoio e videos',
-                        'material_video_principal_titulo' => 'Video principal',
                         'material_video_principal_link' => '',
                         'material_videos_secundarios' => "Video 1 | \nVideo 2 | \nVideo 3 | \nVideo 4 | \nVideo 5 | \nVideo 6 | ",
                         'material_arquivos' => "Arquivo 1 | \nArquivo 2 | \nArquivo 3 | \nEdital | ",
-                        'material_links_topo' => "3 pdf\nAlguns links",
                         'material_links_lista' => "Titulo do link | https://"
                 );
         }
@@ -251,18 +249,11 @@ class Config
                         return false;
                 }
 
-                $videoPrincipalTitulo = self::validarTexto($campos['material_video_principal_titulo'] ?? '', 'o titulo do video principal', 150, true);
-                if ($videoPrincipalTitulo === false) {
-                        return false;
-                }
-
                 $data = array(
                         'material_titulo' => $titulo,
-                        'material_video_principal_titulo' => $videoPrincipalTitulo,
                         'material_video_principal_link' => trim((string) ($campos['material_video_principal_link'] ?? '')) ?: null,
                         'material_videos_secundarios' => trim((string) ($campos['material_videos_secundarios'] ?? '')) ?: null,
                         'material_arquivos' => trim((string) ($campos['material_arquivos'] ?? '')) ?: null,
-                        'material_links_topo' => trim((string) ($campos['material_links_topo'] ?? '')) ?: null,
                         'material_links_lista' => trim((string) ($campos['material_links_lista'] ?? '')) ?: null
                 );
 

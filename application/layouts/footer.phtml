@@ -131,6 +131,23 @@
  	//history.replaceState({ src: '../../dashboard' }, '', '');
 
  	// Botão Voltar/Avançar
+ 	function carregarTelaAnterior(content = '#content', fallbackSrc = null) {
+ 		if (window.history.length > 1) {
+ 			window.history.back();
+ 			return;
+ 		}
+
+ 		let lastSrc = localStorage.getItem('last_src');
+ 		let lastContent = localStorage.getItem('last_content') || content;
+
+ 		if (lastSrc) {
+ 			carregarTela(lastSrc, lastContent, true);
+ 			return;
+ 		}
+
+ 		carregarTela(fallbackSrc || ('../../' + paginaDefault), content, true);
+ 	}
+
  	window.addEventListener('popstate', function(event) {
  		if (event.state && event.state.src) {
  			// Volta para a tela AJAX correspondente

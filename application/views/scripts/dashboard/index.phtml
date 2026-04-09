@@ -1,14 +1,29 @@
 <?
-$config = !empty($this->configDashboard) && is_array($this->configDashboard) ? $this->configDashboard : array();
-$evento = !empty($this->eventoDashboard) && is_array($this->eventoDashboard) ? $this->eventoDashboard : false;
-$inscricao = !empty($this->inscricaoDashboard) && is_array($this->inscricaoDashboard) ? $this->inscricaoDashboard : false;
-$imagensCarrossel = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', (string) ($config['dashboard_carrossel_imagens'] ?? '')))));
+$config = !empty($this->configDashboard) && is_array($this->configDashboard)
+    ? $this->configDashboard
+    : array();
+
+$evento = !empty($this->eventoDashboard) && is_array($this->eventoDashboard)
+    ? $this->eventoDashboard
+    : false;
+
+$inscricao = !empty($this->inscricaoDashboard) && is_array($this->inscricaoDashboard)
+    ? $this->inscricaoDashboard
+    : false;
+
+$imagensCarrossel = array_values(array_filter(array_map(
+    'trim',
+    preg_split('/\r\n|\r|\n/', (string) ($config['dashboard_carrossel_imagens'] ?? ''))
+)));
+
 $formatarData = function ($valor) {
     if (empty($valor)) {
         return 'A definir';
     }
-    return Util::formatData($valor);
+
+    return Util::getDiaDaSemana($valor) . ', ' . Util::formatData($valor);
 };
+
 $timeline = array(
     array('classe' => 'inscricao', 'titulo' => 'Inscricao', 'data' => $formatarData($evento['data_inscricao'] ?? null)),
     array('classe' => 'submissao', 'titulo' => 'Submissao', 'data' => $formatarData($evento['data_submissao'] ?? null)),
@@ -16,92 +31,92 @@ $timeline = array(
     array('classe' => 'resultado', 'titulo' => 'Resultado', 'data' => $formatarData($evento['data_resultado'] ?? null)),
     array('classe' => 'summit', 'titulo' => 'Summit', 'data' => $formatarData($evento['data_summit'] ?? null))
 );
-$timelineSvg = array(
-    array('classe' => 'summit', 'titulo' => $timeline[4]['titulo'], 'data' => $timeline[4]['data'], 'cx' => 115, 'cy' => 66, 'cor' => '#8b4ab3', 'titulo_y' => 62, 'data_y' => 84, 'titulo_fs' => 8.8, 'data_fs' => 8.1),
-    array('classe' => 'resultado', 'titulo' => $timeline[3]['titulo'], 'data' => $timeline[3]['data'], 'cx' => 205, 'cy' => 143, 'cor' => '#ff7a1f', 'titulo_y' => 139, 'data_y' => 161, 'titulo_fs' => 9.2, 'data_fs' => 8.1),
-    array('classe' => 'correcao', 'titulo' => $timeline[2]['titulo'], 'data' => $timeline[2]['data'], 'cx' => 301, 'cy' => 210, 'cor' => '#ffd400', 'titulo_y' => 206, 'data_y' => 228, 'titulo_fs' => 8.8, 'data_fs' => 8.1),
-    array('classe' => 'inscricao', 'titulo' => $timeline[0]['titulo'], 'data' => $timeline[0]['data'], 'cx' => 118, 'cy' => 340, 'cor' => '#86c61c', 'titulo_y' => 336, 'data_y' => 358, 'titulo_fs' => 9.2, 'data_fs' => 8.1),
-    array('classe' => 'submissao', 'titulo' => $timeline[1]['titulo'], 'data' => $timeline[1]['data'], 'cx' => 225, 'cy' => 270, 'cor' => '#0f74c8', 'titulo_y' => 266, 'data_y' => 288, 'titulo_fs' => 8.8, 'data_fs' => 8.1),
-);
+
+$tituloDashboard = $config['dashboard_titulo'] ?? 'Programe-se';
+$avisoDashboard = $config['dashboard_aviso_texto'] ?? '';
+$linkInscricao = $inscricao
+    ? '../../inscricao/detalhe?id_inscricao=' . (int) $inscricao['id_inscricao']
+    : '';
 ?>
 <div class="content-page dashboard-page">
     <div class="dashboard-showcase section-card">
-        <div class="dashboard-showcase__left">
-            <h2 class="dashboard-showcase__title"><?= $this->escape($config['dashboard_titulo'] ?? 'Programe-se') ?></h2>
+        <h2 class="dashboard-showcase__title"><?= $this->escape($tituloDashboard) ?></h2>
 
-            <div class="dashboard-roadmap" aria-label="Cronograma do evento">
-                <svg class="dashboard-roadmap__svg" viewBox="0 0 360 390" role="img" aria-hidden="true">
-                    <defs>
-                        <linearGradient id="dashboard-road-gradient" x1="0%" x2="100%" y1="100%" y2="0%">
-                            <stop offset="0%" stop-color="#767676"></stop>
-                            <stop offset="48%" stop-color="#d9d9d9"></stop>
-                            <stop offset="100%" stop-color="#bdbdbd"></stop>
-                        </linearGradient>
-                        <filter id="dashboard-road-shadow" x="-20%" y="-20%" width="140%" height="140%">
-                            <feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#1f2c42" flood-opacity=".15"></feDropShadow>
-                        </filter>
-                    </defs>
+        <div class="dashboard-showcase__top">
+            <div class="dashboard-showcase__left">
+                <div class="dashboard-journey" aria-label="Cronograma do evento">
+                    <? foreach ($timeline as $indice => $item): ?>
+                        <div class="dashboard-journey__step dashboard-journey__step--<?= $item['classe'] ?>">
+                            <div class="dashboard-journey__marker">
+                                <span><?= str_pad((string) ($indice + 1), 2, '0', STR_PAD_LEFT) ?></span>
+                            </div>
 
-                    <path class="dashboard-roadmap__road-shadow" d="M 53 347 C 75 329, 103 306, 136 280 C 176 248, 212 221, 241 193 C 266 169, 281 145, 273 122 C 264 98, 233 86, 196 79 C 160 72, 120 70, 102 66 C 92 64, 93 59, 106 54 C 117 49, 120 46, 116 42" />
-                    <path class="dashboard-roadmap__road" d="M 60 340 C 81 323, 108 301, 140 276 C 178 246, 214 220, 242 194 C 265 172, 278 150, 271 128 C 262 106, 232 95, 196 88 C 161 81, 122 79, 104 75 C 96 73, 98 68, 109 63 C 119 59, 122 56, 118 52" />
-                    <path class="dashboard-roadmap__lane" d="M 144 330 C 170 309, 196 288, 223 268 C 245 252, 263 235, 272 217 C 280 201, 278 185, 268 170 C 258 155, 242 142, 224 131 C 206 120, 187 113, 169 108" />
-
-                    <? foreach ($timelineSvg as $item): ?>
-                        <g class="dashboard-roadmap__marker dashboard-roadmap__marker--<?= $item['classe'] ?>">
-                            <path class="dashboard-roadmap__marker-tail" d="M <?= $item['cx'] - 14 ?> <?= $item['cy'] + 28 ?> L <?= $item['cx'] ?> <?= $item['cy'] + 51 ?> L <?= $item['cx'] + 14 ?> <?= $item['cy'] + 28 ?> Z" fill="<?= $item['cor'] ?>"></path>
-                            <circle class="dashboard-roadmap__marker-ring" cx="<?= $item['cx'] ?>" cy="<?= $item['cy'] ?>" r="31" fill="#ffffff" stroke="<?= $item['cor'] ?>" stroke-width="7"></circle>
-                            <circle class="dashboard-roadmap__marker-core" cx="<?= $item['cx'] ?>" cy="<?= $item['cy'] ?>" r="24.5" fill="#ffffff"></circle>
-                            <text class="dashboard-roadmap__text dashboard-roadmap__text--title" x="<?= $item['cx'] ?>" y="<?= $item['titulo_y'] ?>" font-size="<?= $item['titulo_fs'] ?>"><?= $this->escape($item['titulo']) ?></text>
-                            <text class="dashboard-roadmap__text dashboard-roadmap__text--date" x="<?= $item['cx'] ?>" y="<?= $item['data_y'] ?>" font-size="<?= $item['data_fs'] ?>"><?= $this->escape($item['data']) ?></text>
-                        </g>
+                            <div class="dashboard-journey__card">
+                                <span class="dashboard-journey__date"><?= $this->escape($item['data']) ?></span>
+                                <strong class="dashboard-journey__title"><?= $this->escape($item['titulo']) ?></strong>
+                            </div>
+                        </div>
                     <? endforeach; ?>
-                </svg>
+                </div>
+            </div>
+
+            <div class="dashboard-showcase__right">
+                <div class="dashboard-carousel-card">
+                    <? if (count($imagensCarrossel)): ?>
+                        <div id="dashboardCarousel" class="carousel slide dashboard-carousel" data-ride="carousel">
+                            <ol class="carousel-indicators">
+                                <? foreach ($imagensCarrossel as $indice => $imagem): ?>
+                                    <li
+                                        data-target="#dashboardCarousel"
+                                        data-slide-to="<?= (int) $indice ?>"
+                                        class="<?= $indice === 0 ? 'active' : '' ?>"
+                                    ></li>
+                                <? endforeach; ?>
+                            </ol>
+
+                            <div class="carousel-inner">
+                                <? foreach ($imagensCarrossel as $indice => $imagem): ?>
+                                    <div class="carousel-item <?= $indice === 0 ? 'active' : '' ?>">
+                                        <img src="<?= $this->escape($imagem) ?>" alt="Banner <?= (int) ($indice + 1) ?>">
+                                    </div>
+                                <? endforeach; ?>
+                            </div>
+                            <? if (count($imagensCarrossel) > 1): ?>
+                                <a class="carousel-control-prev" href="#dashboardCarousel" role="button" data-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                </a>
+                                <a class="carousel-control-next" href="#dashboardCarousel" role="button" data-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                </a>
+                            <? endif; ?>
+                        </div>
+                    <? else: ?>
+                        <div class="dashboard-carousel__empty">Cadastre imagens no menu Cadastros para preencher este carrossel.</div>
+                    <? endif; ?>
+                </div>
+
+                <div class="dashboard-actions-grid">
+                    <button
+                        type="button"
+                        class="dashboard-action-card"
+                        data-link="<?= $linkInscricao ?>"
+                        <?= !$inscricao ? 'disabled' : '' ?>
+                    >
+                        <span class="dashboard-action-card__icon"><i class="fa fa-id-card-o" aria-hidden="true"></i></span>
+                        <span class="dashboard-action-card__label">Detalhes da inscricao</span>
+                    </button>
+
+                    <button type="button" class="dashboard-action-card" data-link="../../dashboard/material">
+                        <span class="dashboard-action-card__icon"><i class="fa fa-book" aria-hidden="true"></i></span>
+                        <span class="dashboard-action-card__label">Material de apoio</span>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="dashboard-showcase__right">
-            <div class="dashboard-carousel-card">
-                <? if (count($imagensCarrossel)): ?>
-                    <div id="dashboardCarousel" class="carousel slide dashboard-carousel" data-ride="carousel">
-                        <ol class="carousel-indicators">
-                            <? foreach ($imagensCarrossel as $indice => $imagem): ?>
-                                <li data-target="#dashboardCarousel" data-slide-to="<?= (int) $indice ?>" class="<?= $indice === 0 ? 'active' : '' ?>"></li>
-                            <? endforeach; ?>
-                        </ol>
-                        <div class="carousel-inner">
-                            <? foreach ($imagensCarrossel as $indice => $imagem): ?>
-                                <div class="carousel-item <?= $indice === 0 ? 'active' : '' ?>">
-                                    <img src="<?= $this->escape($imagem) ?>" alt="Banner <?= (int) ($indice + 1) ?>">
-                                </div>
-                            <? endforeach; ?>
-                        </div>
-                        <? if (count($imagensCarrossel) > 1): ?>
-                            <a class="carousel-control-prev" href="#dashboardCarousel" role="button" data-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            </a>
-                            <a class="carousel-control-next" href="#dashboardCarousel" role="button" data-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            </a>
-                        <? endif; ?>
-                    </div>
-                <? else: ?>
-                    <div class="dashboard-carousel__empty">Cadastre imagens no menu Cadastros para preencher este carrossel.</div>
-                <? endif; ?>
-            </div>
-
-            <div class="dashboard-actions-grid">
-                <button type="button" class="dashboard-action-card" data-link="<?= $inscricao ? '../../inscricao/detalhe?id_inscricao=' . (int) $inscricao['id_inscricao'] : '' ?>" <?= !$inscricao ? 'disabled' : '' ?>>
-                    <span class="dashboard-action-card__icon"><i class="fa fa-id-card-o" aria-hidden="true"></i></span>
-                    <span class="dashboard-action-card__label">Detalhes da inscricao</span>
-                </button>
-                <button type="button" class="dashboard-action-card" data-link="../../dashboard/material">
-                    <span class="dashboard-action-card__icon"><i class="fa fa-book" aria-hidden="true"></i></span>
-                    <span class="dashboard-action-card__label">Material de apoio</span>
-                </button>
-            </div>
-
+        <div class="dashboard-showcase__footer">
             <div class="dashboard-notice-card">
-                <?= nl2br($this->escape($config['dashboard_aviso_texto'] ?? '')) ?>
+                <?= nl2br($this->escape($avisoDashboard)) ?>
             </div>
         </div>
     </div>
@@ -111,6 +126,7 @@ $timelineSvg = array(
     $(document).ready(function() {
         $('.dashboard-action-card').on('click', function() {
             var link = ($(this).data('link') || '').toString().trim();
+
             if (!link.length || $(this).is(':disabled')) {
                 return;
             }
