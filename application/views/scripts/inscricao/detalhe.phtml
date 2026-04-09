@@ -90,15 +90,19 @@
         <div class="row align-items-start">
             <div class="col-12 col-lg-7 mb-3 mb-lg-0">
                 <div class="mb-2">
-                    <form id="form-status-inscricao" class="detalhe-status-form">
-                        <input type="hidden" name="id_inscricao" value="<?= (int) ($inscricao['id_inscricao'] ?? 0) ?>">
-                        <select name="status" id="status" class="detalhe-status detalhe-status-select">
-                            <? foreach ($statusDisponiveis as $status) : ?>
-                                <option value="<?= $this->escape($status) ?>" <?= $status === $statusAtual ? 'selected' : '' ?>><?= $this->escape($status) ?></option>
-                            <? endforeach; ?>
-                        </select>
-                        <button type="submit" class="btn btn-light btn-sm salvar-status"><i class="fa fa-floppy-o" aria-hidden="true"></i> Salvar status</button>
-                    </form>
+                    <? if ((int) ($this->permissao ?? 0) === 1) : ?>
+                        <form id="form-status-inscricao" class="detalhe-status-form">
+                            <input type="hidden" name="id_inscricao" value="<?= (int) ($inscricao['id_inscricao'] ?? 0) ?>">
+                            <select name="status" id="status" class="detalhe-status detalhe-status-select">
+                                <? foreach ($statusDisponiveis as $status) : ?>
+                                    <option value="<?= $this->escape($status) ?>" <?= $status === $statusAtual ? 'selected' : '' ?>><?= $this->escape($status) ?></option>
+                                <? endforeach; ?>
+                            </select>
+                            <button type="submit" class="btn btn-light btn-sm salvar-status"><i class="fa fa-floppy-o" aria-hidden="true"></i> Salvar status</button>
+                        </form>
+                    <? else : ?>
+                        <div class="detalhe-status d-inline-flex px-3 py-2"><?= $this->escape($statusAtual !== '' ? $statusAtual : 'NAO INFORMADO') ?></div>
+                    <? endif; ?>
                 </div>
                 <h3 class="mb-2"><?= $valorOuPadrao($inscricao['nome_organizacao'] ?? null) ?></h3>
                 <p class="mb-0">
@@ -281,7 +285,7 @@
         </div>
     </div>
 
-    <? if (!empty($inscricao['token_confirmacao']) || !empty($inscricao['token_expira_em'])) : ?>
+    <? if ((int) ($this->permissao ?? 0) === 1 && (!empty($inscricao['token_confirmacao']) || !empty($inscricao['token_expira_em']))) : ?>
         <div class="detalhe-card">
             <div class="detalhe-card-body">
                 <div class="section-title">Controle interno</div>

@@ -2,11 +2,23 @@
     <div class="content-page__header">
         <h1 class="content-page__title">Cadastros</h1>
     </div>
-    <main class="col-sm-12 col-md-12 m-0">
-    </main>
-</div>
-<script type="text/javascript">
-    $(document).ready(function() {
 
-    });
-</script>
+    <div class="section-card cadastro-grid">
+        <div class="cadastro-card">
+            <div class="cadastro-card__icon"><i class="fa fa-line-chart" aria-hidden="true"></i></div>
+            <h2 class="section-title">Dashboard</h2>
+            <p class="section-subtitle">Defina os textos, links e imagens que aparecem na home do dashboard.</p>
+            <button type="button" class="btn btn-primary" onclick="carregarTela('../../cadastro/dashboard')">
+                <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Configurar dashboard
+            </button>
+        </div>
+        <div class="cadastro-card">
+            <div class="cadastro-card__icon"><i class="fa fa-play-circle" aria-hidden="true"></i></div>
+            <h2 class="section-title">Tela de Material</h2>
+            <p class="section-subtitle">Escolha o video principal, os cards de videos, arquivos e links da area de material.</p>
+            <button type="button" class="btn btn-primary" onclick="carregarTela('../../cadastro/material')">
+                <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Configurar material
+            </button>
+        </div>
+    </div>
+</div>

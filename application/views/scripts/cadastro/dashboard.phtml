@@ -1,0 +1,156 @@
+<? $registro = !empty($this->registro) && is_array($this->registro) ? $this->registro : array(); ?>
+<? $imagensCarrossel = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', (string) ($registro['dashboard_carrossel_imagens'] ?? ''))))); ?>
+<div class="content-page">
+	<div class="content-page__header">
+		<h1 class="content-page__title">Configuracao do Dashboard</h1>
+		<div class="content-page__toolbar">
+			<button type="button" onclick="carregarTela('../../cadastro')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
+		</div>
+	</div>
+
+	<form id="form-dashboard-config" class="projeto-form" novalidate enctype="multipart/form-data">
+		<div class="section-card">
+			<div class="section-header">
+				<div>
+					<h2 class="section-title">Conteudo principal</h2>
+					<p class="section-subtitle">As datas da trilha vem automaticamente do evento vinculado a inscricao do usuario.</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-6">
+					<span><label for="dashboard_titulo">Titulo principal: </label></span>
+					<input class="form-control" name="dashboard_titulo" id="dashboard_titulo" maxlength="150" value="<?= $this->escape($registro['dashboard_titulo'] ?? '') ?>" required>
+				</div>
+				<div class="form-group col-md-6">
+					<span><label for="dashboard_aviso_texto">Aviso em destaque: </label></span>
+					<textarea class="form-control" name="dashboard_aviso_texto" id="dashboard_aviso_texto" rows="3"><?= $this->escape($registro['dashboard_aviso_texto'] ?? '') ?></textarea>
+				</div>
+			</div>
+		</div>
+
+		<div class="section-card">
+			<div class="section-header">
+				<div>
+					<h2 class="section-title">Carrossel</h2>
+					<p class="section-subtitle">Envie imagens para o carrossel. Dimensao sugerida: 1600 x 900 px. Minimo recomendado: 1200 x 675 px.</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label for="dashboard-dropzone">Upload de imagens: </label></span>
+					<div id="dashboard-dropzone" class="dropzone">
+						<div class="dz-message">
+							Arraste imagens aqui ou clique para selecionar.<br>
+							<small>Formatos aceitos: PNG, JPG, JPEG e WEBP.</small>
+						</div>
+					</div>
+					<input type="hidden" name="dashboard_carrossel_imagens" id="dashboard_carrossel_imagens" value="<?= $this->escape($registro['dashboard_carrossel_imagens'] ?? '') ?>">
+					<div class="upload-subtitle mt-2">Formatos aceitos: PNG, JPG, JPEG e WEBP. Tamanho maximo: 10 MB por imagem.</div>
+				</div>
+				<? if (count($imagensCarrossel)) : ?>
+					<div class="form-group col-md-12">
+						<span class="field-label">Imagens atuais</span>
+						<div class="dashboard-admin-gallery">
+							<? foreach ($imagensCarrossel as $imagem) : ?>
+								<div class="dashboard-admin-gallery__item" data-image-url="<?= $this->escape($imagem) ?>">
+									<button type="button" class="dashboard-admin-gallery__remove" title="Excluir imagem"><i class="fa fa-trash" aria-hidden="true"></i></button>
+									<img src="<?= $this->escape($imagem) ?>" alt="Imagem do carrossel">
+								</div>
+							<? endforeach; ?>
+						</div>
+					</div>
+				<? endif; ?>
+			</div>
+		</div>
+
+		<div class="section-actions">
+			<button class="btn btn-success salvar-dashboard"><i class="fa fa-floppy-o" aria-hidden="true"></i> Salvar configuracao</button>
+		</div>
+	</form>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		function syncDashboardCarrosselImagens() {
+			var urls = [];
+			$('.dashboard-admin-gallery__item').each(function() {
+				var url = ($(this).data('image-url') || '').toString().trim();
+				if (url.length) {
+					urls.push(url);
+				}
+			});
+			$('#dashboard_carrossel_imagens').val(urls.join("\n"));
+		}
+
+		var dashboardDropzone = new Dropzone('#dashboard-dropzone', {
+			url: '#',
+			autoProcessQueue: false,
+			uploadMultiple: true,
+			parallelUploads: 10,
+			maxFilesize: 10,
+			addRemoveLinks: true,
+			paramName: 'dashboard_carrossel_upload',
+			clickable: true,
+			acceptedFiles: '.png,.jpg,.jpeg,.webp',
+			dictDefaultMessage: 'Arraste imagens aqui ou clique para selecionar',
+			dictRemoveFile: 'Remover',
+			dictFileTooBig: 'Imagem muito grande. Tamanho maximo: 10 MB.',
+			dictInvalidFileType: 'Tipo de imagem nao permitido.'
+		});
+
+		$(document).on('click', '.dashboard-admin-gallery__remove', function() {
+			$(this).closest('.dashboard-admin-gallery__item').remove();
+			syncDashboardCarrosselImagens();
+		});
+
+		$('#form-dashboard-config').submit(function(e) {
+			e.preventDefault();
+
+			if (!this.checkValidity()) {
+				this.reportValidity();
+				return false;
+			}
+
+			$('.salvar-dashboard').hide();
+			var formData = new FormData(this);
+			dashboardDropzone.getAcceptedFiles().forEach(function(file) {
+				formData.append('dashboard_carrossel_upload[]', file, file.name);
+			});
+
+			$.ajax({
+				type: "POST",
+				url: "../../cadastro/salvardashboard",
+				data: formData,
+				processData: false,
+				contentType: false,
+				success: function(data) {
+					if (data.trim().length > 0) {
+						$('.salvar-dashboard').show();
+						swal({
+							title: "Atencao!",
+							text: data,
+							type: "error"
+						});
+						return;
+					}
+
+					swal({
+						title: "Sucesso!",
+						text: "Configuracao do dashboard salva com sucesso.",
+						type: "success"
+					}, function() {
+						carregarTela('../../cadastro/dashboard');
+					});
+				},
+				error: function() {
+					$('.salvar-dashboard').show();
+					swal({
+						title: "Atencao!",
+						text: "Nao foi possivel salvar a configuracao do dashboard.",
+						type: "error"
+					});
+				}
+			});
+		});
+	});
+</script>

@@ -1,16 +1,131 @@
-<div class="content-page">
+<?
+$config = !empty($this->configMaterial) && is_array($this->configMaterial) ? $this->configMaterial : array();
+
+$parseLinhas = function ($texto, $limite = null) {
+    $itens = array();
+    $linhas = preg_split('/\r\n|\r|\n/', (string) $texto);
+
+    foreach ($linhas as $linha) {
+        $linha = trim($linha);
+        if ($linha === '') {
+            continue;
+        }
+
+        $partes = array_map('trim', explode('|', $linha, 2));
+        $itens[] = array(
+            'titulo' => $partes[0] !== '' ? $partes[0] : 'Item',
+            'url' => isset($partes[1]) ? trim($partes[1]) : ''
+        );
+
+        if ($limite !== null && count($itens) >= $limite) {
+            break;
+        }
+    }
+
+    return $itens;
+};
+
+$videoPrincipalLink = trim((string) ($config['material_video_principal_link'] ?? ''));
+$videos = $parseLinhas($config['material_videos_secundarios'] ?? '', 6);
+$arquivos = $parseLinhas($config['material_arquivos'] ?? '', 4);
+$links = $parseLinhas($config['material_links_lista'] ?? '');
+$linksTopo = preg_split('/\r\n|\r|\n/', (string) ($config['material_links_topo'] ?? ''));
+
+$normalizarYoutube = function ($url) {
+    $url = trim((string) $url);
+    if ($url === '') {
+        return '';
+    }
+
+    if (preg_match('~youtube\.com/watch\?v=([^&]+)~i', $url, $matches)) {
+        return 'https://www.youtube.com/embed/' . $matches[1];
+    }
+
+    if (preg_match('~youtu\.be/([^?&/]+)~i', $url, $matches)) {
+        return 'https://www.youtube.com/embed/' . $matches[1];
+    }
+
+    return $url;
+};
+
+$videoPrincipalEmbed = $normalizarYoutube($videoPrincipalLink);
+?>
+<div class="content-page dashboard-page">
     <div class="content-page__header">
-        <h1 class="content-page__title">Material de Apoio e Videos</h1>
+        <h1 class="content-page__title"><?= $this->escape($config['material_titulo'] ?? 'Material de apoio e videos') ?></h1>
+        <div class="content-page__toolbar">
+            <button type="button" onclick="carregarTela('../../dashboard')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Inicio</button>
+        </div>
     </div>
-    <main class="col-sm-12 col-md-12 m-0">
-        <a class="btn btn-info" id="dashboard" href="#">Início</a>
-        <h1>Em construçaõ</h1>
-    </main>
+
+    <div class="material-page section-card">
+        <div class="material-page__header-note">
+            <? foreach ($linksTopo as $linhaTopo): ?>
+                <? if (trim((string) $linhaTopo) !== ''): ?>
+                    <div><?= $this->escape($linhaTopo) ?></div>
+                <? endif; ?>
+            <? endforeach; ?>
+        </div>
+
+        <div class="material-layout">
+            <div class="material-main-card">
+                <? if ($videoPrincipalEmbed): ?>
+                    <div class="material-embed">
+                        <iframe src="<?= $this->escape($videoPrincipalEmbed) ?>" title="<?= $this->escape($config['material_video_principal_titulo'] ?? 'Video principal') ?>" allowfullscreen></iframe>
+                    </div>
+                <? else: ?>
+                    <button type="button" class="material-main-placeholder" disabled><?= $this->escape($config['material_video_principal_titulo'] ?? 'Video principal') ?></button>
+                <? endif; ?>
+            </div>
+
+            <div class="material-side-grid">
+                <? foreach ($videos as $video): ?>
+                    <button type="button" class="material-card-button" data-link="<?= $this->escape($video['url']) ?>">
+                        <?= $this->escape($video['titulo']) ?>
+                    </button>
+                <? endforeach; ?>
+            </div>
+        </div>
+
+        <div class="material-files-grid">
+            <? foreach ($arquivos as $arquivo): ?>
+                <button type="button" class="material-card-button material-card-button--file" data-link="<?= $this->escape($arquivo['url']) ?>">
+                    <?= $this->escape($arquivo['titulo']) ?>
+                </button>
+            <? endforeach; ?>
+        </div>
+
+        <div class="material-links-card">
+            <h2>Links</h2>
+            <? if (count($links)): ?>
+                <div class="material-links-list">
+                    <? foreach ($links as $link): ?>
+                        <button type="button" class="material-link-item" data-link="<?= $this->escape($link['url']) ?>">
+                            <?= $this->escape($link['titulo']) ?>
+                        </button>
+                    <? endforeach; ?>
+                </div>
+            <? else: ?>
+                <div class="material-links-empty">Nenhum link cadastrado.</div>
+            <? endif; ?>
+        </div>
+    </div>
 </div>
+
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#dashboard').on('click', function() {
-            carregarTela('../../../dashboard');
+        $('.material-card-button, .material-link-item').on('click', function() {
+            var link = ($(this).data('link') || '').toString().trim();
+            if (!link.length) {
+                return;
+            }
+
+            if (link.indexOf('../../') === 0) {
+                carregarTela(link);
+                return;
+            }
+
+            window.open(link, '_blank');
         });
     });
 </script>
