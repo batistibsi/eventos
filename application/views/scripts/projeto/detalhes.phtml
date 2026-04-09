@@ -15,7 +15,7 @@
 				<h2 class="section-title">Vínculos e Status</h2>
 			</div>
 		</div>
-		<div class="row projeto-detalhe-objetivos-row">
+		<div class="row">
 			<div class="col-md-3 mb-3">
 				<span class="field-label">Status</span>
 				<div class="detalhe-valor"><?= $this->escape($registro['status_projeto_label']) ?></div>
@@ -67,8 +67,8 @@
 				<h2 class="section-title">Classificação e Objetivos</h2>
 			</div>
 		</div>
-		<div class="row projeto-detalhe-classificacao-row">
-			<div class="col-lg-3 mb-4">
+		<div class="row projeto-detalhe-classificacao">
+			<div class="col-12 col-lg-3 projeto-detalhe-classificacao__item projeto-detalhe-classificacao__item--area mb-4">
 				<span class="field-label">Área de atuação</span>
 				<div class="detalhe-card projeto-detalhe-bloco h-100">
 					<div class="detalhe-card-body">
@@ -84,7 +84,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-4 mb-4">
+			<div class="col-12 col-lg-4 projeto-detalhe-classificacao__item projeto-detalhe-classificacao__item--principal mb-4">
 				<span class="field-label">ODS principal</span>
 				<div class="detalhe-card projeto-detalhe-bloco h-100">
 					<div class="detalhe-card-body">
@@ -97,7 +97,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-5 mb-4">
+			<div class="col-12 col-lg-5 projeto-detalhe-classificacao__item projeto-detalhe-classificacao__item--relacionados mb-4">
 				<span class="field-label">Demais ODS relacionados</span>
 				<div class="detalhe-card projeto-detalhe-bloco h-100">
 					<div class="detalhe-card-body">
@@ -119,8 +119,8 @@
 				</div>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-md-12 mt-2 mb-1">
+		<div class="row projeto-detalhe-objetivos-row">
+			<div class="col-md-12 mb-1">
 				<span class="field-label">Objetivo(s) do projeto</span>
 				<div class="detalhe-card projeto-objetivos-card">
 					<div class="detalhe-card-body">

@@ -35,8 +35,10 @@
 							<td class="text-center projeto-table__actions" width="60px" data-label="Ações">
 								<div class="table-actions">
 									<a class="btn btn-primary" href="#" onclick="carregarTela('../../projeto/detalhes?id_projeto=<?= $value['id_projeto'] ?>')"><i class="fa fa-eye"></i></a>
-									<a class="btn btn-primary" href="#" onclick="carregarTela('../../projeto/cadastro?id_projeto=<?= $value['id_projeto'] ?>')"><i class="fa fa-pencil-square-o"></i></a>
-									<a class="btn btn-danger" href="#" onclick="remover('projeto',<?= $value['id_projeto'] ?>,'<?= $this->escape($value['nome']) ?>')"><i class="fa fa-trash-o"></i></a>
+									<? if (!empty($this->permitirEditarExcluir)) : ?>
+										<a class="btn btn-primary" href="#" onclick="carregarTela('../../projeto/cadastro?id_projeto=<?= $value['id_projeto'] ?>')"><i class="fa fa-pencil-square-o"></i></a>
+										<a class="btn btn-danger" href="#" onclick="remover('projeto',<?= $value['id_projeto'] ?>,'<?= $this->escape($value['nome']) ?>')"><i class="fa fa-trash-o"></i></a>
+									<? endif; ?>
 								</div>
 							</td>
 							<td class="text-left align-middle" data-label="Nome do projeto"><?= $this->escape($value['nome']) ?></td>

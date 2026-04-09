@@ -1,5 +1,7 @@
 <? $registro = $this->registro; ?>
 <? $odsRelacionados = $registro && !empty($registro['demais_ods_relacionados']) ? array_map('trim', explode(',', $registro['demais_ods_relacionados'])) : array(); ?>
+<? $eventoVinculado = !empty($this->eventoVinculado) && is_array($this->eventoVinculado) ? $this->eventoVinculado : false; ?>
+<? $empresaVinculada = !empty($this->empresaVinculada) && is_array($this->empresaVinculada) ? $this->empresaVinculada : false; ?>
 <div class="content-page">
 	<div class="content-page__header">
 		<h1 class="content-page__title">Projeto</h1>
@@ -7,189 +9,275 @@
 			<button type="button" onclick="carregarTela('../../projeto')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
 		</div>
 	</div>
-<form id="formulario" class="projeto-form" novalidate>
-	<input name="id_projeto" type="hidden" value="<?= $registro ? $registro['id_projeto'] : '' ?>" id="id_projeto">
-	<? if ($this->permissao != 1): ?>
-		<input name="id_usuario" type="hidden" value="<?= (int) $this->id_usuario ?>" id="id_usuario">
-	<? endif; ?>
+	<form id="formulario" class="projeto-form" novalidate>
+		<input name="id_projeto" type="hidden" value="<?= $registro ? $registro['id_projeto'] : '' ?>" id="id_projeto">
+		<input name="id_evento" type="hidden" value="<?= $eventoVinculado ? (int) $eventoVinculado['id_evento'] : '' ?>" id="id_evento">
+		<? if ($this->permissao != 1): ?>
+			<input name="id_usuario" type="hidden" value="<?= (int) $this->id_usuario ?>" id="id_usuario">
+		<? endif; ?>
 
-	<div class="section-card">
-		<div class="section-header">
-			<div>
-				<h2 class="section-title">Vinculos E Status</h2>
-				<p class="section-subtitle">Associe o projeto ao usuario, ao evento e ao status atual.</p>
+		<div class="section-card projeto-empresa-resumo">
+			<div class="section-header">
+				<div>
+					<h2 class="section-title">Empresa Vinculada à Inscrição</h2>
+					<p class="section-subtitle">Os dados abaixo vêm da inscrição vinculada ao usuário responsável por este projeto.</p>
+				</div>
 			</div>
-		</div>
-		<div class="row">
-			<? if ($this->permissao == 1): ?>
-				<div class="form-group col-md-4">
-					<span><label for="status_projeto">Status: </label></span>
-					<input class="form-control" name="status_projeto" type="number" min="0" value="<?= $registro ? (int) $registro['status_projeto'] : 0 ?>" id="status_projeto" required>
+			<div class="row projeto-empresa-resumo__grid" id="empresa_vinculada_dados" <?= !$empresaVinculada ? 'style="display:none;"' : '' ?>>
+				<div class="col-md-6 col-xl-4 mb-3">
+					<span class="field-label">Organização</span>
+					<div class="detalhe-valor" id="empresa_nome_organizacao"><?= $empresaVinculada ? $this->escape($empresaVinculada['nome_organizacao']) : '-' ?></div>
 				</div>
-				<div class="form-group col-md-4">
-					<span><label for="id_usuario">Usuario: </label></span>
-					<select class="form-control" name="id_usuario" id="id_usuario" required>
-						<option value="">Selecione</option>
-						<? foreach ($this->usuarios as $usuario): ?>
-							<option value="<?= (int) $usuario['id_usuario'] ?>" <?= $registro && (int) $registro['id_usuario'] === (int) $usuario['id_usuario'] ? 'selected' : '' ?>><?= $this->escape($usuario['nome']) ?></option>
-						<? endforeach; ?>
-					</select>
+				<div class="col-md-6 col-xl-4 mb-3">
+					<span class="field-label">CNPJ</span>
+					<div class="detalhe-valor" id="empresa_cnpj"><?= $empresaVinculada ? $this->escape($empresaVinculada['cnpj']) : '-' ?></div>
 				</div>
-				<div class="form-group col-md-4">
-			<? else: ?>
-				<div class="form-group col-md-4">
-					<span><label for="status_projeto">Status: </label></span>
-					<input class="form-control" name="status_projeto" type="number" min="0" value="<?= $registro ? (int) $registro['status_projeto'] : 0 ?>" id="status_projeto" required>
+				<div class="col-md-6 col-xl-4 mb-3">
+					<span class="field-label">Nome no certificado</span>
+					<div class="detalhe-valor" id="empresa_nome_certificado"><?= $empresaVinculada ? $this->escape($empresaVinculada['nome_certificado']) : '-' ?></div>
 				</div>
-				<div class="form-group col-md-8">
-			<? endif; ?>
-				<span><label for="id_evento">Evento: </label></span>
-				<select class="form-control" name="id_evento" id="id_evento" required>
-					<option value="">Selecione</option>
-					<? foreach ($this->eventos as $evento): ?>
-						<option value="<?= (int) $evento['id_evento'] ?>" <?= $registro && (int) $registro['id_evento'] === (int) $evento['id_evento'] ? 'selected' : '' ?>><?= $this->escape($evento['label']) ?></option>
-					<? endforeach; ?>
-				</select>
+				<div class="col-md-6 col-xl-4 mb-3">
+					<span class="field-label">Colaboradores</span>
+					<div class="detalhe-valor" id="empresa_numero_colaboradores"><?= $empresaVinculada ? (int) $empresaVinculada['numero_colaboradores'] : 0 ?></div>
+				</div>
+				<div class="col-md-6 col-xl-4 mb-3">
+					<span class="field-label">Responsável da inscrição</span>
+					<div class="detalhe-valor" id="empresa_responsavel_inscricao"><?= $empresaVinculada ? $this->escape($empresaVinculada['nome']) : '-' ?></div>
+				</div>
+				<div class="col-md-6 col-xl-4 mb-3">
+					<span class="field-label">Contato</span>
+					<div class="detalhe-valor" id="empresa_contato_inscricao">
+						<? if ($empresaVinculada) : ?>
+							<?= $this->escape($empresaVinculada['email']) ?>
+							<? if (!empty($empresaVinculada['telefone'])) : ?><br><?= $this->escape($empresaVinculada['telefone']) ?><? endif; ?>
+						<? else : ?>
+							-
+						<? endif; ?>
+					</div>
+				</div>
 			</div>
+			<div class="projeto-empresa-resumo__empty detalhe-valor" id="empresa_vinculada_vazio" <?= $empresaVinculada ? 'style="display:none;"' : '' ?>>Nenhuma inscrição vinculada encontrada para este usuário.</div>
 		</div>
-	</div>
 
-	<div class="section-card">
-		<div class="row">
-			<div class="form-group col-md-12">
-				<span><label for="nome">Nome do projeto: </label></span>
-				<input class="form-control" name="nome" type="text" value="<?= $registro ? $this->escape($registro['nome']) : '' ?>" id="nome" maxlength="150" required>
+		<div class="section-card">
+			<div class="section-header">
+				<div>
+					<h2 class="section-title">Vínculos e Status</h2>
+					<p class="section-subtitle">Associe o projeto ao usuário, ao evento e ao status atual.</p>
+				</div>
+			</div>
+			<div class="row">
+				<? if ($this->permissao == 1): ?>
+					<div class="form-group col-md-4">
+						<span><label for="status_projeto">Status: </label></span>
+						<select class="form-control" name="status_projeto" id="status_projeto" required>
+							<? foreach ($this->statusProjetoOpcoes as $statusCodigo => $statusDescricao): ?>
+								<option value="<?= (int) $statusCodigo ?>" <?= (int) ($registro ? $registro['status_projeto'] : 0) === (int) $statusCodigo ? 'selected' : '' ?>><?= $this->escape($statusDescricao) ?></option>
+							<? endforeach; ?>
+						</select>
+					</div>
+					<div class="form-group col-md-4">
+						<span><label for="id_usuario">Usuário: </label></span>
+						<select class="form-control" name="id_usuario" id="id_usuario" required>
+							<option value="">Selecione</option>
+							<? foreach ($this->usuarios as $usuario): ?>
+								<option value="<?= (int) $usuario['id_usuario'] ?>" <?= $registro && (int) $registro['id_usuario'] === (int) $usuario['id_usuario'] ? 'selected' : '' ?>><?= $this->escape($usuario['nome']) ?></option>
+							<? endforeach; ?>
+						</select>
+					</div>
+					<div class="form-group col-md-4">
+				<? else: ?>
+					<div class="form-group col-md-12">
+				<? endif; ?>
+					<span><label for="evento_vinculado_label">Evento da inscrição vinculada: </label></span>
+					<input class="form-control" type="text" value="<?= $eventoVinculado ? $this->escape($eventoVinculado['label']) : 'Nenhuma inscrição vinculada encontrada para este usuário.' ?>" id="evento_vinculado_label" readonly>
+				</div>
 			</div>
 		</div>
-		<div class="row">
-			<div class="form-group col-md-12">
-				<span><label for="responsavel">Responsável: </label></span>
-				<input class="form-control" name="responsavel" type="text" value="<?= $registro && !empty($registro['responsavel']) ? $this->escape($registro['responsavel']) : '' ?>" id="responsavel" maxlength="120">
-			</div>
-		</div>
-		<div class="row">
-			<div class="form-group col-md-6">
-				<span><label for="data_inicializacao">Data da inicializacao: </label></span>
-				<input class="form-control" name="data_inicializacao" type="date" value="<?= $registro && !empty($registro['data_inicializacao']) ? date('Y-m-d', strtotime($registro['data_inicializacao'])) : '' ?>" id="data_inicializacao" required>
-			</div>
-			<div class="form-group col-md-6">
-				<span><label for="data_finalizacao">Data da finalizacao: </label></span>
-				<input class="form-control" name="data_finalizacao" type="date" value="<?= $registro && !empty($registro['data_finalizacao']) ? date('Y-m-d', strtotime($registro['data_finalizacao'])) : '' ?>" id="data_finalizacao" required>
-			</div>
-		</div>
-		<div class="row">
-			<div class="form-group col-md-12">
-				<span><label for="justificativa">Justificativa do projeto: </label></span>
-				<textarea class="form-control" name="justificativa" id="justificativa" rows="4" required><?= $registro && !empty($registro['justificativa']) ? $this->escape($registro['justificativa']) : '' ?></textarea>
-			</div>
-		</div>
-	</div>
 
-	<div class="section-card">
-		<div class="section-header">
-			<div>
-				<h2 class="section-title">Classificacao E Objetivos</h2>
-				<p class="section-subtitle">Defina a area de atuacao, os ODS e os objetivos vinculados ao projeto.</p>
+		<div class="section-card">
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label for="nome">Nome do projeto: </label></span>
+					<input class="form-control" name="nome" type="text" value="<?= $registro ? $this->escape($registro['nome']) : '' ?>" id="nome" maxlength="150" required>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label for="responsavel">Responsável: </label></span>
+					<input class="form-control" name="responsavel" type="text" value="<?= $registro && !empty($registro['responsavel']) ? $this->escape($registro['responsavel']) : '' ?>" id="responsavel" maxlength="120">
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-6">
+					<span><label for="data_inicializacao">Data da inicialização: </label></span>
+					<input class="form-control" name="data_inicializacao" type="date" value="<?= $registro && !empty($registro['data_inicializacao']) ? date('Y-m-d', strtotime($registro['data_inicializacao'])) : '' ?>" id="data_inicializacao" required>
+				</div>
+				<div class="form-group col-md-6">
+					<span><label for="data_finalizacao">Data da finalização: </label></span>
+					<input class="form-control" name="data_finalizacao" type="date" value="<?= $registro && !empty($registro['data_finalizacao']) ? date('Y-m-d', strtotime($registro['data_finalizacao'])) : '' ?>" id="data_finalizacao" required>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label for="justificativa">Justificativa do projeto: </label></span>
+					<textarea class="form-control" name="justificativa" id="justificativa" rows="4" required><?= $registro && !empty($registro['justificativa']) ? $this->escape($registro['justificativa']) : '' ?></textarea>
+				</div>
 			</div>
 		</div>
-		<div class="row">
-			<div class="form-group col-md-12">
-				<span><label>Area de atuacao: </label></span>
-				<div class="area-atuacao-group">
-				<label class="area-atuacao-option" for="area_atuacao_ambiental">
-					<input type="radio" name="area_atuacao" id="area_atuacao_ambiental" value="Ambiental" <?= $registro && $registro['area_atuacao'] === 'Ambiental' ? 'checked' : '' ?> required>
-					<span class="area-atuacao-card area-ambiental"><i class="fa fa-leaf" aria-hidden="true"></i> Ambiental</span>
-				</label>
-				<label class="area-atuacao-option" for="area_atuacao_social">
-					<input type="radio" name="area_atuacao" id="area_atuacao_social" value="Social" <?= $registro && $registro['area_atuacao'] === 'Social' ? 'checked' : '' ?> required>
-					<span class="area-atuacao-card area-social"><i class="fa fa-heart" aria-hidden="true"></i> Social</span>
-				</label>
-				<label class="area-atuacao-option" for="area_atuacao_governanca">
-					<input type="radio" name="area_atuacao" id="area_atuacao_governanca" value="Governanca" <?= $registro && $registro['area_atuacao'] === 'Governanca' ? 'checked' : '' ?> required>
-					<span class="area-atuacao-card area-governanca"><i class="fa fa-university" aria-hidden="true"></i> Governanca</span>
-				</label>
+
+		<div class="section-card">
+			<div class="section-header">
+				<div>
+					<h2 class="section-title">Classificação e Objetivos</h2>
+					<p class="section-subtitle">Defina a área de atuação, os ODS e os objetivos vinculados ao projeto.</p>
+				</div>
 			</div>
-		</div>
-		</div>
-		<div class="row">
-			<div class="form-group col-md-12">
-				<span><label>ODS principal do projeto: </label></span>
-				<div class="ods-grid">
-					<? for ($i = 1; $i <= 17; $i++): $ods = 'ODS ' . $i; ?>
-						<label class="ods-option" for="ods_principal_<?= $i ?>">
-							<input type="radio" name="ods_principal" id="ods_principal_<?= $i ?>" value="<?= $ods ?>" <?= $registro && $registro['ods_principal'] === $ods ? 'checked' : '' ?> required>
-							<span class="ods-card">
-								<img src="../../objetivos/<?= $i ?>.png" alt="<?= $ods ?>">
-								<span><?= $ods ?></span>
-							</span>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label>Área de atuação: </label></span>
+					<div class="area-atuacao-group">
+						<label class="area-atuacao-option" for="area_atuacao_ambiental">
+							<input type="radio" name="area_atuacao" id="area_atuacao_ambiental" value="Ambiental" <?= $registro && $registro['area_atuacao'] === 'Ambiental' ? 'checked' : '' ?> required>
+							<span class="area-atuacao-card area-ambiental"><i class="fa fa-leaf" aria-hidden="true"></i> Ambiental</span>
 						</label>
-					<? endfor; ?>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="form-group col-md-12">
-				<span><label for="objetivos">Objetivo(s) do projeto: </label></span>
-				<textarea class="form-control" name="objetivos" id="objetivos" rows="4" required><?= $registro && !empty($registro['objetivos']) ? $this->escape($registro['objetivos']) : '' ?></textarea>
-			</div>
-		</div>
-		<div class="row">
-			<div class="form-group col-md-12">
-				<span><label>Demais ODS relacionados com o projeto: </label></span>
-				<div class="ods-grid">
-					<? for ($i = 1; $i <= 17; $i++): $ods = 'ODS ' . $i; ?>
-						<label class="ods-option" for="demais_ods_relacionados_<?= $i ?>">
-							<input type="checkbox" name="demais_ods_relacionados[]" value="<?= $ods ?>" id="demais_ods_relacionados_<?= $i ?>" <?= in_array($ods, $odsRelacionados, true) ? 'checked' : '' ?>>
-							<span class="ods-card">
-								<img src="../../objetivos/<?= $i ?>.png" alt="<?= $ods ?>">
-								<span><?= $ods ?></span>
-							</span>
+						<label class="area-atuacao-option" for="area_atuacao_social">
+							<input type="radio" name="area_atuacao" id="area_atuacao_social" value="Social" <?= $registro && $registro['area_atuacao'] === 'Social' ? 'checked' : '' ?> required>
+							<span class="area-atuacao-card area-social"><i class="fa fa-heart" aria-hidden="true"></i> Social</span>
 						</label>
-					<? endfor; ?>
+						<label class="area-atuacao-option" for="area_atuacao_governanca">
+							<input type="radio" name="area_atuacao" id="area_atuacao_governanca" value="Governanca" <?= $registro && $registro['area_atuacao'] === 'Governanca' ? 'checked' : '' ?> required>
+							<span class="area-atuacao-card area-governanca"><i class="fa fa-university" aria-hidden="true"></i> Governança</span>
+						</label>
+					</div>
 				</div>
 			</div>
-		</div>
-	</div>
-
-	<div class="section-card">
-		<div class="section-header">
-			<div>
-				<h2 class="section-title">Evidencias</h2>
-				<p class="section-subtitle">Anexe materiais que comprovem os resultados e a execucao do projeto.</p>
-				<p class="section-subtitle">Evidencia qualitativa sao observacoes e descricoes detalhadas que nao podem ser expressas numericamente, focando em caracteristicas e contextos subjetivos.</p>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label>ODS principal do projeto: </label></span>
+					<div class="ods-grid">
+						<? for ($i = 1; $i <= 17; $i++): $ods = 'ODS ' . $i; ?>
+							<label class="ods-option" for="ods_principal_<?= $i ?>">
+								<input type="radio" name="ods_principal" id="ods_principal_<?= $i ?>" value="<?= $ods ?>" <?= $registro && $registro['ods_principal'] === $ods ? 'checked' : '' ?> required>
+								<span class="ods-card">
+									<img src="../../objetivos/<?= $i ?>.png" alt="<?= $ods ?>">
+									<span><?= $ods ?></span>
+								</span>
+							</label>
+						<? endfor; ?>
+					</div>
+				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="form-group col-md-12">
-				<label class="upload-heading">Anexe a evidencia qualitativa do projeto:</label>
-				<div class="upload-subtitle">Exemplos: fotos, videos, depoimentos, documentos, planilhas, entre outros.</div>
-				<div class="upload-highlight">Faca upload de ate 5 arquivos aceitos. O tamanho maximo e de 100 MB por item.</div>
-				<div id="projeto-dropzone" class="dropzone">
-					<div class="dz-message">
-						Arraste arquivos aqui ou clique para selecionar.<br>
-						<small>Voce pode visualizar e remover os uploads antes de salvar.</small>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label for="objetivos">Objetivo(s) do projeto: </label></span>
+					<textarea class="form-control" name="objetivos" id="objetivos" rows="4" required><?= $registro && !empty($registro['objetivos']) ? $this->escape($registro['objetivos']) : '' ?></textarea>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label>Demais ODS relacionados com o projeto: </label></span>
+					<div class="ods-grid">
+						<? for ($i = 1; $i <= 17; $i++): $ods = 'ODS ' . $i; ?>
+							<label class="ods-option" for="demais_ods_relacionados_<?= $i ?>">
+								<input type="checkbox" name="demais_ods_relacionados[]" value="<?= $ods ?>" id="demais_ods_relacionados_<?= $i ?>" <?= in_array($ods, $odsRelacionados, true) ? 'checked' : '' ?>>
+								<span class="ods-card">
+									<img src="../../objetivos/<?= $i ?>.png" alt="<?= $ods ?>">
+									<span><?= $ods ?></span>
+								</span>
+							</label>
+						<? endfor; ?>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
 
-	<div class="row mt-4 mb-3">
-		<div class="form-group col-md-12 text-right">
-			<button class="btn btn-success salvar"><span class="glyphicon glyphicon-floppy-disk"></span><i class="fa fa-floppy-o fa-lg"></i> Salvar</button>
+		<div class="section-card">
+			<div class="section-header">
+				<div>
+					<h2 class="section-title">Evidências</h2>
+					<p class="section-subtitle">Anexe materiais que comprovem os resultados e a execução do projeto.</p>
+					<p class="section-subtitle">Evidência qualitativa são observações e descrições detalhadas que não podem ser expressas numericamente, focando em características e contextos subjetivos.</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<label class="upload-heading">Anexe a evidência qualitativa do projeto:</label>
+					<div class="upload-subtitle">Exemplos: fotos, vídeos, depoimentos, documentos, planilhas, entre outros.</div>
+					<div class="upload-highlight">Faça upload de até 5 arquivos aceitos. O tamanho máximo é de 100 MB por item.</div>
+					<div id="projeto-dropzone" class="dropzone">
+						<div class="dz-message">
+							Arraste arquivos aqui ou clique para selecionar.<br>
+							<small>Você pode visualizar e remover os uploads antes de salvar.</small>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
-	</div>
-</form>
+
+		<div class="row mt-4 mb-3">
+			<div class="form-group col-md-12 text-right">
+				<button class="btn btn-success salvar"><span class="glyphicon glyphicon-floppy-disk"></span><i class="fa fa-floppy-o fa-lg"></i> Salvar</button>
+			</div>
+		</div>
+	</form>
 </div>
 
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('#nome').focus();
-		$('select#id_usuario, select#id_evento').select2({
+		$('select#id_usuario').select2({
 			theme: 'bootstrap4',
 			language: 'pt-BR',
 			width: '100%'
 		});
+
+		<? if ($this->permissao == 1): ?>
+		var eventosPorUsuario = <?= json_encode($this->eventosPorUsuario, JSON_UNESCAPED_UNICODE) ?>;
+		var empresasPorUsuario = <?= json_encode($this->empresasPorUsuario, JSON_UNESCAPED_UNICODE) ?>;
+
+		function atualizarEventoVinculado() {
+			var idUsuario = $('#id_usuario').val();
+			var evento = eventosPorUsuario[idUsuario] || { id_evento: '', label: 'Nenhuma inscrição vinculada encontrada para este usuário.' };
+			$('#id_evento').val(evento.id_evento || '');
+			$('#evento_vinculado_label').val(evento.label || '');
+		}
+
+		function atualizarEmpresaVinculada() {
+			var idUsuario = $('#id_usuario').val();
+			var empresa = empresasPorUsuario[idUsuario] || { vazio: true };
+
+			if (empresa.vazio) {
+				$('#empresa_vinculada_dados').hide();
+				$('#empresa_nome_organizacao').text('');
+				$('#empresa_cnpj').text('');
+				$('#empresa_nome_certificado').text('');
+				$('#empresa_numero_colaboradores').text('');
+				$('#empresa_responsavel_inscricao').text('');
+				$('#empresa_contato_inscricao').html('');
+				$('#empresa_vinculada_vazio').text('Nenhuma inscrição vinculada encontrada para este usuário.').show();
+				return;
+			}
+
+			$('#empresa_vinculada_dados').show();
+			$('#empresa_vinculada_vazio').hide();
+			$('#empresa_nome_organizacao').text(empresa.nome_organizacao || '-');
+			$('#empresa_cnpj').text(empresa.cnpj || '-');
+			$('#empresa_nome_certificado').text(empresa.nome_certificado || '-');
+			$('#empresa_numero_colaboradores').text(empresa.numero_colaboradores || '0');
+			$('#empresa_responsavel_inscricao').text(empresa.nome || '-');
+			var contato = empresa.email || '-';
+			if (empresa.telefone) {
+				contato += '<br>' + empresa.telefone;
+			}
+			$('#empresa_contato_inscricao').html(contato);
+		}
+
+		$('#id_usuario').on('change', atualizarEventoVinculado);
+		$('#id_usuario').on('change', atualizarEmpresaVinculada);
+		atualizarEventoVinculado();
+		atualizarEmpresaVinculada();
+		<? endif; ?>
 
 		var arquivosExistentes = <?= $registro && !empty($registro['arquivos']) ? count($registro['arquivos']) : 0 ?>;
 		var dropzone = new Dropzone('#projeto-dropzone', {
@@ -205,10 +293,32 @@
 			acceptedFiles: '.pdf,.png,.jpg,.jpeg,.gif,.webp,.mp4,.mov,.avi,.wmv,.mp3,.wav,.txt,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.zip,.rar',
 			dictDefaultMessage: 'Arraste arquivos aqui ou clique para selecionar',
 			dictRemoveFile: 'Remover',
-			dictFileTooBig: 'Arquivo muito grande. Tamanho maximo: 100 MB.',
-			dictInvalidFileType: 'Tipo de arquivo nao permitido.',
+			dictFileTooBig: 'Arquivo muito grande. Tamanho máximo: 100 MB.',
+			dictInvalidFileType: 'Tipo de arquivo não permitido.',
 			init: function() {
 				var dz = this;
+				var extensoesImagem = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+
+				function renderizarPreviewExistente(mockFile) {
+					if (!mockFile.previewElement) {
+						return;
+					}
+
+					var $preview = $(mockFile.previewElement);
+					var extensao = (mockFile.name.split('.').pop() || '').toLowerCase();
+					var $image = $preview.find('.dz-image');
+
+					$preview.addClass('dz-success dz-complete dz-existing-file');
+					$preview.find('.dz-filename span').wrap('<a target="_blank" href="' + mockFile.url + '"></a>');
+
+					if (extensoesImagem.indexOf(extensao) !== -1) {
+						dz.emit('thumbnail', mockFile, mockFile.url);
+						return;
+					}
+
+					$image.html('<div class="dropzone-file-icon">' + (extensao ? extensao.toUpperCase() : 'ARQ') + '</div>');
+				}
+
 				<? if ($registro && !empty($registro['arquivos'])): ?>
 					<? foreach ($registro['arquivos'] as $arquivo): ?>
 						(function() {
@@ -221,11 +331,8 @@
 								url: '../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>'
 							};
 							dz.emit('addedfile', mockFile);
+							renderizarPreviewExistente(mockFile);
 							dz.emit('complete', mockFile);
-							if (mockFile.previewElement) {
-								$(mockFile.previewElement).addClass('dz-success dz-complete dz-existing-file');
-								$(mockFile.previewElement).find('.dz-filename span').wrap('<a target="_blank" href="' + mockFile.url + '"></a>');
-							}
 							dz.files.push(mockFile);
 						})();
 					<? endforeach; ?>
@@ -234,8 +341,8 @@
 				dz.on('maxfilesexceeded', function(file) {
 					dz.removeFile(file);
 					swal({
-						title: 'Atencao!',
-						text: 'O projeto pode ter no maximo 5 arquivos de evidencia.',
+						title: 'Atenção!',
+						text: 'O projeto pode ter no máximo 5 arquivos de evidência.',
 						type: 'error'
 					});
 				});
@@ -252,7 +359,7 @@
 						success: function(data) {
 							if (data.trim().length > 0) {
 								swal({
-									title: 'Atencao!',
+									title: 'Atenção!',
 									text: data,
 									type: 'error'
 								});
@@ -263,8 +370,8 @@
 						},
 						error: function() {
 							swal({
-								title: 'Atencao!',
-								text: 'Nao foi possivel remover o arquivo.',
+								title: 'Atenção!',
+								text: 'Não foi possível remover o arquivo.',
 								type: 'error'
 							});
 							carregarTela('../../projeto/cadastro?id_projeto=' + $('#id_projeto').val());
@@ -287,8 +394,8 @@
 			}).length;
 			if ((arquivosSelecionados + arquivosExistentes) > 5) {
 				swal({
-					title: "Atencao!",
-					text: "O projeto pode ter no maximo 5 arquivos de evidencia.",
+					title: "Atenção!",
+					text: "O projeto pode ter no máximo 5 arquivos de evidência.",
 					type: "error"
 				});
 				return false;
@@ -311,7 +418,7 @@
 					if (data.trim().length > 0) {
 						$('.salvar').show();
 						swal({
-							title: "Atencao!",
+							title: "Atenção!",
 							text: data,
 							type: "error"
 						});
@@ -322,8 +429,8 @@
 				error: function() {
 					$('.salvar').show();
 					swal({
-						title: "Atencao!",
-						text: "Nao foi possivel salvar o projeto.",
+						title: "Atenção!",
+						text: "Não foi possível salvar o projeto.",
 						type: "error"
 					});
 				}

@@ -9,8 +9,10 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->id_usuario = Zend_Registry::get('id_usuario');
 		$this->view->permissao = Zend_Registry::get('permissao');
 		$this->view->registros = Projeto::lista(Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
-		$this->view->mostrarBotaoSubmeter = Projeto::todosListadosNoStatus(0, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
-		$this->view->mostrarBotaoNovo = !Projeto::existeListadoNoStatus(1, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+		$ehAdmin = Zend_Registry::get('permissao') == 1;
+		$this->view->mostrarBotaoSubmeter = !$ehAdmin && Projeto::todosListadosNoStatus(0, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+		$this->view->mostrarBotaoNovo = $ehAdmin || !Projeto::existeListadoNoStatus(1, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+		$this->view->permitirEditarExcluir = $ehAdmin || $this->view->mostrarBotaoNovo;
 	}
 
 	public function cadastroAction()
@@ -22,8 +24,37 @@ class ProjetoController extends Zend_Controller_Action
 		$idProjeto = isset($_REQUEST['id_projeto']) ? (int) $_REQUEST['id_projeto'] : 0;
 
 		$this->view->registro = $idProjeto ? Projeto::buscaId($idProjeto, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao')) : false;
+		if ($idProjeto && !$this->view->registro) {
+			die(Projeto::$erro);
+		}
 		$this->view->usuarios = Usuario::lista();
-		$this->view->eventos = Evento::lista();
+		$idUsuarioFormulario = $this->view->registro ? (int) $this->view->registro['id_usuario'] : (int) Zend_Registry::get('id_usuario');
+		$this->view->eventoVinculado = $idUsuarioFormulario ? Inscricao::buscaEventoVinculadoUsuario($idUsuarioFormulario) : false;
+		$this->view->empresaVinculada = $idUsuarioFormulario ? Inscricao::buscaResumoVinculadoUsuario($idUsuarioFormulario) : false;
+		$this->view->statusProjetoOpcoes = Projeto::statusOpcoes();
+		$this->view->eventosPorUsuario = array();
+		$this->view->empresasPorUsuario = array();
+		if (Zend_Registry::get('permissao') == 1) {
+			foreach ($this->view->usuarios as $usuario) {
+				$eventoUsuario = Inscricao::buscaEventoVinculadoUsuario((int) $usuario['id_usuario']);
+				$empresaUsuario = Inscricao::buscaResumoVinculadoUsuario((int) $usuario['id_usuario']);
+				$this->view->eventosPorUsuario[(int) $usuario['id_usuario']] = array(
+					'id_evento' => $eventoUsuario ? (int) $eventoUsuario['id_evento'] : null,
+					'label' => $eventoUsuario ? $eventoUsuario['label'] : 'Nenhuma inscricao vinculada encontrada para este usuario.'
+				);
+				$this->view->empresasPorUsuario[(int) $usuario['id_usuario']] = array(
+					'nome_organizacao' => $empresaUsuario ? ($empresaUsuario['nome_organizacao'] ?? '') : '',
+					'cnpj' => $empresaUsuario ? ($empresaUsuario['cnpj'] ?? '') : '',
+					'nome_certificado' => $empresaUsuario ? ($empresaUsuario['nome_certificado'] ?? '') : '',
+					'numero_colaboradores' => $empresaUsuario ? (int) ($empresaUsuario['numero_colaboradores'] ?? 0) : '',
+					'nome' => $empresaUsuario ? ($empresaUsuario['nome'] ?? '') : '',
+					'email' => $empresaUsuario ? ($empresaUsuario['email'] ?? '') : '',
+					'telefone' => $empresaUsuario ? ($empresaUsuario['telefone'] ?? '') : '',
+					'evento_label' => $empresaUsuario ? ($empresaUsuario['evento_label'] ?? '') : '',
+					'vazio' => !$empresaUsuario
+				);
+			}
+		}
 	}
 
 	public function detalhesAction()
@@ -87,6 +118,11 @@ class ProjetoController extends Zend_Controller_Action
 	public function submeterlistadosAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
+
+		if (Zend_Registry::get('permissao') == 1) {
+			echo 'A submissao em lote nao se aplica ao perfil administrador.';
+			return;
+		}
 
 		$result = Projeto::submeterListados(Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
 		if (!$result) echo Projeto::$erro;

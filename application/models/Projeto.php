@@ -23,6 +23,25 @@ class Projeto
 		return isset($opcoes[$status]) ? $opcoes[$status] : 'Desconhecido';
 	}
 
+	private static function podeEditarRegistro($registro, $permissao = null, $idUsuarioLogado = null)
+	{
+		if ((int) $permissao === 1) {
+			return true;
+		}
+
+		if (!$registro || (int) $registro['id_usuario'] !== (int) $idUsuarioLogado) {
+			self::$erro = 'Projeto nao encontrado.';
+			return false;
+		}
+
+		if ((int) $registro['status_projeto'] !== 0) {
+			self::$erro = 'Projetos submetidos nao podem mais ser editados ou removidos.';
+			return false;
+		}
+
+		return true;
+	}
+
 	private static function uploadDir()
 	{
 		return dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'projetos';
@@ -169,6 +188,10 @@ class Projeto
 			self::$erro = 'Voce nao tem permissao para remover este arquivo.';
 			return false;
 		}
+		if ((int) $permissao !== 1 && (int) $registro['status_projeto'] !== 0) {
+			self::$erro = 'Projetos submetidos nao podem mais ser editados ou removidos.';
+			return false;
+		}
 
 		$db->delete('eventos_projeto_arquivo', 'id_projeto_arquivo = ' . $idProjetoArquivo);
 
@@ -277,6 +300,11 @@ class Projeto
 
 	public static function submeterListados($idUsuarioLogado = null, $permissao = null)
 	{
+		if ((int) $permissao === 1) {
+			self::$erro = 'A submissao em lote nao se aplica ao perfil administrador.';
+			return false;
+		}
+
 		if (!self::todosListadosNoStatus(0, $idUsuarioLogado, $permissao)) {
 			self::$erro = 'Somente projetos em rascunho podem ser submetidos em lote.';
 			return false;
@@ -310,13 +338,17 @@ class Projeto
 			return false;
 		}
 
-		$idEvento = isset($campos['id_evento']) ? (int) $campos['id_evento'] : 0;
-		if (!$idEvento || !Evento::buscaId($idEvento)) {
-			self::$erro = 'Evento invalido.';
+		$eventoVinculado = Inscricao::buscaEventoVinculadoUsuario($idUsuario);
+		if (!$eventoVinculado || empty($eventoVinculado['id_evento'])) {
+			self::$erro = 'O usuario precisa ter uma inscricao vinculada para definir o evento do projeto.';
 			return false;
 		}
+		$idEvento = (int) $eventoVinculado['id_evento'];
 
 		$statusProjeto = isset($campos['status_projeto']) && $campos['status_projeto'] !== '' ? (int) $campos['status_projeto'] : 0;
+		if ((int) $permissao !== 1) {
+			$statusProjeto = 0;
+		}
 		if (!array_key_exists($statusProjeto, self::statusOpcoes())) {
 			self::$erro = 'Status do projeto invalido.';
 			return false;
@@ -452,6 +484,9 @@ class Projeto
 		if (!$registro) {
 			return false;
 		}
+		if (!self::podeEditarRegistro($registro, $permissao, $idUsuarioLogado)) {
+			return false;
+		}
 
 		$data = self::prepararCampos($campos, $permissao, $idUsuarioLogado);
 		if ($data === false) {
@@ -498,6 +533,9 @@ class Projeto
 	{
 		$registro = self::buscaId($idProjeto, $idUsuarioLogado, $permissao);
 		if (!$registro) {
+			return false;
+		}
+		if (!self::podeEditarRegistro($registro, $permissao, $idUsuarioLogado)) {
 			return false;
 		}
 

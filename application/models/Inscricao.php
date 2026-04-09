@@ -386,4 +386,70 @@ class Inscricao
 
                 return true;
         }
+
+        public static function buscaEventoVinculadoUsuario($id_usuario)
+        {
+                $db = Zend_Registry::get('db');
+                $id_usuario = (int) $id_usuario;
+
+                if ($id_usuario <= 0) {
+                        self::$erro = 'Usuario nao informado.';
+                        return false;
+                }
+
+                $select = "select a.id_evento,
+                                  e.titulo,
+                                  e.data_hora
+                             from eventos_inscricao a
+                             inner join eventos_evento e on e.id_evento = a.id_evento
+                             where a.id_usuario = " . $id_usuario . "
+                             order by a.id_inscricao desc
+                             limit 1";
+
+                $registro = $db->fetchRow($select);
+                if (!$registro) {
+                        self::$erro = 'Nao foi encontrada inscricao vinculada para este usuario.';
+                        return false;
+                }
+
+                $registro['label'] = Evento::getLabel($registro['titulo'], $registro['data_hora']);
+                return $registro;
+        }
+
+        public static function buscaResumoVinculadoUsuario($id_usuario)
+        {
+                $db = Zend_Registry::get('db');
+                $id_usuario = (int) $id_usuario;
+
+                if ($id_usuario <= 0) {
+                        self::$erro = 'Usuario nao informado.';
+                        return false;
+                }
+
+                $select = "select a.id_inscricao,
+                                  a.id_evento,
+                                  a.nome_organizacao,
+                                  a.cnpj,
+                                  a.nome_certificado,
+                                  a.numero_colaboradores,
+                                  a.nome,
+                                  a.email,
+                                  a.telefone,
+                                  e.titulo,
+                                  e.data_hora
+                             from eventos_inscricao a
+                             inner join eventos_evento e on e.id_evento = a.id_evento
+                             where a.id_usuario = " . $id_usuario . "
+                             order by a.id_inscricao desc
+                             limit 1";
+
+                $registro = $db->fetchRow($select);
+                if (!$registro) {
+                        self::$erro = 'Nao foi encontrada inscricao vinculada para este usuario.';
+                        return false;
+                }
+
+                $registro['evento_label'] = Evento::getLabel($registro['titulo'], $registro['data_hora']);
+                return $registro;
+        }
 }
