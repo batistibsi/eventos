@@ -2,6 +2,7 @@
 class Evento
 {
         public static $erro;
+        const MAX_TITULO = 150;
 
         public static function normalizarData($data)
         {
@@ -129,6 +130,10 @@ class Evento
 
                 if (strlen($titulo) < 1) {
                         self::$erro = 'Informe uma turma válida para o evento.';
+                        return false;
+                }
+                if (strlen($titulo) > self::MAX_TITULO) {
+                        self::$erro = 'O titulo da turma deve ter no maximo ' . self::MAX_TITULO . ' caracteres.';
                         return false;
                 }
 

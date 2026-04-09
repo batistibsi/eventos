@@ -58,7 +58,13 @@
 		<div class="row">
 			<div class="form-group col-md-12">
 				<span><label for="nome">Nome do projeto: </label></span>
-				<input class="form-control" name="nome" type="text" value="<?= $registro ? $this->escape($registro['nome']) : '' ?>" id="nome" required>
+				<input class="form-control" name="nome" type="text" value="<?= $registro ? $this->escape($registro['nome']) : '' ?>" id="nome" maxlength="150" required>
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col-md-12">
+				<span><label for="responsavel">Responsável: </label></span>
+				<input class="form-control" name="responsavel" type="text" value="<?= $registro && !empty($registro['responsavel']) ? $this->escape($registro['responsavel']) : '' ?>" id="responsavel" maxlength="120">
 			</div>
 		</div>
 		<div class="row">

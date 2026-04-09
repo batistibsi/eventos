@@ -9,6 +9,8 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->id_usuario = Zend_Registry::get('id_usuario');
 		$this->view->permissao = Zend_Registry::get('permissao');
 		$this->view->registros = Projeto::lista(Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+		$this->view->mostrarBotaoSubmeter = Projeto::todosListadosNoStatus(0, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+		$this->view->mostrarBotaoNovo = !Projeto::existeListadoNoStatus(1, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
 	}
 
 	public function cadastroAction()
@@ -24,6 +26,16 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->eventos = Evento::lista();
 	}
 
+	public function detalhesAction()
+	{
+		$this->view->usuario = Zend_Registry::get('usuario');
+		$this->view->id_usuario = Zend_Registry::get('id_usuario');
+		$this->view->permissao = Zend_Registry::get('permissao');
+
+		$idProjeto = isset($_REQUEST['id_projeto']) ? (int) $_REQUEST['id_projeto'] : 0;
+		$this->view->registro = Projeto::buscaId($idProjeto, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+	}
+
 	public function salvarAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
@@ -34,6 +46,7 @@ class ProjetoController extends Zend_Controller_Action
 		$campos['id_evento'] = isset($_REQUEST['id_evento']) ? (int) $_REQUEST['id_evento'] : 0;
 		$campos['status_projeto'] = isset($_REQUEST['status_projeto']) ? (int) $_REQUEST['status_projeto'] : 0;
 		$campos['nome'] = !empty($_REQUEST['nome']) ? $_REQUEST['nome'] : null;
+		$campos['responsavel'] = !empty($_REQUEST['responsavel']) ? $_REQUEST['responsavel'] : null;
 		$campos['data_inicializacao'] = !empty($_REQUEST['data_inicializacao']) ? $_REQUEST['data_inicializacao'] : null;
 		$campos['data_finalizacao'] = !empty($_REQUEST['data_finalizacao']) ? $_REQUEST['data_finalizacao'] : null;
 		$campos['justificativa'] = !empty($_REQUEST['justificativa']) ? $_REQUEST['justificativa'] : null;
@@ -68,6 +81,14 @@ class ProjetoController extends Zend_Controller_Action
 		$idProjetoArquivo = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
 		$result = Projeto::removerArquivo($idProjetoArquivo, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
 
+		if (!$result) echo Projeto::$erro;
+	}
+
+	public function submeterlistadosAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+
+		$result = Projeto::submeterListados(Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
 		if (!$result) echo Projeto::$erro;
 	}
 }

@@ -1,45 +1,61 @@
-<div class="d-flex justify-content-center justify-content-md-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-	<h1 class="h2 text-info">Projetos</h1>
-	<div class="btn-toolbar mb-2 mb-md-0">
-		<div class="btn-group mr-2">
-			<button type="button" onclick="carregarTela('../../projeto/cadastro')" class="btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i> Novo Projeto</button>
+<div class="content-page">
+	<div class="content-page__header">
+		<h1 class="content-page__title">Projetos</h1>
+		<div class="content-page__toolbar">
+			<? if (!empty($this->mostrarBotaoSubmeter)) : ?>
+				<button type="button" id="submeter-projetos" class="btn btn-outline-primary"><i class="fa fa-send" aria-hidden="true"></i> Submeter Projetos</button>
+			<? endif; ?>
+			<? if (!empty($this->mostrarBotaoNovo)) : ?>
+				<button type="button" onclick="carregarTela('../../projeto/cadastro')" class="btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i> Novo Projeto</button>
+			<? endif; ?>
 		</div>
 	</div>
-</div>
 
-<div class="table-responsive">
-	<table class="table table-hover" id="table_projetos">
-		<thead>
-			<tr>
-				<th></th>
-				<th class="text-left">PROJETO</th>
-				<th class="text-left">USUARIO</th>
-				<th class="text-left">EVENTO</th>
-				<th class="text-left">DATA EVENTO</th>
-				<th class="text-left">STATUS</th>
-			</tr>
-		</thead>
-		<tbody>
-			<?
-			if (count($this->registros) > 0): foreach ($this->registros as $value):
-			?>
-					<tr>
-						<td class="text-center" width="60px">
-							<div class="table-actions">
-								<a class="btn btn-primary" href="#" onclick="carregarTela('../../projeto/cadastro?id_projeto=<?= $value['id_projeto'] ?>')"><i class="fa fa-pencil-square-o"></i></a>
-								<a class="btn btn-danger" href="#" onclick="remover('projeto',<?= $value['id_projeto'] ?>,'<?= $this->escape($value['nome']) ?>')"><i class="fa fa-trash-o"></i></a>
-							</div>
-						</td>
-						<td class="text-left align-middle"><?= $this->escape($value['nome']) ?></td>
-						<td class="text-left align-middle"><?= $this->escape($value['nome_usuario']) ?></td>
-						<td class="text-left align-middle"><?= $this->escape($value['titulo_evento']) ?></td>
-						<td class="text-left align-middle"><?= !empty($value['data_hora']) ? Util::formatData($value['data_hora']) . ' ' . Util::formatHora($value['data_hora']) : '-' ?></td>
-						<td class="text-left align-middle"><?= (int) $value['status_projeto'] ?></td>
-					</tr>
-			<? endforeach;
-			endif; ?>
-		</tbody>
-	</table>
+	<div class="table-responsive projeto-table-wrapper">
+		<table class="table table-hover projeto-table" id="table_projetos">
+			<thead>
+				<tr>
+					<th></th>
+					<th class="text-left">NOME DO PROJETO</th>
+					<th class="text-left">AREA DE ATUACAO</th>
+					<th class="text-left">RESPONSAVEL</th>
+					<th class="text-center">ODS PRINCIPAL</th>
+					<th class="text-left">STATUS</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?
+				if (count($this->registros) > 0): foreach ($this->registros as $value):
+					$odsNumero = 0;
+					if (!empty($value['ods_principal']) && preg_match('/^ODS\s+([1-9]|1[0-7])$/', trim((string) $value['ods_principal']), $matches)) {
+						$odsNumero = (int) $matches[1];
+					}
+				?>
+						<tr>
+							<td class="text-center projeto-table__actions" width="60px" data-label="Ações">
+								<div class="table-actions">
+									<a class="btn btn-primary" href="#" onclick="carregarTela('../../projeto/detalhes?id_projeto=<?= $value['id_projeto'] ?>')"><i class="fa fa-eye"></i></a>
+									<a class="btn btn-primary" href="#" onclick="carregarTela('../../projeto/cadastro?id_projeto=<?= $value['id_projeto'] ?>')"><i class="fa fa-pencil-square-o"></i></a>
+									<a class="btn btn-danger" href="#" onclick="remover('projeto',<?= $value['id_projeto'] ?>,'<?= $this->escape($value['nome']) ?>')"><i class="fa fa-trash-o"></i></a>
+								</div>
+							</td>
+							<td class="text-left align-middle" data-label="Nome do projeto"><?= $this->escape($value['nome']) ?></td>
+							<td class="text-left align-middle" data-label="Área de atuação"><?= !empty($value['area_atuacao']) ? $this->escape($value['area_atuacao']) : '-' ?></td>
+							<td class="text-left align-middle" data-label="Responsável"><?= !empty($value['responsavel']) ? $this->escape($value['responsavel']) : '-' ?></td>
+							<td class="text-center align-middle projeto-table__ods" data-label="ODS principal">
+								<? if ($odsNumero > 0): ?>
+									<img src="../../objetivos/<?= $odsNumero ?>.png" alt="<?= $this->escape($value['ods_principal']) ?>" title="<?= $this->escape($value['ods_principal']) ?>" class="projeto-table__ods-image">
+								<? else: ?>
+									-
+								<? endif; ?>
+							</td>
+							<td class="text-left align-middle" data-label="Status"><?= $this->escape($value['status_projeto_label']) ?></td>
+						</tr>
+				<? endforeach;
+				endif; ?>
+			</tbody>
+		</table>
+	</div>
 </div>
 
 <script type="text/javascript">
@@ -55,6 +71,49 @@
 			"order": [
 				[1, 'asc']
 			]
+		});
+
+		$('#submeter-projetos').on('click', function() {
+			swal({
+				title: "Confirmar submissão?",
+				text: "Todos os projetos listados em rascunho serão enviados para o status Submetido.",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonText: "Sim, submeter",
+				cancelButtonText: "Cancelar"
+			}, function(confirmado) {
+				if (!confirmado) return;
+
+				$.ajax({
+					type: "POST",
+					url: "../../projeto/submeterlistados",
+					success: function(data) {
+						if (data.trim().length > 0) {
+							swal({
+								title: "Atenção!",
+								text: data,
+								type: "error"
+							});
+							return;
+						}
+
+						swal({
+							title: "Sucesso!",
+							text: "Projetos submetidos com sucesso.",
+							type: "success"
+						}, function() {
+							carregarTela('../../projeto');
+						});
+					},
+					error: function() {
+						swal({
+							title: "Atenção!",
+							text: "Não foi possível submeter os projetos.",
+							type: "error"
+						});
+					}
+				});
+			});
 		});
 	});
 </script>

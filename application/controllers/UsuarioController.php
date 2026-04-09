@@ -27,7 +27,28 @@ class UsuarioController extends Zend_Controller_Action
 
 		$registro = $id_usuario ? Usuario::buscaId($id_usuario) : false;
 
+		$id_inscricao = !empty($_REQUEST["id_inscricao"]) ? (int) $_REQUEST["id_inscricao"] : 0;
+		$perfilTravado = false;
+		if (!$registro && $id_inscricao) {
+			$inscricao = Inscricao::buscaId($id_inscricao);
+			if ($inscricao && is_array($inscricao)) {
+				$usuarioExistente = !empty($inscricao['email']) ? Usuario::buscaEmail($inscricao['email']) : false;
+				if ($usuarioExistente && is_array($usuarioExistente)) {
+					$registro = $usuarioExistente;
+				} else {
+					$registro = array(
+						'nome' => $inscricao['nome'] ?? '',
+						'email' => $inscricao['email'] ?? '',
+						'id_perfil' => 3
+					);
+					$perfilTravado = true;
+				}
+			}
+		}
+
 		$this->view->registro = $registro;
+		$this->view->id_inscricao = $id_inscricao;
+		$this->view->perfilTravado = $perfilTravado;
 
 		$this->view->comboPerfil = Usuario::comboPerfil();
 	}
@@ -60,6 +81,7 @@ class UsuarioController extends Zend_Controller_Action
 
 		$id_usuario = isset($_REQUEST["id_usuario"]) ? (int) $_REQUEST["id_usuario"] : 0;
 		$id_empresa = isset($_REQUEST["id_empresa"]) ? (int) $_REQUEST["id_empresa"] : 0;
+		$id_inscricao = isset($_REQUEST["id_inscricao"]) ? (int) $_REQUEST["id_inscricao"] : 0;
 
 		$email = !empty($_REQUEST["email"]) ? $_REQUEST["email"] : null;
 		$nome = !empty($_REQUEST["nome"]) ? $_REQUEST["nome"] : null;
@@ -67,6 +89,9 @@ class UsuarioController extends Zend_Controller_Action
 		$confirm_senha = !empty($_REQUEST["confirm_senha"]) ? md5($_REQUEST["confirm_senha"]) : null;
 
 		$id_perfil = (int) !empty($_REQUEST["id_perfil"]) ? $_REQUEST["id_perfil"] : null;
+		if ($id_inscricao && !$id_usuario) {
+			$id_perfil = 3;
+		}
 
 		$ativo = true;
 
@@ -76,6 +101,20 @@ class UsuarioController extends Zend_Controller_Action
 			$result = Usuario::update($email, $nome, $id_perfil, $ativo, $senha, $id_usuario, $confirm_senha);
 		}
 
-		if (!$result) echo Usuario::$erro;
+		if (!$result) {
+			echo Usuario::$erro;
+			return;
+		}
+
+		if ($id_inscricao) {
+			if (!$id_usuario) {
+				$usuario = Usuario::buscaEmail($email);
+				$id_usuario = $usuario && is_array($usuario) ? (int) $usuario['id_usuario'] : 0;
+			}
+
+			if ($id_usuario && !Inscricao::vincularUsuario($id_inscricao, $id_usuario)) {
+				echo Inscricao::$erro;
+			}
+		}
 	}
 }

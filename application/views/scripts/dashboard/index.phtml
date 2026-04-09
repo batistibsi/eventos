@@ -1,13 +1,15 @@
- <div class="d-flex justify-content-center justify-content-md-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-     <h2 class="h2 text-info">Dashboard</h2>
- </div>
- <main class="col-sm-12 col-md-12 m-0">
-     <a class="btn btn-info" id="material" href="#">Material de Apoio e Videos</a>
- </main>
- <script type="text/javascript">
-     $(document).ready(function() {
-         $('#material').on('click', function() {
-             carregarTela('../../../dashboard/material');
-         });
-     });
- </script>
+<div class="content-page">
+    <div class="content-page__header">
+        <h1 class="content-page__title">Dashboard</h1>
+    </div>
+    <main class="col-sm-12 col-md-12 m-0">
+        <a class="btn btn-info" id="material" href="#">Material de Apoio e Videos</a>
+    </main>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#material').on('click', function() {
+            carregarTela('../../../dashboard/material');
+        });
+    });
+</script>

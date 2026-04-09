@@ -1,47 +1,47 @@
-<div class="d-flex justify-content-center justify-content-md-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-	<h1 class="h2 text-info">Eventos</h1>
-	<div class="btn-toolbar mb-2 mb-md-0">
-		<div class="btn-group mr-2">
+<div class="content-page">
+	<div class="content-page__header">
+		<h1 class="content-page__title">Eventos</h1>
+		<div class="content-page__toolbar">
 			<button type="button" onclick="carregarTela('../../evento/cadastro')" class="btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i> Novo Evento</button>
 		</div>
 	</div>
-</div>
 
-<div class="table-responsive">
-	<table class="table table-hover" id="table_eventos">
-		<thead>
-			<tr>
-				<th></th>
-				<th class="text-left">TURMA</th>
-				<th class="text-left">OBSERVAÇÃO</th>
-				<th class="text-left">TREINAMENTO D1</th>
-				<th class="text-left">TREINAMENTO D2</th>
-				<th class="text-left">AUDITORIA</th>
-				<th class="text-left">LIMITE</th>
-			</tr>
-		</thead>
-		<tbody>
-			<?
-			if (count($this->registros) > 0): foreach ($this->registros as $key => $value):
-			?>
-					<tr>
-						<td class="text-center" width="60px">
-							<div class="btn-group">
-								<a class="btn btn-primary" href="#" onclick="carregarTela('../../evento/cadastro?id_evento=<?= $value['id_evento'] ?>')"><i class="fa fa-pencil-square-o"></i></a>
-								<a class="btn btn-danger" href="#" onclick="remover('evento',<?= $value['id_evento'] ?>,'<?= $this->escape($value['titulo']) ?>')"><i class="fa fa-trash-o"></i></a>
-							</div>
-						</td>
-						<td class="text-left align-middle"><?= $this->escape($value['titulo']) ?></td>
-						<td class="text-left align-middle"><?= $this->escape($value['observacao']) ?></td>
-						<td class="text-left align-middle"><?= Util::formatData($value['data_hora']) ?> <?= Util::formatHora($value['data_hora']) ?></td>
-						<td class="text-left align-middle"><?= !empty($value['data_hora_2']) ? Util::formatData($value['data_hora_2']) . ' ' . Util::formatHora($value['data_hora_2']) : '-' ?></td>
-						<td class="text-left align-middle"><?= !empty($value['auditoria']) ? Util::formatData($value['auditoria']) . ' ' . Util::formatHora($value['auditoria']) : '-' ?></td>
-						<td class="text-left align-middle"><?= $value['limite_vagas'] !== null ? (int) $value['limite_vagas'] : '-' ?></td>
-					</tr>
-			<? endforeach;
-			endif; ?>
-		</tbody>
-	</table>
+	<div class="table-responsive">
+		<table class="table table-hover" id="table_eventos">
+			<thead>
+				<tr>
+					<th></th>
+					<th class="text-left">TURMA</th>
+					<th class="text-left">OBSERVAÇÃO</th>
+					<th class="text-left">TREINAMENTO D1</th>
+					<th class="text-left">TREINAMENTO D2</th>
+					<th class="text-left">AUDITORIA</th>
+					<th class="text-left">LIMITE</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?
+				if (count($this->registros) > 0): foreach ($this->registros as $key => $value):
+				?>
+						<tr>
+							<td class="text-center" width="60px">
+								<div class="btn-group">
+									<a class="btn btn-primary" href="#" onclick="carregarTela('../../evento/cadastro?id_evento=<?= $value['id_evento'] ?>')"><i class="fa fa-pencil-square-o"></i></a>
+									<a class="btn btn-danger" href="#" onclick="remover('evento',<?= $value['id_evento'] ?>,'<?= $this->escape($value['titulo']) ?>')"><i class="fa fa-trash-o"></i></a>
+								</div>
+							</td>
+							<td class="text-left align-middle"><?= $this->escape($value['titulo']) ?></td>
+							<td class="text-left align-middle"><?= $this->escape($value['observacao']) ?></td>
+							<td class="text-left align-middle"><?= Util::formatData($value['data_hora']) ?> <?= Util::formatHora($value['data_hora']) ?></td>
+							<td class="text-left align-middle"><?= !empty($value['data_hora_2']) ? Util::formatData($value['data_hora_2']) . ' ' . Util::formatHora($value['data_hora_2']) : '-' ?></td>
+							<td class="text-left align-middle"><?= !empty($value['auditoria']) ? Util::formatData($value['auditoria']) . ' ' . Util::formatHora($value['auditoria']) : '-' ?></td>
+							<td class="text-left align-middle"><?= $value['limite_vagas'] !== null ? (int) $value['limite_vagas'] : '-' ?></td>
+						</tr>
+				<? endforeach;
+				endif; ?>
+			</tbody>
+		</table>
+	</div>
 </div>
 
 <script type="text/javascript">

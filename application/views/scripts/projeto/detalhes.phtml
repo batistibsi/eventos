@@ -1,0 +1,160 @@
+<? $registro = $this->registro; ?>
+<? $odsRelacionados = $registro && !empty($registro['demais_ods_relacionados']) ? array_map('trim', explode(',', $registro['demais_ods_relacionados'])) : array(); ?>
+<? $arquivos = $registro && !empty($registro['arquivos']) ? $registro['arquivos'] : array(); ?>
+<div class="content-page">
+	<div class="content-page__header">
+		<h1 class="content-page__title">Detalhes do Projeto</h1>
+		<div class="content-page__toolbar">
+			<button type="button" onclick="carregarTela('../../projeto')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
+		</div>
+	</div>
+
+	<div class="section-card">
+		<div class="section-header">
+			<div>
+				<h2 class="section-title">Vínculos e Status</h2>
+			</div>
+		</div>
+		<div class="row projeto-detalhe-objetivos-row">
+			<div class="col-md-3 mb-3">
+				<span class="field-label">Status</span>
+				<div class="detalhe-valor"><?= $this->escape($registro['status_projeto_label']) ?></div>
+			</div>
+			<div class="col-md-4 mb-3">
+				<span class="field-label">Usuário</span>
+				<div class="detalhe-valor"><?= $this->escape($registro['nome_usuario']) ?></div>
+			</div>
+			<div class="col-md-5 mb-3">
+				<span class="field-label">Evento</span>
+				<div class="detalhe-valor"><?= $this->escape($registro['titulo_evento']) ?></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="section-card">
+		<div class="section-header">
+			<div>
+				<h2 class="section-title">Informações do Projeto</h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 mb-3">
+				<span class="field-label">Nome do projeto</span>
+				<div class="detalhe-valor"><?= $this->escape($registro['nome']) ?></div>
+			</div>
+			<div class="col-md-12 mb-3">
+				<span class="field-label">Responsável</span>
+				<div class="detalhe-valor"><?= !empty($registro['responsavel']) ? $this->escape($registro['responsavel']) : '-' ?></div>
+			</div>
+			<div class="col-md-6 mb-3">
+				<span class="field-label">Data da inicialização</span>
+				<div class="detalhe-valor"><?= !empty($registro['data_inicializacao']) ? Util::formatData($registro['data_inicializacao']) : '-' ?></div>
+			</div>
+			<div class="col-md-6 mb-3">
+				<span class="field-label">Data da finalização</span>
+				<div class="detalhe-valor"><?= !empty($registro['data_finalizacao']) ? Util::formatData($registro['data_finalizacao']) : '-' ?></div>
+			</div>
+			<div class="col-md-12 mb-3">
+				<span class="field-label">Justificativa</span>
+				<div class="detalhe-valor"><?= nl2br($this->escape($registro['justificativa'])) ?></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="section-card">
+		<div class="section-header">
+			<div>
+				<h2 class="section-title">Classificação e Objetivos</h2>
+			</div>
+		</div>
+		<div class="row projeto-detalhe-classificacao-row">
+			<div class="col-lg-3 mb-4">
+				<span class="field-label">Área de atuação</span>
+				<div class="detalhe-card projeto-detalhe-bloco h-100">
+					<div class="detalhe-card-body">
+					<? $areaAtuacaoClasse = 'area-governanca'; ?>
+					<? if (($registro['area_atuacao'] ?? '') === 'Ambiental') $areaAtuacaoClasse = 'area-ambiental'; ?>
+					<? if (($registro['area_atuacao'] ?? '') === 'Social') $areaAtuacaoClasse = 'area-social'; ?>
+					<span class="area-atuacao-card is-static <?= $areaAtuacaoClasse ?>">
+						<? if (($registro['area_atuacao'] ?? '') === 'Ambiental') : ?><i class="fa fa-leaf" aria-hidden="true"></i>&nbsp;<? endif; ?>
+						<? if (($registro['area_atuacao'] ?? '') === 'Social') : ?><i class="fa fa-heart" aria-hidden="true"></i>&nbsp;<? endif; ?>
+						<? if (($registro['area_atuacao'] ?? '') === 'Governanca') : ?><i class="fa fa-university" aria-hidden="true"></i>&nbsp;<? endif; ?>
+						<?= $this->escape($registro['area_atuacao']) ?>
+					</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-4 mb-4">
+				<span class="field-label">ODS principal</span>
+				<div class="detalhe-card projeto-detalhe-bloco h-100">
+					<div class="detalhe-card-body">
+						<div class="projeto-detalhe-ods-principal">
+					<? if (!empty($registro['ods_principal']) && preg_match('/^ODS\s+([1-9]|1[0-7])$/', trim((string) $registro['ods_principal']), $matches)) : ?>
+						<img src="../../objetivos/<?= (int) $matches[1] ?>.png" alt="<?= $this->escape($registro['ods_principal']) ?>">
+					<? endif; ?>
+							<div class="detalhe-valor"><?= $this->escape($registro['ods_principal']) ?></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-5 mb-4">
+				<span class="field-label">Demais ODS relacionados</span>
+				<div class="detalhe-card projeto-detalhe-bloco h-100">
+					<div class="detalhe-card-body">
+				<? if (count($odsRelacionados)) : ?>
+					<div class="projeto-detalhe-ods-secundarios">
+						<? foreach ($odsRelacionados as $ods) : ?>
+							<? if (preg_match('/^ODS\s+([1-9]|1[0-7])$/', trim((string) $ods), $matchesRelacionados)) : ?>
+								<div class="ods-card">
+									<img src="../../objetivos/<?= (int) $matchesRelacionados[1] ?>.png" alt="<?= $this->escape($ods) ?>">
+									<span><?= $this->escape($ods) ?></span>
+								</div>
+							<? endif; ?>
+						<? endforeach; ?>
+					</div>
+				<? else : ?>
+					<div class="detalhe-valor">-</div>
+				<? endif; ?>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 mt-2 mb-1">
+				<span class="field-label">Objetivo(s) do projeto</span>
+				<div class="detalhe-card projeto-objetivos-card">
+					<div class="detalhe-card-body">
+						<div class="detalhe-valor"><?= nl2br($this->escape($registro['objetivos'])) ?></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="section-card">
+		<div class="section-header">
+			<div>
+				<h2 class="section-title">Evidências</h2>
+			</div>
+		</div>
+		<? if (count($arquivos)) : ?>
+			<div class="row">
+				<? foreach ($arquivos as $arquivo) : ?>
+					<div class="col-md-6 col-xl-4 mb-3">
+						<div class="detalhe-card projeto-evidencia-card h-100">
+							<div class="detalhe-card-body">
+								<span class="field-label">Arquivo</span>
+								<div class="detalhe-valor mb-3"><?= $this->escape($arquivo['nome_original']) ?></div>
+								<a href="../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>" target="_blank" class="btn btn-outline-primary btn-sm">
+									<i class="fa fa-download" aria-hidden="true"></i> Abrir arquivo
+								</a>
+							</div>
+						</div>
+					</div>
+				<? endforeach; ?>
+			</div>
+		<? else : ?>
+			<div class="detalhe-valor">Nenhum arquivo enviado.</div>
+		<? endif; ?>
+	</div>
+</div>

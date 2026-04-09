@@ -2,6 +2,8 @@
 class Usuario
 {
 	public static $erro;
+	const MAX_NOME = 80;
+	const MAX_EMAIL = 80;
 
 	public function __construct() {}
 
@@ -94,12 +96,12 @@ class Usuario
 		if ($ativo) {
 			$idPerfil = (int) $idPerfil;
 
-			if (strlen($email) < 3 || strlen($email) > 80) {
+			if (strlen($email) < 3 || strlen($email) > self::MAX_EMAIL) {
 				Usuario::$erro = 'Email inválido!';
 				return false;
 			}
 
-			if (strlen($nome) > 80 || strlen($nome) < 1) {
+			if (strlen($nome) > self::MAX_NOME || strlen($nome) < 1) {
 				Usuario::$erro = 'Nome inválido!';
 				return false;
 			}
@@ -152,12 +154,12 @@ class Usuario
 	public static function update($email, $nome, $idPerfil, $ativo, $senha, $id_usuario, $confirmSenha)
 	{
 
-		if (strlen($email) < 3 || strlen($email) > 80) {
+		if (strlen($email) < 3 || strlen($email) > self::MAX_EMAIL) {
 			Usuario::$erro = 'Email inválido!';
 			return false;
 		}
 
-		if (strlen($nome) > 80 || strlen($nome) < 1) {
+		if (strlen($nome) > self::MAX_NOME || strlen($nome) < 1) {
 			Usuario::$erro = 'Nome inválido!';
 			return false;
 		}

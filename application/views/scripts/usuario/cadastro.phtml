@@ -1,53 +1,59 @@
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-	<h1 class="h2 text-info">Usuário</h1>
-	<div class="btn-toolbar mb-2 mb-md-0">
-		<div class="btn-group mr-2">
+<div class="content-page">
+	<div class="content-page__header">
+		<h1 class="content-page__title">Usuário</h1>
+		<div class="content-page__toolbar">
 			<button type="button" onclick="carregarTela('../../usuario')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
 		</div>
 	</div>
+	<form id="formulario">
+		<input name="id_usuario" type="hidden" value="<?= $this->registro ? $this->registro['id_usuario'] : '' ?>" id="id_usuario">
+		<input name="id_inscricao" type="hidden" value="<?= !empty($this->id_inscricao) ? (int) $this->id_inscricao : '' ?>" id="id_inscricao">
+		<div class="section-card">
+			<div class="row">
+				<div class="form-group col-md-5">
+					<span><label for="nome">Nome: </label></span>
+					<input class="form-control" name="nome" type="text" value="<?= $this->registro ? $this->registro['nome'] : '' ?>" id="nome" maxlength="80">
+				</div>
+				<div class="form-group col-md-7">
+					<span><label for="email">E-mail: </label></span>
+					<input class="form-control" name="email" type="text" value="<?= $this->registro ? $this->registro['email'] : '' ?>" id="email">
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-4">
+					<span><label for="id_perfil">Perfil: </label></span>
+					<? if (!empty($this->perfilTravado)) : ?>
+						<input type="hidden" name="id_perfil" value="3" id="id_perfil_hidden">
+					<? endif; ?>
+					<select class="form-control" name="<?= !empty($this->perfilTravado) ? 'id_perfil_exibicao' : 'id_perfil' ?>" id="id_perfil" <?= !empty($this->perfilTravado) ? 'disabled' : '' ?>>
+						<option value="0">Escolha um perfil...</option>
+						<?
+						if (count($this->comboPerfil) > 0): foreach ($this->comboPerfil as $key => $value):
+						?>
+								<option <?= ($this->registro && $value['id_perfil'] == $this->registro['id_perfil']) ? 'selected' : '' ?> value="<?= $value['id_perfil'] ?>"><?= $value['descricao'] ?></option>
+
+						<? endforeach;
+						endif; ?>
+					</select>
+				</div>
+				<div class="form-group col-md-4">
+					<span><label for="senha">Senha: </label></span>
+					<input class="form-control" name="senha" type="password" value="" id="senha">
+				</div>
+				<div class="form-group col-md-4">
+					<span><label for="confirm_senha">Confirmar Senha: </label></span>
+					<input class="form-control" name="confirm_senha" type="password" value="" id="confirm_senha">
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="form-group col-12 section-actions">
+				<button class="btn btn-success salvar"><span class="glyphicon glyphicon-floppy-disk"></span><i class="fa fa-floppy-o fa-lg"></i> Salvar</button>
+			</div>
+		</div>
+	</form>
 </div>
-<form id="formulario">
-	<input name="id_usuario" type="hidden" value="<?= $this->registro ? $this->registro['id_usuario'] : '' ?>" id="id_usuario">
-	<div class="row">
-		<div class="form-group col-md-5">
-			<span><label for="nome">Nome: </label></span>
-			<input class="form-control" name="nome" type="text" value="<?= $this->registro ? $this->registro['nome'] : '' ?>" id="nome">
-		</div>
-		<div class="form-group col-md-7">
-			<span><label for="email">E-mail: </label></span>
-			<input class="form-control" name="email" type="text" value="<?= $this->registro ? $this->registro['email'] : '' ?>" id="email">
-		</div>
-	</div>
-	<div class="row">
-		<div class="form-group col-md-4">
-			<span><label for="id_perfil">Perfil: </label></span>
-			<select class="form-control" name="id_perfil" id="id_perfil">
-				<option value="0">Escolha um perfil...</option>
-				<?
-				if (count($this->comboPerfil) > 0): foreach ($this->comboPerfil as $key => $value):
-				?>
-						<option <?= ($this->registro && $value['id_perfil'] == $this->registro['id_perfil']) ? 'selected' : '' ?> value="<?= $value['id_perfil'] ?>"><?= $value['descricao'] ?></option>
-
-				<? endforeach;
-				endif; ?>
-			</select>
-		</div>
-		<div class="form-group col-md-4">
-			<span><label for="senha">Senha: </label></span>
-			<input class="form-control" name="senha" type="password" value="" id="senha">
-		</div>
-		<div class="form-group col-md-4">
-			<span><label for="confirm_senha">Corfirmar Senha: </label></span>
-			<input class="form-control" name="confirm_senha" type="password" value="" id="confirm_senha">
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="form-group col-12 text-right">
-			<button class="btn btn-success salvar"><span class="glyphicon glyphicon-floppy-disk"></span><i class="fa fa-floppy-o fa-lg"></i> Salvar</button>
-		</div>
-	</div>
-</form>
 
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -58,28 +64,44 @@
 			var erro = "";
 
 			if ($('#email').val().trim() < 3 || $('#email').val().trim() > 80) {
-				erro = 'Email informado é inválido!';
+				erro = "Email inválido!";
+			}
+			else if ($('#nome').val().trim() < 3 || $('#nome').val().trim() > 80) {
+				erro = "Nome inválido!";
+			}
+			else if ($('#id_perfil').val().trim() == "0") {
+				erro = "Escolha um perfil!";
+			}
+			else if ($('#senha').val().trim() != $('#confirm_senha').val().trim()) {
+				erro = "As senhas devem ser iguais!";
 			}
 
-			if ($('#nome').val().trim() < 1 || $('#nome').val().trim() > 80) {
-				erro = 'Nome informado é inválido!';
-			}
-
-			if ($('#id_perfil').val() == "0") {
-				erro = 'Informe um perfil para salvar!';
-			}
-
-			if ($('#confirm_senha').val().trim() != $('#senha').val().trim()) {
-				erro = 'Senhas informadas não conferem!';
-			}
-
-			// caso seja usuario novo e não está informando uma senha, porque se for alteração, não precisa informar senha
-			// então não precisa validar
-			if ($('#senha').val().trim() == "" && $('#id_usuario').val().trim() == "") {
-				erro = 'Informe uma senha para salvar!';
-			}
-
-			if (erro != "") {
+			if (erro == "") {
+				e.preventDefault();
+				$('.salvar').hide();
+				$.ajax({
+					type: "POST",
+					url: "../../usuario/salvar",
+					data: $("#formulario").serialize(),
+					success: function(data) {
+						if (data.trim().length > 0) {
+							$('.salvar').show();
+							swal({
+								title: "Atenção!",
+								text: data,
+								type: "error"
+							});
+						} else {
+							var idInscricao = $('#id_inscricao').val();
+							if (idInscricao) {
+								carregarTela('../../inscricao/detalhe?id_inscricao=' + idInscricao);
+							} else {
+								carregarTela('../../usuario');
+							}
+						}
+					}
+				});
+			} else {
 				swal({
 					title: "Atenção!",
 					text: erro,
@@ -87,31 +109,6 @@
 				});
 				return false;
 			}
-			$('.salvar').hide();
-			$.ajax({
-				type: "POST",
-				url: "../../usuario/salvar",
-				data: $("#formulario").serialize(),
-				success: function(data) {
-
-					// falha ao salvar
-					if (data.trim().length > 0) {
-						$('.salvar').show();
-						swal({
-							title: "Atenção!",
-							text: data,
-							type: "error"
-						});
-						// sucesso ao salvar
-					} else {
-						carregarTela('../../usuario');
-					}
-				}
-			});
-
-			e.preventDefault();
 		});
-
-
 	});
 </script>

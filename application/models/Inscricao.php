@@ -2,6 +2,10 @@
 class Inscricao
 {
         public static $erro;
+        const MAX_NOME_RESPONSAVEL = 120;
+        const MAX_NOME_ORGANIZACAO = 150;
+        const MAX_REPRESENTANTE_NOME = 120;
+        const MAX_NOME_CERTIFICADO = 150;
 
         public static function statusDisponiveis()
         {
@@ -17,9 +21,15 @@ class Inscricao
                                     b.observacao as evento_observacao,
                                     b.data_hora as evento_data_hora,
                                     b.data_hora_2 as evento_data_hora_2,
-                                    b.limite_vagas as evento_limite_vagas
+                                    b.limite_vagas as evento_limite_vagas,
+                                    u.id_usuario as usuario_id,
+                                    u.nome as usuario_nome,
+                                    u.email as usuario_email,
+                                    p.descricao as usuario_perfil
                              from eventos_inscricao a
                              left join eventos_evento b on b.id_evento = a.id_evento
+                             left join eventos_usuario u on a.id_usuario = u.id_usuario and u.ativo
+                             left join eventos_perfil p on u.id_perfil = p.id_perfil
                              where a.id_inscricao = " . $id_inscricao . ";";
 
                 $registros = $db->fetchAll($select);
@@ -143,9 +153,56 @@ class Inscricao
                 return 'inscricoes/' . $nomeArquivo;
         }
 
+        private static function validarTamanhoTexto($valor, $limite, $rotulo, $obrigatorio = true)
+        {
+                $valor = trim((string) $valor);
+
+                if ($obrigatorio && $valor === '') {
+                        self::$erro = 'Informe ' . $rotulo . '.';
+                        return false;
+                }
+
+                if ($valor !== '' && strlen($valor) > $limite) {
+                        self::$erro = 'O campo ' . $rotulo . ' deve ter no maximo ' . $limite . ' caracteres.';
+                        return false;
+                }
+
+                return $valor;
+        }
+
         public static function novo($campos)
         {
                 $db = Zend_Registry::get('db');
+
+                $nome = self::validarTamanhoTexto($campos['nome'] ?? '', self::MAX_NOME_RESPONSAVEL, 'nome do responsavel');
+                if ($nome === false) {
+                        return false;
+                }
+
+                $nomeOrganizacao = self::validarTamanhoTexto($campos['nome_organizacao'] ?? '', self::MAX_NOME_ORGANIZACAO, 'nome da organizacao');
+                if ($nomeOrganizacao === false) {
+                        return false;
+                }
+
+                $representante1Nome = self::validarTamanhoTexto($campos['representante_1_nome'] ?? '', self::MAX_REPRESENTANTE_NOME, 'nome do representante 1');
+                if ($representante1Nome === false) {
+                        return false;
+                }
+
+                $representante2Nome = self::validarTamanhoTexto($campos['representante_2_nome'] ?? '', self::MAX_REPRESENTANTE_NOME, 'nome do representante 2', false);
+                if ($representante2Nome === false) {
+                        return false;
+                }
+
+                $representante3Nome = self::validarTamanhoTexto($campos['representante_3_nome'] ?? '', self::MAX_REPRESENTANTE_NOME, 'nome do representante 3', false);
+                if ($representante3Nome === false) {
+                        return false;
+                }
+
+                $nomeCertificado = self::validarTamanhoTexto($campos['nome_certificado'] ?? '', self::MAX_NOME_CERTIFICADO, 'nome da organizacao no certificado');
+                if ($nomeCertificado === false) {
+                        return false;
+                }
 
                 if (!self::uniqueInscricaoEmail($campos['email'])) {
                         self::$erro = 'Inscricao ja realizada para o email: ' . $campos['email'] . '!';
@@ -185,25 +242,25 @@ class Inscricao
 
                         $data = array(
                                 'id_evento' => $campos['id_evento'],
-                                'nome' => $campos['nome'],
+                                'nome' => $nome,
                                 'email' => $campos['email'],
                                 'telefone' => $campos['telefone'],
                                 'cpf_responsavel' => $campos['cpf_responsavel'],
-                                'nome_organizacao' => $campos['nome_organizacao'],
+                                'nome_organizacao' => $nomeOrganizacao,
                                 'cnpj' => $campos['cnpj'],
                                 'endereco' => $campos['endereco'],
                                 'numero_colaboradores' => $campos['numero_colaboradores'],
-                                'representante_1_nome' => $campos['representante_1_nome'],
+                                'representante_1_nome' => $representante1Nome,
                                 'representante_1_email' => $campos['representante_1_email'],
                                 'representante_1_telefone' => $campos['representante_1_telefone'],
-                                'representante_2_nome' => !empty($campos['representante_2_nome']) ? $campos['representante_2_nome'] : null,
+                                'representante_2_nome' => $representante2Nome !== '' ? $representante2Nome : null,
                                 'representante_2_email' => !empty($campos['representante_2_email']) ? $campos['representante_2_email'] : null,
                                 'representante_2_telefone' => !empty($campos['representante_2_telefone']) ? $campos['representante_2_telefone'] : null,
-                                'representante_3_nome' => !empty($campos['representante_3_nome']) ? $campos['representante_3_nome'] : null,
+                                'representante_3_nome' => $representante3Nome !== '' ? $representante3Nome : null,
                                 'representante_3_email' => !empty($campos['representante_3_email']) ? $campos['representante_3_email'] : null,
                                 'representante_3_telefone' => !empty($campos['representante_3_telefone']) ? $campos['representante_3_telefone'] : null,
                                 'primeira_participacao' => $campos['primeira_participacao'] === 'sim',
-                                'nome_certificado' => $campos['nome_certificado'],
+                                'nome_certificado' => $nomeCertificado,
                                 'logo_organizacao' => $logoPath,
                                 'como_soube' => $campos['como_soube'],
                                 'indicacao_organizacao' => !empty($campos['indicacao_organizacao']) ? $campos['indicacao_organizacao'] : null,
@@ -250,9 +307,10 @@ class Inscricao
                 $inicio = $db->quote($inicio . ' 00:00:00');
                 $fim = $db->quote($fim . ' 23:59:59');
 
-                $select = "select a.*, b.titulo, b.data_hora
+                $select = "select a.*, b.titulo, b.data_hora, u.nome as usuario
                         from eventos_inscricao a
-                        inner join eventos_evento b on a.id_evento = b.id_evento
+                        inner join eventos_evento b on a.id_evento = b.id_evento                        
+                        left join eventos_usuario u on a.id_usuario = u.id_usuario and u.ativo
                         where a.created_at between " . $inicio . " and " . $fim;
 
                 $registros = $db->fetchAll($select);
@@ -289,6 +347,40 @@ class Inscricao
                         $db->update('eventos_inscricao', ['status' => $status], $where);
                 } catch (Exception $e) {
                         self::$erro = 'Nao foi possivel atualizar o status.';
+                        return false;
+                }
+
+                return true;
+        }
+
+        public static function vincularUsuario($id_inscricao, $id_usuario)
+        {
+                $db = Zend_Registry::get('db');
+
+                $id_inscricao = (int) $id_inscricao;
+                $id_usuario = (int) $id_usuario;
+
+                if ($id_inscricao <= 0) {
+                        self::$erro = 'Inscricao nao informada.';
+                        return false;
+                }
+
+                if ($id_usuario <= 0 || !Usuario::buscaId($id_usuario)) {
+                        self::$erro = 'Usuario invalido.';
+                        return false;
+                }
+
+                $inscricao = self::buscaId($id_inscricao);
+                if (!$inscricao || !is_array($inscricao)) {
+                        self::$erro = 'Inscricao nao encontrada.';
+                        return false;
+                }
+
+                try {
+                        $where = $db->quoteInto('id_inscricao = ?', $id_inscricao);
+                        $db->update('eventos_inscricao', ['id_usuario' => $id_usuario], $where);
+                } catch (Exception $e) {
+                        self::$erro = 'Nao foi possivel vincular o usuario a inscricao.';
                         return false;
                 }
 

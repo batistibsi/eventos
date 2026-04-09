@@ -73,6 +73,7 @@
     $logo = !empty($inscricao['logo_organizacao']) ? '../../download.php?arquivo=' . urlencode($inscricao['logo_organizacao']) : null;
     $extensaoLogo = !empty($inscricao['logo_organizacao']) ? strtolower(pathinfo($inscricao['logo_organizacao'], PATHINFO_EXTENSION)) : '';
     $logoEhImagem = in_array($extensaoLogo, ['png', 'jpg', 'jpeg', 'gif', 'webp'], true);
+    $usuarioVinculado = !empty($inscricao['usuario_id']);
 ?>
 
 <div class="content-page inscricao-detalhe">
@@ -96,7 +97,7 @@
                                 <option value="<?= $this->escape($status) ?>" <?= $status === $statusAtual ? 'selected' : '' ?>><?= $this->escape($status) ?></option>
                             <? endforeach; ?>
                         </select>
-                        <button type="submit" class="btn btn-light btn-sm salvar-status"><i class="fa fa-floppy-o" aria-hidden="true"></i>  Salvar status</button>
+                        <button type="submit" class="btn btn-light btn-sm salvar-status"><i class="fa fa-floppy-o" aria-hidden="true"></i> Salvar status</button>
                     </form>
                 </div>
                 <h3 class="mb-2"><?= $valorOuPadrao($inscricao['nome_organizacao'] ?? null) ?></h3>
@@ -105,6 +106,22 @@
                     E-mail: <?= $valorOuPadrao($inscricao['email'] ?? null) ?><br>
                     Telefone: <?= $formatarTelefone($inscricao['telefone'] ?? null) ?>
                 </p>
+                <? if ($usuarioVinculado) : ?>
+                    <div class="inscricao-usuario-vinculo mt-3">
+                        <span class="field-label">Usuário vinculado</span>
+                        <div class="inscricao-usuario-vinculo__nome"><?= $valorOuPadrao($inscricao['usuario_nome'] ?? null) ?></div>
+                        <div class="inscricao-usuario-vinculo__meta">
+                            <?= $valorOuPadrao($inscricao['usuario_email'] ?? null) ?>
+                            <? if (!empty($inscricao['usuario_perfil'])) : ?> • <?= $this->escape($inscricao['usuario_perfil']) ?><? endif; ?>
+                        </div>
+                    </div>
+                <? else : ?>
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-primary inscricao-usuario-vinculo__botao" onclick="carregarTela('../../usuario/cadastro?id_inscricao=<?= (int) ($inscricao['id_inscricao'] ?? 0) ?>')">
+                            <i class="fa fa-user-plus" aria-hidden="true"></i> Incluir usuário
+                        </button>
+                    </div>
+                <? endif; ?>
             </div>
             <div class="col-12 col-lg-5">
                 <div class="row">

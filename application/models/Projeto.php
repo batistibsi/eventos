@@ -2,6 +2,26 @@
 class Projeto
 {
 	public static $erro;
+	const MAX_NOME = 150;
+	const MAX_RESPONSAVEL = 120;
+
+	public static function statusOpcoes()
+	{
+		return array(
+			0 => 'Rascunho',
+			1 => 'Submetido',
+			2 => 'Ajustar',
+			3 => 'Validado',
+			4 => 'Invalido'
+		);
+	}
+
+	public static function statusLabel($status)
+	{
+		$status = (int) $status;
+		$opcoes = self::statusOpcoes();
+		return isset($opcoes[$status]) ? $opcoes[$status] : 'Desconhecido';
+	}
 
 	private static function uploadDir()
 	{
@@ -191,6 +211,7 @@ class Projeto
 		}
 
 		$registro = $registros[0];
+		$registro['status_projeto_label'] = self::statusLabel($registro['status_projeto']);
 		$registro['arquivos'] = self::listaArquivos($registro['id_projeto']);
 		return $registro;
 	}
@@ -213,7 +234,68 @@ class Projeto
 				inner join eventos_evento e on e.id_evento = p.id_evento" . $where . "
 				order by p.id_projeto desc";
 
-		return $db->fetchAll($select);
+		$registros = $db->fetchAll($select);
+
+		foreach ($registros as $indice => $registro) {
+			$registros[$indice]['status_projeto_label'] = self::statusLabel($registro['status_projeto']);
+		}
+
+		return $registros;
+	}
+
+	public static function todosListadosNoStatus($statusEsperado, $idUsuarioLogado = null, $permissao = null)
+	{
+		$registros = self::lista($idUsuarioLogado, $permissao);
+		if (!count($registros)) {
+			return false;
+		}
+
+		foreach ($registros as $registro) {
+			if ((int) $registro['status_projeto'] !== (int) $statusEsperado) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public static function existeListadoNoStatus($statusEsperado, $idUsuarioLogado = null, $permissao = null)
+	{
+		$registros = self::lista($idUsuarioLogado, $permissao);
+		if (!count($registros)) {
+			return false;
+		}
+
+		foreach ($registros as $registro) {
+			if ((int) $registro['status_projeto'] === (int) $statusEsperado) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static function submeterListados($idUsuarioLogado = null, $permissao = null)
+	{
+		if (!self::todosListadosNoStatus(0, $idUsuarioLogado, $permissao)) {
+			self::$erro = 'Somente projetos em rascunho podem ser submetidos em lote.';
+			return false;
+		}
+
+		$db = Zend_Registry::get('db');
+		$where = 'status_projeto = 0';
+
+		if ((int) $permissao !== 1 && $idUsuarioLogado) {
+			$where .= ' AND id_usuario = ' . (int) $idUsuarioLogado;
+		}
+
+		$linhas = $db->update('eventos_projeto', array('status_projeto' => 1), $where);
+		if (!$linhas) {
+			self::$erro = 'Nenhum projeto foi submetido.';
+			return false;
+		}
+
+		return true;
 	}
 
 	public static function prepararCampos($campos, $permissao = null, $idUsuarioLogado = null)
@@ -235,7 +317,7 @@ class Projeto
 		}
 
 		$statusProjeto = isset($campos['status_projeto']) && $campos['status_projeto'] !== '' ? (int) $campos['status_projeto'] : 0;
-		if ($statusProjeto < 0) {
+		if (!array_key_exists($statusProjeto, self::statusOpcoes())) {
 			self::$erro = 'Status do projeto invalido.';
 			return false;
 		}
@@ -243,6 +325,16 @@ class Projeto
 		$nome = isset($campos['nome']) ? trim((string) $campos['nome']) : '';
 		if ($nome === '') {
 			self::$erro = 'Informe o nome do projeto.';
+			return false;
+		}
+		if (strlen($nome) > self::MAX_NOME) {
+			self::$erro = 'O nome do projeto deve ter no maximo ' . self::MAX_NOME . ' caracteres.';
+			return false;
+		}
+
+		$responsavel = isset($campos['responsavel']) ? trim((string) $campos['responsavel']) : '';
+		if (strlen($responsavel) > self::MAX_RESPONSAVEL) {
+			self::$erro = 'O nome do responsavel deve ter no maximo ' . self::MAX_RESPONSAVEL . ' caracteres.';
 			return false;
 		}
 
@@ -300,6 +392,7 @@ class Projeto
 			'id_evento' => $idEvento,
 			'status_projeto' => $statusProjeto,
 			'nome' => $nome,
+			'responsavel' => $responsavel !== '' ? $responsavel : null,
 			'data_inicializacao' => $dataInicializacao,
 			'data_finalizacao' => $dataFinalizacao,
 			'justificativa' => $justificativa,

@@ -1,59 +1,63 @@
-<div class="d-flex justify-content-center justify-content-md-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-    <h1 class="h2 text-info">Inscrições</h1>
-    <form id="form_inscricao" class="form-inline text-right">
-        <div class="form-group">
-            <input style="min-width:240px; background:#fff" class="form-control text-center shadow" type="text" id="periodo" readonly>
-            <input type='hidden' id="inicio" value="<?= Util::formatData($this->inicio) ?>" />
-            <input type='hidden' id="fim" value="<?= Util::formatData($this->fim) ?>" />
+<div class="content-page">
+    <div class="content-page__header">
+        <h1 class="content-page__title">Inscrições</h1>
+        <div class="content-page__toolbar">
+            <form id="form_inscricao" class="form-inline text-right mb-0">
+                <div class="form-group mb-0">
+                    <input style="min-width:240px; background:#fff" class="form-control text-center shadow" type="text" id="periodo" readonly>
+                    <input type='hidden' id="inicio" value="<?= Util::formatData($this->inicio) ?>" />
+                    <input type='hidden' id="fim" value="<?= Util::formatData($this->fim) ?>" />
+                </div>
+            </form>
         </div>
-    </form>
-</div>
+    </div>
 
-<div class="table-responsive">
-    <table class="table table-bordered table-hover table-striped w-100" id="tabela_inscricao">
-        <thead>
-            <tr>
-                <th></th>
-                <th class="text-left">INSCRIÇÃO</th>
-                <th class="text-left">EVENTO</th>
-                <th class="text-left">DATA</th>
-                <th class="text-left">EMPRESA</th>
-                <th class="text-left">NOME</th>
-                <th class="text-left">E-MAIL</th>
-                <th class="text-left">STATUS</th>
-            </tr>
-            <tr>
-                <th></th>
-                <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
-                <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
-                <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
-                <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
-                <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
-                <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
-                <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
-            </tr>
-        </thead>
-        <tbody id="corpo">
-            <? if ($this->registros && count($this->registros) > 0) foreach ($this->registros as $key => $value) : ?>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-striped w-100" id="tabela_inscricao">
+            <thead>
                 <tr>
-                    <td class="text-center" width="30px">
-                        <div class="btn-group">
-                            <a class="btn btn-primary" href="#" onclick="carregarTela('../../inscricao/detalhe?id_inscricao=<?= $value['id_inscricao'] ?>')"><i class="fa fa-eye"></i></a>
-                        </div>
-                    </td>
-                    <td class="text-left align-middle"><?= Util::formatData($value['created_at']) ?> <?= Util::formatHora($value['created_at']) ?></td>
-                    <td class="text-left align-middle"><?= $value['titulo'] ?></td>
-                    <td class="text-left align-middle"><?= Util::formatData($value['data_hora']) ?> <?= Util::formatHora($value['data_hora']) ?></td>
-                    <td class="text-left align-middle"><?= $value['nome_organizacao'] ?></td>
-                    <td class="text-left align-middle"><?= $value['nome'] ?></td>
-                    <td class="text-left align-middle"><?= $value['email'] ?></td>
-                    <td class="text-left align-middle"><?= $value['status'] ?></td>
+                    <th></th>
+                    <th class="text-left">INSCRIÇÃO</th>
+                    <th class="text-left">EVENTO</th>
+                    <th class="text-left">DATA</th>
+                    <th class="text-left">EMPRESA</th>
+                    <th class="text-left">NOME</th>
+                    <th class="text-left">E-MAIL</th>
+                    <th class="text-left">STATUS</th>
                 </tr>
-            <? endforeach; ?>
-        </tbody>
-        <tfoot>
-        </tfoot>
-    </table>
+                <tr>
+                    <th></th>
+                    <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
+                    <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
+                    <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
+                    <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
+                    <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
+                    <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
+                    <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
+                </tr>
+            </thead>
+            <tbody id="corpo">
+                <? if ($this->registros && count($this->registros) > 0) foreach ($this->registros as $key => $value) : ?>
+                    <tr>
+                        <td class="text-center" width="30px">
+                            <div class="btn-group">
+                                <a class="btn btn-primary" href="#" onclick="carregarTela('../../inscricao/detalhe?id_inscricao=<?= $value['id_inscricao'] ?>')"><i class="fa fa-eye"></i></a>
+                            </div>
+                        </td>
+                        <td class="text-left align-middle"><?= Util::formatData($value['created_at']) ?> <?= Util::formatHora($value['created_at']) ?></td>
+                        <td class="text-left align-middle"><?= $value['titulo'] ?></td>
+                        <td class="text-left align-middle"><?= Util::formatData($value['data_hora']) ?> <?= Util::formatHora($value['data_hora']) ?></td>
+                        <td class="text-left align-middle"><?= $value['nome_organizacao'] ?></td>
+                        <td class="text-left align-middle"><?= $value['nome'] ?></td>
+                        <td class="text-left align-middle"><?= $value['email'] ?></td>
+                        <td class="text-left align-middle"><?= $value['status'] ?></td>
+                    </tr>
+                <? endforeach; ?>
+            </tbody>
+            <tfoot>
+            </tfoot>
+        </table>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -139,49 +143,17 @@
                 "<'row'<'col-12'tr>>" +
                 "<'row align-items-center mt-2'<'col-12 col-md-5'i><'col-12 col-md-7'p>>",
             buttons: [
-                /*{
-                                    extend: 'copy',
-                                    titleAttr: 'Copiar',
-                                    text: '<i class="fas fa-copy"></i>',
-                                    className: 'text-info',
-                                    exportOptions: {
-                                        search: 'applied',
-                                        columns: [1, 2, 3, 4, 5]
-                                    }
-                                },*/
                 {
                     extend: 'excel',
                     titleAttr: 'Excel',
-                    text: '<i class="fas fa-file-excel"></i>',
+                    text: '<i class=\"fas fa-file-excel\"></i>',
                     className: 'text-info',
                     filename: 'eventos',
                     exportOptions: {
                         search: 'applied',
                         columns: [1, 2, 3, 4, 5, 6, 7]
                     }
-                },
-                /*{
-                    extend: 'pdf',
-                    orientation: 'landscape',
-                    pageSize: 'A4',
-                    titleAttr: 'PDF',
-                    text: '<i class="fas fa-file-pdf"></i>',
-                    className: 'text-info',
-                    title: 'Relatório de Faturamento',
-                    filename: 'eventos',
-                    customize: function(doc) {
-                        doc.content.splice(0, 0, {
-                            margin: [0, 0, 0, 12],
-                            width: 100,
-                            alignment: 'center',
-                            image: logo_base_64
-                        });
-                    },
-                    exportOptions: {
-                        search: 'applied',
-                        columns: [1, 2, 3, 4, 5]
-                    }
-                }*/
+                }
             ]
         });
 
