@@ -213,7 +213,7 @@ class Projeto
 
 		$db = Zend_Registry::get('db');
 
-		$where = ' where p.id_projeto = ' . $idProjeto;
+		$where = ' where p.ativo and p.id_projeto = ' . $idProjeto;
 		if ((int) $permissao !== 1 && $idUsuarioLogado) {
 			$where .= ' and p.id_usuario = ' . (int) $idUsuarioLogado;
 		}
@@ -243,9 +243,9 @@ class Projeto
 	{
 		$db = Zend_Registry::get('db');
 
-		$where = '';
+		$where = ' where p.ativo';
 		if ((int) $permissao !== 1 && $idUsuarioLogado) {
-			$where = ' where p.id_usuario = ' . (int) $idUsuarioLogado;
+			$where .= ' and p.id_usuario = ' . (int) $idUsuarioLogado;
 		}
 
 		$select = "select p.*,
@@ -423,6 +423,7 @@ class Projeto
 			'id_usuario' => $idUsuario,
 			'id_evento' => $idEvento,
 			'status_projeto' => $statusProjeto,
+			'ativo' => true,
 			'nome' => $nome,
 			'responsavel' => $responsavel !== '' ? $responsavel : null,
 			'data_inicializacao' => $dataInicializacao,
@@ -540,7 +541,7 @@ class Projeto
 		}
 
 		$db = Zend_Registry::get('db');
-		$db->delete('eventos_projeto', 'id_projeto = ' . (int) $registro['id_projeto']);
+		$db->update('eventos_projeto', array('ativo' => false), 'id_projeto = ' . (int) $registro['id_projeto']);
 
 		return true;
 	}

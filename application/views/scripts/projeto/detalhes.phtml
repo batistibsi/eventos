@@ -1,12 +1,55 @@
 <? $registro = $this->registro; ?>
 <? $odsRelacionados = $registro && !empty($registro['demais_ods_relacionados']) ? array_map('trim', explode(',', $registro['demais_ods_relacionados'])) : array(); ?>
 <? $arquivos = $registro && !empty($registro['arquivos']) ? $registro['arquivos'] : array(); ?>
+<? $empresaVinculada = !empty($this->empresaVinculada) && is_array($this->empresaVinculada) ? $this->empresaVinculada : false; ?>
 <div class="content-page">
 	<div class="content-page__header">
 		<h1 class="content-page__title">Detalhes do Projeto</h1>
 		<div class="content-page__toolbar">
 			<button type="button" onclick="carregarTela('../../projeto')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
 		</div>
+	</div>
+
+	<div class="section-card projeto-empresa-resumo">
+		<div class="section-header">
+			<div>
+				<h2 class="section-title">Empresa Vinculada à Inscrição</h2>
+				<p class="section-subtitle">Esses dados vêm da inscrição vinculada ao usuário responsável por este projeto.</p>
+			</div>
+		</div>
+		<? if ($empresaVinculada) : ?>
+			<div class="row projeto-empresa-resumo__grid">
+				<div class="col-md-6 col-xl-4 mb-3">
+					<span class="field-label">Organização</span>
+					<div class="detalhe-valor"><?= $this->escape($empresaVinculada['nome_organizacao']) ?></div>
+				</div>
+				<div class="col-md-6 col-xl-4 mb-3">
+					<span class="field-label">CNPJ</span>
+					<div class="detalhe-valor"><?= $this->escape($empresaVinculada['cnpj']) ?></div>
+				</div>
+				<div class="col-md-6 col-xl-4 mb-3">
+					<span class="field-label">Nome no certificado</span>
+					<div class="detalhe-valor"><?= $this->escape($empresaVinculada['nome_certificado']) ?></div>
+				</div>
+				<div class="col-md-6 col-xl-4 mb-3">
+					<span class="field-label">Colaboradores</span>
+					<div class="detalhe-valor"><?= (int) $empresaVinculada['numero_colaboradores'] ?></div>
+				</div>
+				<div class="col-md-6 col-xl-4 mb-3">
+					<span class="field-label">Responsável da inscrição</span>
+					<div class="detalhe-valor"><?= $this->escape($empresaVinculada['nome']) ?></div>
+				</div>
+				<div class="col-md-6 col-xl-4 mb-3">
+					<span class="field-label">Contato</span>
+					<div class="detalhe-valor">
+						<?= $this->escape($empresaVinculada['email']) ?>
+						<? if (!empty($empresaVinculada['telefone'])) : ?><br><?= $this->escape($empresaVinculada['telefone']) ?><? endif; ?>
+					</div>
+				</div>
+			</div>
+		<? else : ?>
+			<div class="projeto-empresa-resumo__empty detalhe-valor">Nenhuma inscrição vinculada encontrada para este usuário.</div>
+		<? endif; ?>
 	</div>
 
 	<div class="section-card">

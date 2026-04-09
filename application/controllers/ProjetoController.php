@@ -65,6 +65,7 @@ class ProjetoController extends Zend_Controller_Action
 
 		$idProjeto = isset($_REQUEST['id_projeto']) ? (int) $_REQUEST['id_projeto'] : 0;
 		$this->view->registro = Projeto::buscaId($idProjeto, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+		$this->view->empresaVinculada = $this->view->registro ? Inscricao::buscaResumoVinculadoUsuario((int) $this->view->registro['id_usuario']) : false;
 	}
 
 	public function salvarAction()
