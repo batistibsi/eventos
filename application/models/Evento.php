@@ -185,6 +185,12 @@ class Evento
                         return false;
                 }
 
+                $dataInscricaoSummit = self::normalizarData(isset($campos['data_inscricao_summit']) ? $campos['data_inscricao_summit'] : null);
+                if (!$dataInscricaoSummit) {
+                        self::$erro = 'Informe a data de inscricao no Summit.';
+                        return false;
+                }
+
                 $dataSummit = self::normalizarData(isset($campos['data_summit']) ? $campos['data_summit'] : null);
                 if (!$dataSummit) {
                         self::$erro = 'Informe a data de summit do evento.';
@@ -201,6 +207,7 @@ class Evento
                         'data_submissao' => $dataSubmissao,
                         'data_correcao' => $dataCorrecao,
                         'data_resultado' => $dataResultado,
+                        'data_inscricao_summit' => $dataInscricaoSummit,
                         'data_summit' => $dataSummit,
                         'observacao' => isset($campos['observacao']) && trim((string) $campos['observacao']) !== '' ? trim((string) $campos['observacao']) : null
                 );

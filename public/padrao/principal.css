@@ -1313,6 +1313,61 @@ table td .btn-group > .btn,
   text-align: center;
 }
 
+.inscricao-detalhe .inscricao-summit__form {
+  margin-top: 18px;
+}
+
+.inscricao-detalhe .inscricao-summit__slot {
+  background: linear-gradient(180deg, #f8fbff 0%, #edf4fb 100%);
+  border: 1px solid #d7e2ef;
+  border-radius: 14px;
+  height: 100%;
+  padding: 16px;
+}
+
+.inscricao-detalhe .inscricao-summit__badge {
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: .78rem;
+  font-weight: 700;
+  padding: 8px 12px;
+}
+
+.inscricao-detalhe .inscricao-summit__badge.is-open {
+  background: rgba(47, 143, 70, .12);
+  color: #2f8f46;
+}
+
+.inscricao-detalhe .inscricao-summit__badge.is-closed {
+  background: rgba(179, 74, 74, .12);
+  color: #a33838;
+}
+
+.inscricao-detalhe .inscricao-summit__notice {
+  background: linear-gradient(135deg, #fff4cc 0%, #ffe29a 100%);
+  border: 2px solid #e5b93c;
+  border-radius: 16px;
+  box-shadow: 0 14px 28px rgba(181, 128, 10, .16);
+  color: #714e00;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: .01em;
+  margin-top: 16px;
+  padding: 16px 18px;
+}
+
+.inscricao-detalhe .content-page__toolbar a[href="#formulario-summit"] {
+  align-items: center;
+  border-width: 2px;
+  box-shadow: 0 10px 22px rgba(49, 93, 143, .14);
+  display: inline-flex;
+  font-weight: 700;
+}
+
+.inscricao-detalhe .content-page__toolbar a[href="#formulario-summit"] i {
+  margin-right: .4rem;
+}
+
 .cadastro-grid {
   display: grid;
   gap: 18px;

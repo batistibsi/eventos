@@ -36,6 +36,7 @@ class EventoController extends Zend_Controller_Action
                 $campos['data_submissao'] = !empty($_REQUEST['data_submissao']) ? $_REQUEST['data_submissao'] : null;
                 $campos['data_correcao'] = !empty($_REQUEST['data_correcao']) ? $_REQUEST['data_correcao'] : null;
                 $campos['data_resultado'] = !empty($_REQUEST['data_resultado']) ? $_REQUEST['data_resultado'] : null;
+                $campos['data_inscricao_summit'] = !empty($_REQUEST['data_inscricao_summit']) ? $_REQUEST['data_inscricao_summit'] : null;
                 $campos['data_summit'] = !empty($_REQUEST['data_summit']) ? $_REQUEST['data_summit'] : null;
                 $campos['observacao'] = !empty($_REQUEST['observacao']) ? $_REQUEST['observacao'] : null;
 

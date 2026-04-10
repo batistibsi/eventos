@@ -65,6 +65,13 @@
 			<input class="form-control" name="data_resultado" type="date" value="<?= $registro && !empty($registro['data_resultado']) ? date('Y-m-d', strtotime($registro['data_resultado'])) : '' ?>" id="data_resultado" required>
 		</div>
 		<div class="form-group col-md-6">
+			<span><label for="data_inscricao_summit">Data inscricao summit: </label></span>
+			<input class="form-control" name="data_inscricao_summit" type="date" value="<?= $registro && !empty($registro['data_inscricao_summit']) ? date('Y-m-d', strtotime($registro['data_inscricao_summit'])) : '' ?>" id="data_inscricao_summit" required>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="form-group col-md-6">
 			<span><label for="data_summit">Data summit: </label></span>
 			<input class="form-control" name="data_summit" type="date" value="<?= $registro && !empty($registro['data_summit']) ? date('Y-m-d', strtotime($registro['data_summit'])) : '' ?>" id="data_summit" required>
 		</div>

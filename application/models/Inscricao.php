@@ -6,6 +6,9 @@ class Inscricao
         const MAX_NOME_ORGANIZACAO = 150;
         const MAX_REPRESENTANTE_NOME = 120;
         const MAX_NOME_CERTIFICADO = 150;
+        const MAX_SUMMIT_INSCRICOES = 3;
+        const MAX_SUMMIT_NOME = 150;
+        const MAX_SUMMIT_CARGO = 150;
 
         public static function statusDisponiveis()
         {
@@ -22,6 +25,8 @@ class Inscricao
                                     b.data_hora as evento_data_hora,
                                     b.data_hora_2 as evento_data_hora_2,
                                     b.limite_vagas as evento_limite_vagas,
+                                    b.data_inscricao_summit as data_inscricao_summit,
+                                    b.data_summit as data_summit,
                                     u.id_usuario as usuario_id,
                                     u.nome as usuario_nome,
                                     u.email as usuario_email,
@@ -37,6 +42,30 @@ class Inscricao
                 if (count($registros) == 0) return true;
 
                 return $registros[0];
+        }
+
+        public static function listaInscricoesSummit($id_inscricao)
+        {
+                $db = Zend_Registry::get('db');
+                $id_inscricao = (int) $id_inscricao;
+
+                if ($id_inscricao <= 0) {
+                        return [];
+                }
+
+                $select = "select id_inscricao_summit,
+                                  id_inscricao,
+                                  nome_representante,
+                                  cargo_representante,
+                                  telefone_contato,
+                                  ordem,
+                                  created_at
+                             from eventos_inscricao_summit
+                            where id_inscricao = " . $id_inscricao . "
+                            order by ordem asc";
+
+                $registros = $db->fetchAll($select);
+                return is_array($registros) ? $registros : [];
         }
 
         public static function buscaToken($token)
@@ -168,6 +197,74 @@ class Inscricao
                 }
 
                 return $valor;
+        }
+
+        private static function prazoSummitEncerrado($dataSummit)
+        {
+                if (empty($dataSummit)) {
+                        self::$erro = 'A data limite do Summit nao esta configurada para este evento.';
+                        return true;
+                }
+
+                try {
+                        $hoje = new DateTimeImmutable(date('Y-m-d'));
+                        $limite = new DateTimeImmutable((new DateTimeImmutable($dataSummit))->format('Y-m-d'));
+                } catch (Exception $e) {
+                        self::$erro = 'A data limite do Summit e invalida.';
+                        return true;
+                }
+
+                if ($hoje > $limite) {
+                        self::$erro = 'O prazo para preencher a inscricao no Summit foi encerrado.';
+                        return true;
+                }
+
+                return false;
+        }
+
+        private static function prepararInscricoesSummit($campos)
+        {
+                $inscricoes = [];
+
+                for ($i = 1; $i <= self::MAX_SUMMIT_INSCRICOES; $i++) {
+                        $nome = trim((string) ($campos['summit_nome_' . $i] ?? ''));
+                        $cargo = trim((string) ($campos['summit_cargo_' . $i] ?? ''));
+                        $telefone = trim((string) ($campos['summit_telefone_' . $i] ?? ''));
+                        $temAlgumValor = ($nome !== '' || $cargo !== '' || $telefone !== '');
+
+                        if (!$temAlgumValor) {
+                                continue;
+                        }
+
+                        $nome = self::validarTamanhoTexto($nome, self::MAX_SUMMIT_NOME, 'o nome completo do representante do Summit ' . $i);
+                        if ($nome === false) {
+                                return false;
+                        }
+
+                        $cargo = self::validarTamanhoTexto($cargo, self::MAX_SUMMIT_CARGO, 'o cargo do representante do Summit ' . $i);
+                        if ($cargo === false) {
+                                return false;
+                        }
+
+                        if ($telefone === '') {
+                                self::$erro = 'Informe o telefone para contato do representante do Summit ' . $i . '.';
+                                return false;
+                        }
+
+                        if (strlen($telefone) > 20) {
+                                self::$erro = 'O telefone para contato do representante do Summit ' . $i . ' deve ter no maximo 20 caracteres.';
+                                return false;
+                        }
+
+                        $inscricoes[] = [
+                                'nome_representante' => $nome,
+                                'cargo_representante' => $cargo,
+                                'telefone_contato' => $telefone,
+                                'ordem' => count($inscricoes) + 1
+                        ];
+                }
+
+                return $inscricoes;
         }
 
         public static function novo($campos)
@@ -347,6 +444,66 @@ class Inscricao
                         $db->update('eventos_inscricao', ['status' => $status], $where);
                 } catch (Exception $e) {
                         self::$erro = 'Nao foi possivel atualizar o status.';
+                        return false;
+                }
+
+                return true;
+        }
+
+        public static function salvarInscricoesSummit($id_inscricao, $campos, $id_usuario = 0, $permissao = 0)
+        {
+                $db = Zend_Registry::get('db');
+                $id_inscricao = (int) $id_inscricao;
+                $id_usuario = (int) $id_usuario;
+                $permissao = (int) $permissao;
+
+                if ($id_inscricao <= 0) {
+                        self::$erro = 'Inscricao nao informada.';
+                        return false;
+                }
+
+                $inscricao = self::buscaId($id_inscricao);
+                if (!$inscricao || !is_array($inscricao)) {
+                        self::$erro = 'Inscricao nao encontrada.';
+                        return false;
+                }
+
+                if ($permissao !== 1 && (int) ($inscricao['id_usuario'] ?? 0) !== $id_usuario) {
+                        self::$erro = 'Nao permitido!';
+                        return false;
+                }
+
+                if (self::prazoSummitEncerrado($inscricao['data_inscricao_summit'] ?? null)) {
+                        return false;
+                }
+
+                $inscricoes = self::prepararInscricoesSummit($campos);
+                if ($inscricoes === false) {
+                        return false;
+                }
+
+                try {
+                        $db->beginTransaction();
+                        $where = $db->quoteInto('id_inscricao = ?', $id_inscricao);
+                        $db->delete('eventos_inscricao_summit', $where);
+
+                        foreach ($inscricoes as $item) {
+                                $db->insert('eventos_inscricao_summit', [
+                                        'id_inscricao' => $id_inscricao,
+                                        'nome_representante' => $item['nome_representante'],
+                                        'cargo_representante' => $item['cargo_representante'],
+                                        'telefone_contato' => $item['telefone_contato'],
+                                        'ordem' => $item['ordem']
+                                ]);
+                        }
+
+                        $db->commit();
+                } catch (Exception $e) {
+                        if ($db->getConnection()->inTransaction()) {
+                                $db->rollBack();
+                        }
+
+                        self::$erro = 'Nao foi possivel salvar as inscricoes do Summit.';
                         return false;
                 }
 

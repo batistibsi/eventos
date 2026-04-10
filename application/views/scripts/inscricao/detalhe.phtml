@@ -74,12 +74,38 @@
     $extensaoLogo = !empty($inscricao['logo_organizacao']) ? strtolower(pathinfo($inscricao['logo_organizacao'], PATHINFO_EXTENSION)) : '';
     $logoEhImagem = in_array($extensaoLogo, ['png', 'jpg', 'jpeg', 'gif', 'webp'], true);
     $usuarioVinculado = !empty($inscricao['usuario_id']);
+    $summitInscricoes = isset($this->summitInscricoes) && is_array($this->summitInscricoes) ? $this->summitInscricoes : [];
+
+    $dataSummitFormatada = !empty($inscricao['data_inscricao_summit']) ? Util::formatData($inscricao['data_inscricao_summit']) : 'Não informada';
+    $prazoSummitEncerrado = true;
+
+    if (!empty($inscricao['data_inscricao_summit'])) {
+        try {
+            $prazoSummitEncerrado = (new DateTime(date('Y-m-d'))) > (new DateTime(date('Y-m-d', strtotime($inscricao['data_inscricao_summit']))));
+        } catch (Exception $e) {
+            $prazoSummitEncerrado = true;
+        }
+    }
+
+    $summitSlots = [];
+    for ($i = 1; $i <= 3; $i++) {
+        $registroSummit = $summitInscricoes[$i - 1] ?? [];
+        $summitSlots[] = [
+            'indice' => $i,
+            'nome' => $registroSummit['nome_representante'] ?? '',
+            'cargo' => $registroSummit['cargo_representante'] ?? '',
+            'telefone' => $registroSummit['telefone_contato'] ?? ''
+        ];
+    }
 ?>
 
 <div class="content-page inscricao-detalhe">
     <div class="content-page__header">
         <h1 class="h2 text-info mb-2 mb-md-0">Detalhe da inscrição</h1>
         <div class="content-page__toolbar">
+            <a href="#representantes-summit" class="btn btn-warning">
+                <i class="fa fa-calendar-check-o" aria-hidden="true"></i> Inscrição no Summit
+            </a>
             <button type="button" onclick="carregarTelaAnterior();" class="btn btn-primary">
                 <i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar
             </button>
@@ -255,13 +281,13 @@
         </div>
     </div>
 
-    <div class="detalhe-card mb-4">
+    <div class="detalhe-card mb-4" id="formulario-summit">
         <div class="detalhe-card-body">
             <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
                 <div class="section-title mb-0">Representantes</div>
                 <small class="text-muted"></small>
             </div>
-            <div class="row">
+            <div class="row" id="representantes-summit">
                 <? foreach ($representantes as $representante) : ?>
                     <div class="col-12 col-lg-4 mb-3">
                         <div class="border rounded h-100 p-3">
@@ -282,6 +308,86 @@
                     </div>
                 <? endforeach; ?>
             </div>
+        </div>
+    </div>
+
+    <div class="detalhe-card mb-4">
+        <div class="detalhe-card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+                <div>
+                    <div class="section-title mb-1">Inscri&ccedil;&atilde;o no Summit</div>
+                    <div class="section-subtitle mb-0">Preencha at&eacute; 3 inscri&ccedil;&otilde;es. O limite para preenchimento deste formul&aacute;rio &eacute; <?= $this->escape($dataSummitFormatada) ?>.</div>
+                </div>
+                <span class="inscricao-summit__badge <?= $prazoSummitEncerrado ? 'is-closed' : 'is-open' ?>">
+                    <?= $prazoSummitEncerrado ? 'Prazo encerrado' : 'Prazo em aberto' ?>
+                </span>
+            </div>
+
+            <? if ($prazoSummitEncerrado) : ?>
+                <div class="inscricao-summit__notice">
+                    O limite para preenchimento deste formul&aacute;rio era <?= $this->escape($dataSummitFormatada) ?>.
+                </div>
+            <? else : ?>
+                <div class="inscricao-summit__notice">
+                    O limite para preenchimento deste formul&aacute;rio &eacute; <?= $this->escape($dataSummitFormatada) ?>.
+                </div>
+            <? endif; ?>
+
+            <form id="form-summit-inscricao" class="inscricao-summit__form">
+                <input type="hidden" name="id_inscricao" value="<?= (int) ($inscricao['id_inscricao'] ?? 0) ?>">
+                <div class="row">
+                    <? foreach ($summitSlots as $slot) : ?>
+                        <div class="col-12 col-xl-4 mb-3">
+                            <div class="inscricao-summit__slot">
+                                <div class="font-weight-bold text-info mb-3">Inscri&ccedil;&atilde;o <?= (int) $slot['indice'] ?></div>
+                                <div class="form-group">
+                                    <label for="summit_nome_<?= (int) $slot['indice'] ?>">Nome Completo do representante</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="summit_nome_<?= (int) $slot['indice'] ?>"
+                                        name="summit_nome_<?= (int) $slot['indice'] ?>"
+                                        maxlength="150"
+                                        value="<?= $this->escape($slot['nome']) ?>"
+                                        <?= $prazoSummitEncerrado ? 'disabled' : '' ?>
+                                    >
+                                </div>
+                                <div class="form-group">
+                                    <label for="summit_cargo_<?= (int) $slot['indice'] ?>">Cargo do Representante</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="summit_cargo_<?= (int) $slot['indice'] ?>"
+                                        name="summit_cargo_<?= (int) $slot['indice'] ?>"
+                                        maxlength="150"
+                                        value="<?= $this->escape($slot['cargo']) ?>"
+                                        <?= $prazoSummitEncerrado ? 'disabled' : '' ?>
+                                    >
+                                </div>
+                                <div class="form-group mb-0">
+                                    <label for="summit_telefone_<?= (int) $slot['indice'] ?>">Telefone para Contato</label>
+                                    <input
+                                        type="text"
+                                        class="form-control summit-telefone"
+                                        id="summit_telefone_<?= (int) $slot['indice'] ?>"
+                                        name="summit_telefone_<?= (int) $slot['indice'] ?>"
+                                        maxlength="20"
+                                        value="<?= $this->escape($slot['telefone']) ?>"
+                                        <?= $prazoSummitEncerrado ? 'disabled' : '' ?>
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    <? endforeach; ?>
+                </div>
+                <? if (!$prazoSummitEncerrado) : ?>
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-primary salvar-summit-inscricao">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i> Salvar inscrições do Summit
+                        </button>
+                    </div>
+                <? endif; ?>
+            </form>
         </div>
     </div>
 
@@ -340,6 +446,46 @@
                     swal({
                         title: "Atenção!",
                         text: "Não foi possível alterar o status.",
+                        type: "error"
+                    });
+                }
+            });
+        });
+
+        $('.summit-telefone').mask('(00) 00000-0000');
+
+        $('#form-summit-inscricao').submit(function(e) {
+            e.preventDefault();
+
+            $('.salvar-summit-inscricao').prop('disabled', true);
+
+            $.ajax({
+                type: "POST",
+                url: "../../inscricao/salvarsummit",
+                data: $(this).serialize(),
+                success: function(data) {
+                    if (data.trim().length > 0) {
+                        swal({
+                            title: "Atenção!",
+                            text: data,
+                            type: "error"
+                        });
+                    } else {
+                        swal({
+                            title: "Sucesso!",
+                            text: "Inscrições do Summit salvas com sucesso.",
+                            type: "success"
+                        });
+                    }
+
+                    $('.salvar-summit-inscricao').prop('disabled', false);
+                },
+                error: function() {
+                    $('.salvar-summit-inscricao').prop('disabled', false);
+
+                    swal({
+                        title: "Atenção!",
+                        text: "Não foi possível salvar as inscrições do Summit.",
                         type: "error"
                     });
                 }

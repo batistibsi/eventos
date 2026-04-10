@@ -46,6 +46,7 @@ class InscricaoController extends Zend_Controller_Action
 		}
 
 		$this->view->statusDisponiveis = Inscricao::statusDisponiveis();
+		$this->view->summitInscricoes = Inscricao::listaInscricoesSummit($id_inscricao);
 	}
 
 	public function alterarstatusAction()
@@ -58,6 +59,22 @@ class InscricaoController extends Zend_Controller_Action
 		$status = !empty($_REQUEST['status']) ? $_REQUEST['status'] : null;
 
 		$result = Inscricao::alterarStatus($id_inscricao, $status);
+
+		if (!$result) echo Inscricao::$erro;
+	}
+
+	public function salvarsummitAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+
+		$id_inscricao = !empty($_REQUEST['id_inscricao']) ? (int) $_REQUEST['id_inscricao'] : 0;
+
+		$result = Inscricao::salvarInscricoesSummit(
+			$id_inscricao,
+			$_REQUEST,
+			Zend_Registry::get('id_usuario'),
+			Zend_Registry::get('permissao')
+		);
 
 		if (!$result) echo Inscricao::$erro;
 	}
