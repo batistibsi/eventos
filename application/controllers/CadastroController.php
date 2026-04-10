@@ -48,6 +48,16 @@ class CadastroController extends Zend_Controller_Action
 		$this->view->registro = Config::material();
 	}
 
+	public function helpAction()
+	{
+		if (Zend_Registry::get('permissao') != 1) exit();
+
+		$this->view->usuario = Zend_Registry::get('usuario');
+		$this->view->idUsuario = Zend_Registry::get('id_usuario');
+		$this->view->permissao = Zend_Registry::get('permissao');
+		$this->view->registro = Config::help();
+	}
+
 	public function salvamaterialAction()
 	{
 		if (Zend_Registry::get('permissao') != 1) exit();
@@ -62,7 +72,26 @@ class CadastroController extends Zend_Controller_Action
 			'material_links_lista' => $_REQUEST['material_links_lista'] ?? null
 		);
 
-		if (!Config::salvarMaterial($campos)) {
+		if (!Config::salvarMaterial($campos, $_FILES)) {
+			echo Config::$erro;
+		}
+	}
+
+	public function salvahelpAction()
+	{
+		if (Zend_Registry::get('permissao') != 1) exit();
+
+		$this->_helper->viewRenderer->setNoRender();
+
+		$campos = array(
+			'help_titulo' => $_REQUEST['help_titulo'] ?? null,
+			'help_subtitulo' => $_REQUEST['help_subtitulo'] ?? null,
+			'help_conteudo' => $_REQUEST['help_conteudo'] ?? null,
+			'help_contato_nome' => $_REQUEST['help_contato_nome'] ?? null,
+			'help_contato_whatsapp' => $_REQUEST['help_contato_whatsapp'] ?? null
+		);
+
+		if (!Config::salvarHelp($campos)) {
 			echo Config::$erro;
 		}
 	}

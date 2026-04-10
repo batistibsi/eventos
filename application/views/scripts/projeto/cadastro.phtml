@@ -2,6 +2,15 @@
 <? $odsRelacionados = $registro && !empty($registro['demais_ods_relacionados']) ? array_map('trim', explode(',', $registro['demais_ods_relacionados'])) : array(); ?>
 <? $eventoVinculado = !empty($this->eventoVinculado) && is_array($this->eventoVinculado) ? $this->eventoVinculado : false; ?>
 <? $empresaVinculada = !empty($this->empresaVinculada) && is_array($this->empresaVinculada) ? $this->empresaVinculada : false; ?>
+<? $anoReferencia = ($registro && !empty($registro['created_at'])) ? (int) date('Y', strtotime($registro['created_at'])) : (int) date('Y'); ?>
+<? $anoPassado = $anoReferencia - 1; ?>
+<? $anoRetrasado = $anoReferencia - 2; ?>
+<? $dataMinimaProjeto = $anoRetrasado . '-01-01'; ?>
+<? $dataMaximaProjeto = $anoPassado . '-12-31'; ?>
+<? $mensagemSucessoProjeto = 'Projeto inserido com sucesso. Você poderá editá-lo até que os projetos sejam submetidos à análise.'; ?>
+<? if ($eventoVinculado && !empty($eventoVinculado['data_submissao'])): ?>
+	<? $mensagemSucessoProjeto = 'Projeto inserido com sucesso. Você poderá editá-lo até que se encerre a data de submissão do evento da sua inscrição (' . date('d/m/Y', strtotime($eventoVinculado['data_submissao'])) . ') ou até que os projetos sejam submetidos à análise.'; ?>
+<? endif; ?>
 <div class="content-page">
 	<div class="content-page__header">
 		<h1 class="content-page__title">Projeto</h1>
@@ -9,6 +18,7 @@
 			<button type="button" onclick="carregarTela('../../projeto')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
 		</div>
 	</div>
+	<div class="alert alert-info mb-3">Este formulário será utilizado para cadastrar seus projetos na Certificação, onde cada projeto deverá ser preenchido com todas as suas particularidades apresentadas no decorrer do formulário.</div>
 	<form id="formulario" class="projeto-form" novalidate>
 		<input name="id_projeto" type="hidden" value="<?= $registro ? $registro['id_projeto'] : '' ?>" id="id_projeto">
 		<input name="id_evento" type="hidden" value="<?= $eventoVinculado ? (int) $eventoVinculado['id_evento'] : '' ?>" id="id_evento">
@@ -111,16 +121,19 @@
 			<div class="row">
 				<div class="form-group col-md-6">
 					<span><label for="data_inicializacao">Data da inicialização: </label></span>
-					<input class="form-control" name="data_inicializacao" type="date" value="<?= $registro && !empty($registro['data_inicializacao']) ? date('Y-m-d', strtotime($registro['data_inicializacao'])) : '' ?>" id="data_inicializacao" required>
+					<small class="form-text text-muted">Necessário que tenha sido realizado em <?= $anoRetrasado ?> - <?= $anoPassado ?>.</small>
+					<input class="form-control" name="data_inicializacao" type="date" min="<?= $dataMinimaProjeto ?>" max="<?= $dataMaximaProjeto ?>" value="<?= $registro && !empty($registro['data_inicializacao']) ? date('Y-m-d', strtotime($registro['data_inicializacao'])) : '' ?>" id="data_inicializacao" required>
 				</div>
 				<div class="form-group col-md-6">
 					<span><label for="data_finalizacao">Data da finalização: </label></span>
-					<input class="form-control" name="data_finalizacao" type="date" value="<?= $registro && !empty($registro['data_finalizacao']) ? date('Y-m-d', strtotime($registro['data_finalizacao'])) : '' ?>" id="data_finalizacao" required>
+					<small class="form-text text-muted">Necessário que tenha sido realizado em <?= $anoRetrasado ?> - <?= $anoPassado ?>.</small>
+					<input class="form-control" name="data_finalizacao" type="date" min="<?= $dataMinimaProjeto ?>" max="<?= $dataMaximaProjeto ?>" value="<?= $registro && !empty($registro['data_finalizacao']) ? date('Y-m-d', strtotime($registro['data_finalizacao'])) : '' ?>" id="data_finalizacao" required>
 				</div>
 			</div>
 			<div class="row">
 				<div class="form-group col-md-12">
 					<span><label for="justificativa">Justificativa do projeto: </label></span>
+					<small class="form-text text-muted">O que motivou a realização do projeto? Qual o propósito de sua realização? O que inspirou a execução?</small>
 					<textarea class="form-control" name="justificativa" id="justificativa" rows="4" required><?= $registro && !empty($registro['justificativa']) ? $this->escape($registro['justificativa']) : '' ?></textarea>
 				</div>
 			</div>
@@ -155,6 +168,7 @@
 			<div class="row">
 				<div class="form-group col-md-12">
 					<span><label>ODS principal do projeto: </label></span>
+					<small class="form-text text-muted">Selecione o ODS - Objetivo de Desenvolvimento Sustentável - de acordo com a atuação do projeto</small>
 					<div class="ods-grid">
 						<? for ($i = 1; $i <= 17; $i++): $ods = 'ODS ' . $i; ?>
 							<label class="ods-option" for="ods_principal_<?= $i ?>">
@@ -171,12 +185,14 @@
 			<div class="row">
 				<div class="form-group col-md-12">
 					<span><label for="objetivos">Objetivo(s) do projeto: </label></span>
+					<small class="form-text text-muted">Os objetivos do projeto referem-se às metas específicas e mensuráveis que um projeto busca alcançar. Eles servem como diretrizes claras para orientar as atividades e esforços na execução do projeto.</small>
 					<textarea class="form-control" name="objetivos" id="objetivos" rows="4" required><?= $registro && !empty($registro['objetivos']) ? $this->escape($registro['objetivos']) : '' ?></textarea>
 				</div>
 			</div>
 			<div class="row">
 				<div class="form-group col-md-12">
 					<span><label>Demais ODS relacionados com o projeto: </label></span>
+					<small class="form-text text-muted">Selecione outros ODS - Objetivo de Desenvolvimento Sustentável - que estejam relacionados com a atuação do projeto (item não obrigatório).</small>
 					<div class="ods-grid">
 						<? for ($i = 1; $i <= 17; $i++): $ods = 'ODS ' . $i; ?>
 							<label class="ods-option" for="demais_ods_relacionados_<?= $i ?>">
@@ -190,22 +206,138 @@
 					</div>
 				</div>
 			</div>
-		</div>
-
-		<div class="section-card">
-			<div class="section-header">
-				<div>
-					<h2 class="section-title">Evidências</h2>
-					<p class="section-subtitle">Anexe materiais que comprovem os resultados e a execução do projeto.</p>
-					<p class="section-subtitle">Evidência qualitativa são observações e descrições detalhadas que não podem ser expressas numericamente, focando em características e contextos subjetivos.</p>
-				</div>
-			</div>
 			<div class="row">
 				<div class="form-group col-md-12">
 					<label class="upload-heading">Anexe a evidência qualitativa do projeto:</label>
 					<div class="upload-subtitle">Exemplos: fotos, vídeos, depoimentos, documentos, planilhas, entre outros.</div>
 					<div class="upload-highlight">Faça upload de até 5 arquivos aceitos. O tamanho máximo é de 100 MB por item.</div>
-					<div id="projeto-dropzone" class="dropzone">
+					<div id="projeto-dropzone" class="dropzone mb-4">
+						<div class="dz-message">
+							Arraste arquivos aqui ou clique para selecionar.<br>
+							<small>Você pode visualizar e remover os uploads antes de salvar.</small>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="section-card">
+			<div class="section-header">
+				<div>
+					<h2 class="section-title">EVIDÊNCIA DE ITENS</h2>
+					<p class="section-subtitle">Os ITENS são uma unidade específica que faz parte do projeto. Eles podem variar, dependendo do objetivo. Caso possua evidência dos itens relacionados ao projeto, preencha os campos a seguir.</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<div class="mt-3">
+						<span><label for="tipo_item">Informe o tipo de item.</label></span>
+						<small class="form-text text-muted">Exemplo: roupas, alimentos, treinamentos, cursos, doação de sangue, exames realizados, consultas médicas, água, energia/eletricidade, inovações/ideias, resíduos, emissão de gases, terreno, documentos, entre outros.</small>
+						<input class="form-control" name="tipo_item" type="text" value="<?= $registro && !empty($registro['tipo_item']) ? $this->escape($registro['tipo_item']) : '' ?>" id="tipo_item" maxlength="150">
+					</div>
+					<div class="row mt-3">
+						<div class="form-group col-md-6">
+							<span><label for="quantidade_itens">Informe a quantidade de itens.</label></span>
+							<input class="form-control" name="quantidade_itens" type="number" min="0" step="0.01" value="<?= $registro && !empty($registro['quantidade_itens']) ? $this->escape($registro['quantidade_itens']) : '' ?>" id="quantidade_itens">
+						</div>
+						<div class="form-group col-md-6">
+							<span><label>Informe a unidade de medida do item.</label></span>
+							<small class="form-text text-muted">Unidade, Kg, Horas ou outro tipo de medida.</small>
+							<div class="mt-2">
+								<label class="mr-3" for="unidade_medida_unidade"><input type="radio" name="unidade_medida" id="unidade_medida_unidade" value="Unidade" <?= $registro && isset($registro['unidade_medida']) && $registro['unidade_medida'] === 'Unidade' ? 'checked' : '' ?>> Unidade</label>
+								<label class="mr-3" for="unidade_medida_kg"><input type="radio" name="unidade_medida" id="unidade_medida_kg" value="Kg" <?= $registro && isset($registro['unidade_medida']) && $registro['unidade_medida'] === 'Kg' ? 'checked' : '' ?>> Kg</label>
+								<label class="mr-3" for="unidade_medida_horas"><input type="radio" name="unidade_medida" id="unidade_medida_horas" value="Horas" <?= $registro && isset($registro['unidade_medida']) && $registro['unidade_medida'] === 'Horas' ? 'checked' : '' ?>> Horas</label>
+								<label for="unidade_medida_outro_opcao"><input type="radio" name="unidade_medida" id="unidade_medida_outro_opcao" value="Outro" <?= $registro && isset($registro['unidade_medida']) && !in_array($registro['unidade_medida'], array('Unidade', 'Kg', 'Horas'), true) && $registro['unidade_medida'] !== '' ? 'checked' : '' ?>> Outro:</label>
+							</div>
+							<input class="form-control mt-2" name="unidade_medida_outro" type="text" value="<?= $registro && isset($registro['unidade_medida']) && !in_array($registro['unidade_medida'], array('Unidade', 'Kg', 'Horas'), true) ? $this->escape($registro['unidade_medida']) : '' ?>" id="unidade_medida_outro" maxlength="80" placeholder="Informe a unidade de medida" style="<?= $registro && isset($registro['unidade_medida']) && !in_array($registro['unidade_medida'], array('Unidade', 'Kg', 'Horas'), true) && $registro['unidade_medida'] !== '' ? '' : 'display:none;' ?>">
+						</div>
+					</div>
+					<label class="upload-heading mt-3">Anexe a evidência quantitativa do material relacionado ao projeto.</label>
+					<div class="upload-subtitle">Exemplos: Comprovante de pagamento, recibos, nota fiscal, termo de doação, e-mail, planilha, entre outros.</div>
+					<div class="upload-highlight">Faça upload de até 5 arquivos aceitos. O tamanho máximo é de 100 MB por item.</div>
+					<div id="projeto-dropzone-itens" class="dropzone mb-4">
+						<div class="dz-message">
+							Arraste arquivos aqui ou clique para selecionar.<br>
+							<small>Você pode visualizar e remover os uploads antes de salvar.</small>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="section-card">
+			<div class="section-header">
+				<div>
+					<h2 class="section-title">EVIDÊNCIA DE PESSOAS</h2>
+					<p class="section-subtitle">As PESSOAS se referem à equipe de pessoas envolvidas na execução das atividades e na consecução dos objetivos do projeto, ou o público alvo beneficiado pelo projeto.</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label>Informe o tipo de público relacionado ao projeto.</label></span>
+					<div class="mt-2">
+						<label class="mr-4" for="publico_tipo_interno">
+							<input type="checkbox" name="publico_tipo[]" id="publico_tipo_interno" value="Interno" <?= !empty($registro['publico_tipo']) && strpos((string) $registro['publico_tipo'], 'Interno') !== false ? 'checked' : '' ?>>
+							Interno (colaboradores, equipe do projeto, departamento, outros)
+						</label>
+					</div>
+					<div class="mt-2">
+						<label for="publico_tipo_externo">
+							<input type="checkbox" name="publico_tipo[]" id="publico_tipo_externo" value="Externo" <?= !empty($registro['publico_tipo']) && strpos((string) $registro['publico_tipo'], 'Externo') !== false ? 'checked' : '' ?>>
+							Externo (beneficiários, comunidade, parceiros, outros)
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-6">
+					<span><label for="quantidade_publico_interno">Informe a quantidade do público INTERNO relacionado ao projeto.</label></span>
+					<input class="form-control" name="quantidade_publico_interno" type="number" min="0" step="1" value="<?= $registro && !empty($registro['quantidade_publico_interno']) ? $this->escape($registro['quantidade_publico_interno']) : '' ?>" id="quantidade_publico_interno">
+				</div>
+				<div class="form-group col-md-6">
+					<span><label for="quantidade_publico_externo">Informe a quantidade do público EXTERNO relacionado ao projeto.</label></span>
+					<input class="form-control" name="quantidade_publico_externo" type="number" min="0" step="1" value="<?= $registro && !empty($registro['quantidade_publico_externo']) ? $this->escape($registro['quantidade_publico_externo']) : '' ?>" id="quantidade_publico_externo">
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<label class="upload-heading mt-3">Anexe a evidência quantitativa da participação de pessoas no projeto.</label>
+					<div class="upload-subtitle">Exemplos: Lista de presença, relatório, entre outros.</div>
+					<div class="upload-highlight">Faça upload de até 5 arquivos aceitos. O tamanho máximo é de 100 MB por item.</div>
+					<div id="projeto-dropzone-pessoas" class="dropzone mb-4">
+						<div class="dz-message">
+							Arraste arquivos aqui ou clique para selecionar.<br>
+							<small>Você pode visualizar e remover os uploads antes de salvar.</small>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="section-card">
+			<div class="section-header">
+				<div>
+					<h2 class="section-title">EVIDÊNCIA DE PARCEIROS</h2>
+					<p class="section-subtitle">Os PARCEIROS são instituições externas que colaboram com o projeto, contribuindo com recursos, conhecimentos ou apoio para alcançar os objetivos estabelecidos. Os parceiros podem incluir organizações, empresas, instituições governamentais, ONGs, comunidades locais ou outros grupos interessados que tenham interesse ou envolvimento no projeto.</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-6">
+					<span><label for="quantidade_parceiros">Quantidade de parceiros envolvidos no projeto.</label></span>
+					<input class="form-control" name="quantidade_parceiros" type="number" min="0" step="1" value="<?= $registro && !empty($registro['quantidade_parceiros']) ? $this->escape($registro['quantidade_parceiros']) : '' ?>" id="quantidade_parceiros">
+				</div>
+				<div class="form-group col-md-6">
+					<span><label for="parceiros">Parceiros</label></span>
+					<small class="form-text text-muted">Nome das organizações parceiras do projeto.</small>
+					<input class="form-control" name="parceiros" type="text" value="<?= $registro && !empty($registro['parceiros']) ? $this->escape($registro['parceiros']) : '' ?>" id="parceiros" maxlength="255">
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<label class="upload-heading mt-3">Anexe a evidência quantitativa de parceria do projeto.</label>
+					<div class="upload-subtitle">Exemplo: termos de parceria, termo de doação, contrato, e-mail, entre outros.</div>
+					<div class="upload-highlight">Faça upload de até 5 arquivos aceitos. O tamanho máximo é de 100 MB por item.</div>
+					<div id="projeto-dropzone-parceiros" class="dropzone mb-4">
 						<div class="dz-message">
 							Arraste arquivos aqui ou clique para selecionar.<br>
 							<small>Você pode visualizar e remover os uploads antes de salvar.</small>
@@ -226,10 +358,328 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('#nome').focus();
+		function atualizarCampoUnidadeMedidaOutro() {
+			var exibirOutro = $('#unidade_medida_outro_opcao').is(':checked');
+			$('#unidade_medida_outro').toggle(exibirOutro);
+			if (!exibirOutro) {
+				$('#unidade_medida_outro').val('');
+			}
+		}
+
+		$('input[name="unidade_medida"]').on('change', atualizarCampoUnidadeMedidaOutro);
+		atualizarCampoUnidadeMedidaOutro();
 		$('select#id_usuario').select2({
 			theme: 'bootstrap4',
 			language: 'pt-BR',
 			width: '100%'
+		});
+
+		var arquivosExistentes = <?= $registro && !empty($registro['arquivos']) ? count($registro['arquivos']) : 0 ?>;
+		var arquivosExistentesItens = 0;
+		var arquivosExistentesPessoas = 0;
+		var arquivosExistentesParceiros = 0;
+
+		var dropzoneItens = new Dropzone('#projeto-dropzone-itens', {
+			url: '#',
+			autoProcessQueue: false,
+			uploadMultiple: true,
+			parallelUploads: 5,
+			maxFiles: 5,
+			maxFilesize: 100,
+			addRemoveLinks: true,
+			paramName: 'evidencias_itens',
+			clickable: true,
+			acceptedFiles: '.pdf,.png,.jpg,.jpeg,.gif,.webp,.mp4,.mov,.avi,.wmv,.mp3,.wav,.txt,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.zip,.rar',
+			dictDefaultMessage: 'Arraste arquivos aqui ou clique para selecionar',
+			dictRemoveFile: 'Remover',
+			dictFileTooBig: 'Arquivo muito grande. Tamanho máximo: 100 MB.',
+			dictInvalidFileType: 'Tipo de arquivo não permitido.',
+			init: function() {
+				var dzItens = this;
+				var extensoesImagemItens = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+
+				function renderizarPreviewExistenteItens(mockFile) {
+					if (!mockFile.previewElement) {
+						return;
+					}
+
+					var $preview = $(mockFile.previewElement);
+					var extensao = (mockFile.name.split('.').pop() || '').toLowerCase();
+					var $image = $preview.find('.dz-image');
+
+					$preview.addClass('dz-success dz-complete dz-existing-file');
+					$preview.find('.dz-filename span').wrap('<a target="_blank" href="' + mockFile.url + '"></a>');
+
+					if (extensoesImagemItens.indexOf(extensao) !== -1) {
+						dzItens.emit('thumbnail', mockFile, mockFile.url);
+						return;
+					}
+
+					$image.html('<div class="dropzone-file-icon">' + (extensao ? extensao.toUpperCase() : 'ARQ') + '</div>');
+				}
+
+				<? if ($registro && !empty($registro['arquivos_itens'])): ?>
+					<? foreach ($registro['arquivos_itens'] as $arquivoItem): ?>
+						(function() {
+							var mockFile = {
+								name: <?= json_encode($arquivoItem['nome_original']) ?>,
+								size: <?= (int) ($arquivoItem['tamanho_bytes'] ?: 0) ?>,
+								accepted: true,
+								existing: true,
+								serverId: <?= (int) $arquivoItem['id_projeto_arquivo'] ?>,
+								url: '../../download.php?arquivo=<?= urlencode($arquivoItem['caminho_arquivo']) ?>'
+							};
+							dzItens.emit('addedfile', mockFile);
+							renderizarPreviewExistenteItens(mockFile);
+							dzItens.emit('complete', mockFile);
+							dzItens.files.push(mockFile);
+							arquivosExistentesItens++;
+						})();
+					<? endforeach; ?>
+				<? endif; ?>
+			}
+		});
+
+		dropzoneItens.on('maxfilesexceeded', function(file) {
+			dropzoneItens.removeFile(file);
+			swal({
+				title: 'Atenção!',
+				text: 'A área de itens pode ter no máximo 5 arquivos de evidência.',
+				type: 'error'
+			});
+		});
+		dropzoneItens.on('removedfile', function(file) {
+			if (!file || !file.existing || !file.serverId) {
+				return;
+			}
+
+			$.ajax({
+				type: 'POST',
+				url: '../../projeto/removerarquivo',
+				data: { id: file.serverId },
+				success: function(data) {
+					if (data.trim().length > 0) {
+						swal({
+							title: 'Atenção!',
+							text: data,
+							type: 'error'
+						});
+						carregarTela('../../projeto/cadastro?id_projeto=' + $('#id_projeto').val());
+					} else {
+						arquivosExistentesItens = Math.max(0, arquivosExistentesItens - 1);
+					}
+				},
+				error: function() {
+					swal({
+						title: 'Atenção!',
+						text: 'Não foi possível remover o arquivo.',
+						type: 'error'
+					});
+					carregarTela('../../projeto/cadastro?id_projeto=' + $('#id_projeto').val());
+				}
+			});
+		});
+
+		var dropzonePessoas = new Dropzone('#projeto-dropzone-pessoas', {
+			url: '#',
+			autoProcessQueue: false,
+			uploadMultiple: true,
+			parallelUploads: 5,
+			maxFiles: 5,
+			maxFilesize: 100,
+			addRemoveLinks: true,
+			paramName: 'evidencias_pessoas',
+			clickable: true,
+			acceptedFiles: '.pdf,.png,.jpg,.jpeg,.gif,.webp,.mp4,.mov,.avi,.wmv,.mp3,.wav,.txt,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.zip,.rar',
+			dictDefaultMessage: 'Arraste arquivos aqui ou clique para selecionar',
+			dictRemoveFile: 'Remover',
+			dictFileTooBig: 'Arquivo muito grande. Tamanho máximo: 100 MB.',
+			dictInvalidFileType: 'Tipo de arquivo não permitido.',
+			init: function() {
+				var dzPessoas = this;
+				var extensoesImagemPessoas = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+
+				function renderizarPreviewExistentePessoas(mockFile) {
+					if (!mockFile.previewElement) {
+						return;
+					}
+
+					var $preview = $(mockFile.previewElement);
+					var extensao = (mockFile.name.split('.').pop() || '').toLowerCase();
+					var $image = $preview.find('.dz-image');
+
+					$preview.addClass('dz-success dz-complete dz-existing-file');
+					$preview.find('.dz-filename span').wrap('<a target="_blank" href="' + mockFile.url + '"></a>');
+
+					if (extensoesImagemPessoas.indexOf(extensao) !== -1) {
+						dzPessoas.emit('thumbnail', mockFile, mockFile.url);
+						return;
+					}
+
+					$image.html('<div class="dropzone-file-icon">' + (extensao ? extensao.toUpperCase() : 'ARQ') + '</div>');
+				}
+
+				<? if ($registro && !empty($registro['arquivos_pessoas'])): ?>
+					<? foreach ($registro['arquivos_pessoas'] as $arquivoPessoa): ?>
+						(function() {
+							var mockFile = {
+								name: <?= json_encode($arquivoPessoa['nome_original']) ?>,
+								size: <?= (int) ($arquivoPessoa['tamanho_bytes'] ?: 0) ?>,
+								accepted: true,
+								existing: true,
+								serverId: <?= (int) $arquivoPessoa['id_projeto_arquivo'] ?>,
+								url: '../../download.php?arquivo=<?= urlencode($arquivoPessoa['caminho_arquivo']) ?>'
+							};
+							dzPessoas.emit('addedfile', mockFile);
+							renderizarPreviewExistentePessoas(mockFile);
+							dzPessoas.emit('complete', mockFile);
+							dzPessoas.files.push(mockFile);
+							arquivosExistentesPessoas++;
+						})();
+					<? endforeach; ?>
+				<? endif; ?>
+			}
+		});
+
+		dropzonePessoas.on('maxfilesexceeded', function(file) {
+			dropzonePessoas.removeFile(file);
+			swal({
+				title: 'Atenção!',
+				text: 'A área de pessoas pode ter no máximo 5 arquivos de evidência.',
+				type: 'error'
+			});
+		});
+		dropzonePessoas.on('removedfile', function(file) {
+			if (!file || !file.existing || !file.serverId) {
+				return;
+			}
+
+			$.ajax({
+				type: 'POST',
+				url: '../../projeto/removerarquivo',
+				data: { id: file.serverId },
+				success: function(data) {
+					if (data.trim().length > 0) {
+						swal({
+							title: 'Atenção!',
+							text: data,
+							type: 'error'
+						});
+						carregarTela('../../projeto/cadastro?id_projeto=' + $('#id_projeto').val());
+					} else {
+						arquivosExistentesPessoas = Math.max(0, arquivosExistentesPessoas - 1);
+					}
+				},
+				error: function() {
+					swal({
+						title: 'Atenção!',
+						text: 'Não foi possível remover o arquivo.',
+						type: 'error'
+					});
+					carregarTela('../../projeto/cadastro?id_projeto=' + $('#id_projeto').val());
+				}
+			});
+		});
+
+		var dropzoneParceiros = new Dropzone('#projeto-dropzone-parceiros', {
+			url: '#',
+			autoProcessQueue: false,
+			uploadMultiple: true,
+			parallelUploads: 5,
+			maxFiles: 5,
+			maxFilesize: 100,
+			addRemoveLinks: true,
+			paramName: 'evidencias_parceiros',
+			clickable: true,
+			acceptedFiles: '.pdf,.png,.jpg,.jpeg,.gif,.webp,.mp4,.mov,.avi,.wmv,.mp3,.wav,.txt,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.zip,.rar',
+			dictDefaultMessage: 'Arraste arquivos aqui ou clique para selecionar',
+			dictRemoveFile: 'Remover',
+			dictFileTooBig: 'Arquivo muito grande. Tamanho máximo: 100 MB.',
+			dictInvalidFileType: 'Tipo de arquivo não permitido.',
+			init: function() {
+				var dzParceiros = this;
+				var extensoesImagemParceiros = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+
+				function renderizarPreviewExistenteParceiros(mockFile) {
+					if (!mockFile.previewElement) {
+						return;
+					}
+
+					var $preview = $(mockFile.previewElement);
+					var extensao = (mockFile.name.split('.').pop() || '').toLowerCase();
+					var $image = $preview.find('.dz-image');
+
+					$preview.addClass('dz-success dz-complete dz-existing-file');
+					$preview.find('.dz-filename span').wrap('<a target="_blank" href="' + mockFile.url + '"></a>');
+
+					if (extensoesImagemParceiros.indexOf(extensao) !== -1) {
+						dzParceiros.emit('thumbnail', mockFile, mockFile.url);
+						return;
+					}
+
+					$image.html('<div class="dropzone-file-icon">' + (extensao ? extensao.toUpperCase() : 'ARQ') + '</div>');
+				}
+
+				<? if ($registro && !empty($registro['arquivos_parceiros'])): ?>
+					<? foreach ($registro['arquivos_parceiros'] as $arquivoParceiro): ?>
+						(function() {
+							var mockFile = {
+								name: <?= json_encode($arquivoParceiro['nome_original']) ?>,
+								size: <?= (int) ($arquivoParceiro['tamanho_bytes'] ?: 0) ?>,
+								accepted: true,
+								existing: true,
+								serverId: <?= (int) $arquivoParceiro['id_projeto_arquivo'] ?>,
+								url: '../../download.php?arquivo=<?= urlencode($arquivoParceiro['caminho_arquivo']) ?>'
+							};
+							dzParceiros.emit('addedfile', mockFile);
+							renderizarPreviewExistenteParceiros(mockFile);
+							dzParceiros.emit('complete', mockFile);
+							dzParceiros.files.push(mockFile);
+							arquivosExistentesParceiros++;
+						})();
+					<? endforeach; ?>
+				<? endif; ?>
+			}
+		});
+
+		dropzoneParceiros.on('maxfilesexceeded', function(file) {
+			dropzoneParceiros.removeFile(file);
+			swal({
+				title: 'Atenção!',
+				text: 'A área de parceiros pode ter no máximo 5 arquivos de evidência.',
+				type: 'error'
+			});
+		});
+		dropzoneParceiros.on('removedfile', function(file) {
+			if (!file || !file.existing || !file.serverId) {
+				return;
+			}
+
+			$.ajax({
+				type: 'POST',
+				url: '../../projeto/removerarquivo',
+				data: { id: file.serverId },
+				success: function(data) {
+					if (data.trim().length > 0) {
+						swal({
+							title: 'Atenção!',
+							text: data,
+							type: 'error'
+						});
+						carregarTela('../../projeto/cadastro?id_projeto=' + $('#id_projeto').val());
+					} else {
+						arquivosExistentesParceiros = Math.max(0, arquivosExistentesParceiros - 1);
+					}
+				},
+				error: function() {
+					swal({
+						title: 'Atenção!',
+						text: 'Não foi possível remover o arquivo.',
+						type: 'error'
+					});
+					carregarTela('../../projeto/cadastro?id_projeto=' + $('#id_projeto').val());
+				}
+			});
 		});
 
 		<? if ($this->permissao == 1): ?>
@@ -279,7 +729,6 @@
 		atualizarEmpresaVinculada();
 		<? endif; ?>
 
-		var arquivosExistentes = <?= $registro && !empty($registro['arquivos']) ? count($registro['arquivos']) : 0 ?>;
 		var dropzone = new Dropzone('#projeto-dropzone', {
 			url: '#',
 			autoProcessQueue: false,
@@ -392,10 +841,43 @@
 			var arquivosSelecionados = dropzone.getAcceptedFiles().filter(function(file) {
 				return !file.existing;
 			}).length;
+			var arquivosSelecionadosItens = dropzoneItens.getAcceptedFiles().filter(function(file) {
+				return !file.existing;
+			}).length;
 			if ((arquivosSelecionados + arquivosExistentes) > 5) {
 				swal({
 					title: "Atenção!",
 					text: "O projeto pode ter no máximo 5 arquivos de evidência.",
+					type: "error"
+				});
+				return false;
+			}
+			if ((arquivosSelecionadosItens + arquivosExistentesItens) > 5) {
+				swal({
+					title: "Atenção!",
+					text: "A área de itens pode ter no máximo 5 arquivos de evidência.",
+					type: "error"
+				});
+				return false;
+			}
+			var arquivosSelecionadosPessoas = dropzonePessoas.getAcceptedFiles().filter(function(file) {
+				return !file.existing;
+			}).length;
+			if ((arquivosSelecionadosPessoas + arquivosExistentesPessoas) > 5) {
+				swal({
+					title: "Atenção!",
+					text: "A área de pessoas pode ter no máximo 5 arquivos de evidência.",
+					type: "error"
+				});
+				return false;
+			}
+			var arquivosSelecionadosParceiros = dropzoneParceiros.getAcceptedFiles().filter(function(file) {
+				return !file.existing;
+			}).length;
+			if ((arquivosSelecionadosParceiros + arquivosExistentesParceiros) > 5) {
+				swal({
+					title: "Atenção!",
+					text: "A área de parceiros pode ter no máximo 5 arquivos de evidência.",
 					type: "error"
 				});
 				return false;
@@ -406,6 +888,21 @@
 			dropzone.getAcceptedFiles().forEach(function(file) {
 				if (!file.existing) {
 					formData.append('evidencias[]', file, file.name);
+				}
+			});
+			dropzoneItens.getAcceptedFiles().forEach(function(file) {
+				if (!file.existing) {
+					formData.append('evidencias_itens[]', file, file.name);
+				}
+			});
+			dropzonePessoas.getAcceptedFiles().forEach(function(file) {
+				if (!file.existing) {
+					formData.append('evidencias_pessoas[]', file, file.name);
+				}
+			});
+			dropzoneParceiros.getAcceptedFiles().forEach(function(file) {
+				if (!file.existing) {
+					formData.append('evidencias_parceiros[]', file, file.name);
 				}
 			});
 			$.ajax({
@@ -423,7 +920,13 @@
 							type: "error"
 						});
 					} else {
-						carregarTela('../../projeto');
+						swal({
+							title: "Sucesso!",
+							text: <?= json_encode($mensagemSucessoProjeto, JSON_UNESCAPED_UNICODE) ?>,
+							type: "success"
+						}, function() {
+							carregarTela('../../projeto');
+						});
 					}
 				},
 				error: function() {

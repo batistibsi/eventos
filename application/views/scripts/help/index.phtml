@@ -1,0 +1,43 @@
+<? $registro = $this->registro ?? array(); ?>
+<? $conteudo = !empty($registro['help_conteudo']) ? preg_split('/\r\n|\r|\n/', (string) $registro['help_conteudo']) : array(); ?>
+<? $whatsNumero = !empty($registro['help_contato_whatsapp']) ? preg_replace('/\D+/', '', (string) $registro['help_contato_whatsapp']) : ''; ?>
+<div class="content-page">
+	<div class="content-page__header">
+		<h1 class="content-page__title">Ajuda</h1>
+	</div>
+
+	<div class="section-card">
+		<div class="section-header">
+			<div>
+				<h2 class="section-title"><?= $this->escape($registro['help_titulo'] ?? 'Cadastro de Projetos') ?></h2>
+				<p class="section-subtitle"><?= $this->escape($registro['help_subtitulo'] ?? '') ?></p>
+			</div>
+		</div>
+		<div class="detalhe-valor">
+			<? foreach ($conteudo as $paragrafo): ?>
+				<? if (trim($paragrafo) !== ''): ?>
+					<p><?= nl2br($this->escape($paragrafo)) ?></p>
+				<? endif; ?>
+			<? endforeach; ?>
+		</div>
+	</div>
+
+	<div class="section-card">
+		<div class="section-header">
+			<div>
+				<h2 class="section-title">Em caso de dúvidas</h2>
+			</div>
+		</div>
+		<div class="detalhe-valor">
+			<div class="detalhe-card" style="max-width: 420px;">
+				<div class="detalhe-card-body" style="padding: 24px;">
+					<div class="field-label mb-2">Atendimento</div>
+					<div class="mb-3"><strong><?= $this->escape($registro['help_contato_nome'] ?? '') ?></strong></div>
+					<a href="https://wa.me/55<?= $this->escape($whatsNumero) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-success">
+						<i class="fa fa-whatsapp" aria-hidden="true"></i> <?= $this->escape($registro['help_contato_whatsapp'] ?? '') ?>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

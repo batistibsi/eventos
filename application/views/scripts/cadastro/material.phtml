@@ -1,4 +1,116 @@
-<? $registro = !empty($this->registro) && is_array($this->registro) ? $this->registro : array(); ?>
+<?php
+$registro = !empty($this->registro) && is_array($this->registro) ? $this->registro : array();
+$videos = array();
+$linhasVideos = preg_split('/\r\n|\r|\n/', (string) ($registro['material_videos_secundarios'] ?? ''));
+foreach ($linhasVideos as $linhaVideo) {
+	$linhaVideo = trim((string) $linhaVideo);
+	if ($linhaVideo === '') {
+		continue;
+	}
+
+	$partesVideo = array_map('trim', explode('|', $linhaVideo, 2));
+	$videos[] = array(
+		'titulo' => $partesVideo[0] ?? '',
+		'url' => $partesVideo[1] ?? ''
+	);
+
+	if (count($videos) >= 6) {
+		break;
+	}
+}
+
+for ($i = count($videos); $i < 6; $i++) {
+	$videos[] = array(
+		'titulo' => '',
+		'url' => ''
+	);
+}
+
+$arquivos = array();
+$linhasArquivos = preg_split('/\r\n|\r|\n/', (string) ($registro['material_arquivos'] ?? ''));
+foreach ($linhasArquivos as $linhaArquivo) {
+	$linhaArquivo = trim((string) $linhaArquivo);
+	if ($linhaArquivo === '') {
+		continue;
+	}
+
+	$partesArquivo = array_map('trim', explode('|', $linhaArquivo, 2));
+	$arquivos[] = array(
+		'titulo' => $partesArquivo[0] ?? '',
+		'url' => $partesArquivo[1] ?? ''
+	);
+
+	if (count($arquivos) >= 4) {
+		break;
+	}
+}
+
+for ($i = count($arquivos); $i < 4; $i++) {
+	$arquivos[] = array(
+		'titulo' => '',
+		'url' => ''
+	);
+}
+?>
+<style>
+	.material-config-card {
+		background: linear-gradient(180deg, #f7fafd 0%, #f2f7fb 100%);
+		border: 1px solid #dbe6f1;
+		border-radius: 14px;
+		box-shadow: none;
+		padding: 18px 18px 16px;
+	}
+
+	.material-config-card .form-group:last-child {
+		margin-bottom: 0;
+	}
+
+	.material-config-card label {
+		color: #3f5874;
+		font-weight: 600;
+	}
+
+	.material-config-card .form-control {
+		border-color: #cfdceb;
+	}
+
+	.material-config-card .form-control:focus {
+		border-color: #7fa8d6;
+		box-shadow: 0 0 0 0.12rem rgba(52, 122, 183, 0.16);
+	}
+
+	.material-config-card .form-control-file {
+		background: #fff;
+		border: 1px dashed #bfd2e6;
+		border-radius: 10px;
+		color: #52708f;
+		padding: 10px 12px;
+		width: 100%;
+	}
+
+	.material-config-card .form-text {
+		color: #69819c !important;
+	}
+
+	.material-config-card .form-text a {
+		color: #2f6fad;
+		font-weight: 600;
+		text-decoration: none;
+	}
+
+	.material-config-card .form-text a:hover {
+		text-decoration: underline;
+	}
+
+	.material-config-section-label {
+		color: #48627e;
+		font-size: .82rem;
+		font-weight: 700;
+		letter-spacing: .04em;
+		margin-bottom: 0;
+		text-transform: uppercase;
+	}
+</style>
 <div class="content-page">
 	<div class="content-page__header">
 		<h1 class="content-page__title">Configuração da Tela de Material</h1>
@@ -7,7 +119,7 @@
 		</div>
 	</div>
 
-	<form id="form-material-config" class="projeto-form" novalidate>
+	<form id="form-material-config" class="projeto-form" novalidate enctype="multipart/form-data">
 		<div class="section-card">
 			<div class="section-header">
 				<div>
@@ -21,8 +133,16 @@
 					<input class="form-control" name="material_titulo" id="material_titulo" maxlength="150" value="<?= $this->escape($registro['material_titulo'] ?? '') ?>" required>
 				</div>
 				<div class="form-group col-md-12">
-					<span><label for="material_video_principal_link">Link do video principal: </label></span>
-					<input class="form-control" name="material_video_principal_link" id="material_video_principal_link" value="<?= $this->escape($registro['material_video_principal_link'] ?? '') ?>" placeholder="https://www.youtube.com/watch?v=...">
+					<span><label for="material_video_principal_upload">Video principal: </label></span>
+					<input type="hidden" name="material_video_principal_atual" value="<?= $this->escape($registro['material_video_principal_link'] ?? '') ?>">
+					<input class="form-control-file" type="file" name="material_video_principal_upload" id="material_video_principal_upload">
+					<small class="form-text text-muted">Envie o arquivo do video principal. O sistema gera o link interno automaticamente.</small>
+					<? if (!empty($registro['material_video_principal_link'])) : ?>
+						<small class="form-text text-muted">
+							Video atual:
+							<a href="<?= $this->escape($registro['material_video_principal_link']) ?>" target="_blank" rel="noopener noreferrer">abrir video</a>
+						</small>
+					<? endif; ?>
 				</div>
 			</div>
 		</div>
@@ -31,14 +151,35 @@
 			<div class="section-header">
 				<div>
 					<h2 class="section-title">Videos secundarios</h2>
-					<p class="section-subtitle">Use uma linha por card no formato: Titulo | URL</p>
+					<p class="section-subtitle">Nos cards de video, informe o nome e envie o arquivo. O sistema gera o link interno automaticamente para uso no dashboard.</p>
 				</div>
 			</div>
 			<div class="row">
 				<div class="form-group col-md-12">
-					<span><label for="material_videos_secundarios">Cards de video: </label></span>
-					<textarea class="form-control" name="material_videos_secundarios" id="material_videos_secundarios" rows="7"><?= $this->escape($registro['material_videos_secundarios'] ?? '') ?></textarea>
+					<label class="material-config-section-label">Cards de video</label>
 				</div>
+				<? foreach ($videos as $indice => $video): ?>
+					<div class="form-group col-md-6">
+						<div class="material-config-card h-100">
+							<div class="form-group">
+								<span><label for="material_videos_secundarios_titulo_<?= $indice ?>">Nome do video <?= $indice + 1 ?>: </label></span>
+								<input class="form-control material-video-titulo" name="material_videos_secundarios_titulo[<?= $indice ?>]" id="material_videos_secundarios_titulo_<?= $indice ?>" maxlength="150" value="<?= $this->escape($video['titulo']) ?>">
+								<input type="hidden" name="material_videos_secundarios_atual[<?= $indice ?>]" value="<?= $this->escape($video['url']) ?>">
+							</div>
+							<div class="form-group mb-0">
+								<span><label for="material_videos_secundarios_upload_<?= $indice ?>">Arquivo do video <?= $indice + 1 ?>: </label></span>
+								<input class="form-control-file material-video-upload" type="file" name="material_videos_secundarios_upload[<?= $indice ?>]" id="material_videos_secundarios_upload_<?= $indice ?>">
+								<small class="form-text text-muted">Aceita videos e outros formatos permitidos de ate 100 MB.</small>
+								<? if (!empty($video['url'])) : ?>
+									<small class="form-text text-muted">
+										Video atual:
+										<a href="<?= $this->escape($video['url']) ?>" target="_blank" rel="noopener noreferrer">abrir video</a>
+									</small>
+								<? endif; ?>
+							</div>
+						</div>
+					</div>
+				<? endforeach; ?>
 			</div>
 		</div>
 
@@ -46,15 +187,42 @@
 			<div class="section-header">
 				<div>
 					<h2 class="section-title">Arquivos e links</h2>
-					<p class="section-subtitle">Arquivos e lista final tambem usam uma linha por item no formato: Titulo | URL</p>
+					<p class="section-subtitle">Nos cards de arquivos, informe o nome e envie o arquivo. O sistema gera o link interno automaticamente para uso no dashboard.</p>
 				</div>
 			</div>
 			<div class="row">
-				<div class="form-group col-md-6">
-					<span><label for="material_arquivos">Cards de arquivos: </label></span>
-					<textarea class="form-control" name="material_arquivos" id="material_arquivos" rows="6"><?= $this->escape($registro['material_arquivos'] ?? '') ?></textarea>
+				<div class="form-group col-md-12">
+					<label class="material-config-section-label">Cards de arquivos</label>
 				</div>
-				<div class="form-group col-md-6">
+				<? foreach ($arquivos as $indice => $arquivo): ?>
+					<div class="form-group col-md-6">
+						<div class="material-config-card h-100">
+							<div class="form-group">
+								<span><label for="material_arquivos_titulo_<?= $indice ?>">Nome do arquivo <?= $indice + 1 ?>: </label></span>
+								<input
+									class="form-control material-arquivo-titulo"
+									name="material_arquivos_titulo[<?= $indice ?>]"
+									id="material_arquivos_titulo_<?= $indice ?>"
+									maxlength="150"
+									value="<?= $this->escape($arquivo['titulo']) ?>"
+									data-file-input="#material_arquivos_upload_<?= $indice ?>">
+								<input type="hidden" name="material_arquivos_atual[<?= $indice ?>]" value="<?= $this->escape($arquivo['url']) ?>">
+							</div>
+							<div class="form-group mb-0">
+								<span><label for="material_arquivos_upload_<?= $indice ?>">Arquivo <?= $indice + 1 ?>: </label></span>
+								<input class="form-control-file material-arquivo-upload" type="file" name="material_arquivos_upload[<?= $indice ?>]" id="material_arquivos_upload_<?= $indice ?>">
+								<small class="form-text text-muted">Aceita documentos, planilhas, imagens, audio, video e compactados de ate 100 MB.</small>
+								<? if (!empty($arquivo['url'])) : ?>
+									<small class="form-text text-muted">
+										Arquivo atual:
+										<a href="<?= $this->escape($arquivo['url']) ?>" target="_blank" rel="noopener noreferrer">abrir arquivo</a>
+									</small>
+								<? endif; ?>
+							</div>
+						</div>
+					</div>
+				<? endforeach; ?>
+				<div class="form-group col-md-12">
 					<span><label for="material_links_lista">Lista de links: </label></span>
 					<textarea class="form-control" name="material_links_lista" id="material_links_lista" rows="6"><?= $this->escape($registro['material_links_lista'] ?? '') ?></textarea>
 				</div>
@@ -77,11 +245,38 @@
 				return false;
 			}
 
+			var possuiErro = false;
+			$('.material-video-upload, .material-arquivo-upload').each(function() {
+				var inputArquivo = $(this);
+				var possuiArquivoNovo = (inputArquivo.val() || '').trim().length > 0;
+				if (!possuiArquivoNovo) {
+					return;
+				}
+
+				var seletorTitulo = inputArquivo.closest('.section-card').find('.material-video-titulo, .material-arquivo-titulo').first();
+				var titulo = (seletorTitulo.val() || '').trim();
+				if (!titulo.length) {
+					possuiErro = true;
+				}
+			});
+
+			if (possuiErro) {
+				swal({
+					title: "Atencao!",
+					text: "Informe o nome em cada card de video ou arquivo que possuir upload.",
+					type: "error"
+				});
+				return false;
+			}
+
 			$('.salvar-material').hide();
+			var formData = new FormData(this);
 			$.ajax({
 				type: "POST",
 				url: "../../cadastro/salvamaterial",
-				data: $(this).serialize(),
+				data: formData,
+				processData: false,
+				contentType: false,
 				success: function(data) {
 					if (data.trim().length > 0) {
 						$('.salvar-material').show();

@@ -864,6 +864,9 @@ table td .btn-group > .btn,
 }
 
 #projeto-dropzone,
+#projeto-dropzone-itens,
+#projeto-dropzone-pessoas,
+#projeto-dropzone-parceiros,
 #dashboard-dropzone {
   align-items: start;
   background: #f8fbff;
@@ -871,12 +874,16 @@ table td .btn-group > .btn,
   border-radius: 14px;
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 260px));
+  justify-content: start;
   min-height: 180px;
   padding: 18px;
 }
 
 #projeto-dropzone .dz-message,
+#projeto-dropzone-itens .dz-message,
+#projeto-dropzone-pessoas .dz-message,
+#projeto-dropzone-parceiros .dz-message,
 #dashboard-dropzone .dz-message {
   color: #56708f;
   font-weight: 600;
@@ -887,18 +894,25 @@ table td .btn-group > .btn,
 }
 
 #projeto-dropzone .dz-preview,
+#projeto-dropzone-itens .dz-preview,
+#projeto-dropzone-pessoas .dz-preview,
+#projeto-dropzone-parceiros .dz-preview,
 #dashboard-dropzone .dz-preview {
   background: #fff;
   border: 1px solid #d9e4f0;
   border-radius: 16px;
   box-shadow: var(--page-shadow);
   margin: 0;
+  max-width: 260px;
   min-height: 220px;
   padding: 12px 12px 16px;
   width: 100%;
 }
 
 #projeto-dropzone .dz-preview .dz-image,
+#projeto-dropzone-itens .dz-preview .dz-image,
+#projeto-dropzone-pessoas .dz-preview .dz-image,
+#projeto-dropzone-parceiros .dz-preview .dz-image,
 #dashboard-dropzone .dz-preview .dz-image {
   align-items: center;
   background: linear-gradient(180deg, #f7f9fc 0%, #eef3f8 100%);
@@ -912,6 +926,9 @@ table td .btn-group > .btn,
 }
 
 #projeto-dropzone .dz-preview .dz-image .dropzone-file-icon,
+#projeto-dropzone-itens .dz-preview .dz-image .dropzone-file-icon,
+#projeto-dropzone-pessoas .dz-preview .dz-image .dropzone-file-icon,
+#projeto-dropzone-parceiros .dz-preview .dz-image .dropzone-file-icon,
 #dashboard-dropzone .dz-preview .dz-image .dropzone-file-icon {
   align-items: center;
   background: linear-gradient(180deg, #315d8f 0%, #264061 100%);
@@ -928,6 +945,9 @@ table td .btn-group > .btn,
 }
 
 #projeto-dropzone .dz-preview .dz-image img,
+#projeto-dropzone-itens .dz-preview .dz-image img,
+#projeto-dropzone-pessoas .dz-preview .dz-image img,
+#projeto-dropzone-parceiros .dz-preview .dz-image img,
 #dashboard-dropzone .dz-preview .dz-image img {
   height: 100%;
   object-fit: cover;
@@ -935,6 +955,9 @@ table td .btn-group > .btn,
 }
 
 #projeto-dropzone .dz-preview .dz-details,
+#projeto-dropzone-itens .dz-preview .dz-details,
+#projeto-dropzone-pessoas .dz-preview .dz-details,
+#projeto-dropzone-parceiros .dz-preview .dz-details,
 #dashboard-dropzone .dz-preview .dz-details {
   min-height: 54px;
   opacity: 1;
@@ -944,6 +967,9 @@ table td .btn-group > .btn,
 }
 
 #projeto-dropzone .dz-preview .dz-size,
+#projeto-dropzone-itens .dz-preview .dz-size,
+#projeto-dropzone-pessoas .dz-preview .dz-size,
+#projeto-dropzone-parceiros .dz-preview .dz-size,
 #dashboard-dropzone .dz-preview .dz-size {
   background: transparent;
   color: #5f7592;
@@ -957,6 +983,21 @@ table td .btn-group > .btn,
 #projeto-dropzone .dz-preview .dz-filename span,
 #projeto-dropzone .dz-preview:hover .dz-filename,
 #projeto-dropzone .dz-preview:hover .dz-filename span,
+#projeto-dropzone-itens .dz-preview .dz-size span,
+#projeto-dropzone-itens .dz-preview .dz-filename,
+#projeto-dropzone-itens .dz-preview .dz-filename span,
+#projeto-dropzone-itens .dz-preview:hover .dz-filename,
+#projeto-dropzone-itens .dz-preview:hover .dz-filename span,
+#projeto-dropzone-pessoas .dz-preview .dz-size span,
+#projeto-dropzone-pessoas .dz-preview .dz-filename,
+#projeto-dropzone-pessoas .dz-preview .dz-filename span,
+#projeto-dropzone-pessoas .dz-preview:hover .dz-filename,
+#projeto-dropzone-pessoas .dz-preview:hover .dz-filename span,
+#projeto-dropzone-parceiros .dz-preview .dz-size span,
+#projeto-dropzone-parceiros .dz-preview .dz-filename,
+#projeto-dropzone-parceiros .dz-preview .dz-filename span,
+#projeto-dropzone-parceiros .dz-preview:hover .dz-filename,
+#projeto-dropzone-parceiros .dz-preview:hover .dz-filename span,
 #dashboard-dropzone .dz-preview .dz-size span,
 #dashboard-dropzone .dz-preview .dz-filename,
 #dashboard-dropzone .dz-preview .dz-filename span,
@@ -966,6 +1007,9 @@ table td .btn-group > .btn,
 }
 
 #projeto-dropzone .dz-preview .dz-filename,
+#projeto-dropzone-itens .dz-preview .dz-filename,
+#projeto-dropzone-pessoas .dz-preview .dz-filename,
+#projeto-dropzone-parceiros .dz-preview .dz-filename,
 #dashboard-dropzone .dz-preview .dz-filename {
   color: var(--page-text);
   display: block;
@@ -979,6 +1023,9 @@ table td .btn-group > .btn,
 }
 
 #projeto-dropzone .dz-preview .dz-filename span,
+#projeto-dropzone-itens .dz-preview .dz-filename span,
+#projeto-dropzone-pessoas .dz-preview .dz-filename span,
+#projeto-dropzone-parceiros .dz-preview .dz-filename span,
 #dashboard-dropzone .dz-preview .dz-filename span {
   display: block;
   overflow: hidden;
@@ -991,6 +1038,18 @@ table td .btn-group > .btn,
 #projeto-dropzone .dz-preview .dz-error-mark,
 #projeto-dropzone .dz-preview .dz-error-message,
 #projeto-dropzone .dz-preview .dz-progress,
+#projeto-dropzone-itens .dz-preview .dz-success-mark,
+#projeto-dropzone-itens .dz-preview .dz-error-mark,
+#projeto-dropzone-itens .dz-preview .dz-error-message,
+#projeto-dropzone-itens .dz-preview .dz-progress,
+#projeto-dropzone-pessoas .dz-preview .dz-success-mark,
+#projeto-dropzone-pessoas .dz-preview .dz-error-mark,
+#projeto-dropzone-pessoas .dz-preview .dz-error-message,
+#projeto-dropzone-pessoas .dz-preview .dz-progress,
+#projeto-dropzone-parceiros .dz-preview .dz-success-mark,
+#projeto-dropzone-parceiros .dz-preview .dz-error-mark,
+#projeto-dropzone-parceiros .dz-preview .dz-error-message,
+#projeto-dropzone-parceiros .dz-preview .dz-progress,
 #dashboard-dropzone .dz-preview .dz-success-mark,
 #dashboard-dropzone .dz-preview .dz-error-mark,
 #dashboard-dropzone .dz-preview .dz-error-message,
@@ -999,6 +1058,9 @@ table td .btn-group > .btn,
 }
 
 #projeto-dropzone .dz-preview .dz-remove,
+#projeto-dropzone-itens .dz-preview .dz-remove,
+#projeto-dropzone-pessoas .dz-preview .dz-remove,
+#projeto-dropzone-parceiros .dz-preview .dz-remove,
 #dashboard-dropzone .dz-preview .dz-remove {
   color: #c0392b;
   display: inline-block;
@@ -1869,10 +1931,16 @@ table td .btn-group > .btn,
     border-collapse: separate;
     border-spacing: 0 12px;
     min-width: 0;
+    width: 100% !important;
   }
 
   .projeto-table thead {
     display: none;
+  }
+
+  .projeto-table.dataTable,
+  .projeto-table.dataTable.no-footer {
+    width: 100% !important;
   }
 
   .projeto-table tbody,
@@ -1955,6 +2023,14 @@ table td .btn-group > .btn,
 
   .projeto-table .projeto-table__ods-image {
     width: 44px;
+  }
+
+  .projeto-table-wrapper .dataTables_wrapper,
+  .projeto-table-wrapper .dataTables_scroll,
+  .projeto-table-wrapper .dataTables_scrollHead,
+  .projeto-table-wrapper .dataTables_scrollBody {
+    width: 100% !important;
+    overflow: visible !important;
   }
 
   .projeto-detalhe-ods-principal {

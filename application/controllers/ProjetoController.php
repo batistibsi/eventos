@@ -10,9 +10,11 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->permissao = Zend_Registry::get('permissao');
 		$this->view->registros = Projeto::lista(Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
 		$ehAdmin = Zend_Registry::get('permissao') == 1;
+		$atingiuLimiteProjetos = !$ehAdmin && Projeto::quantidadeProjetosUsuario(Zend_Registry::get('id_usuario')) >= Projeto::MAX_PROJETOS_POR_USUARIO;
 		$this->view->mostrarBotaoSubmeter = !$ehAdmin && Projeto::todosListadosNoStatus(0, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
-		$this->view->mostrarBotaoNovo = $ehAdmin || !Projeto::existeListadoNoStatus(1, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+		$this->view->mostrarBotaoNovo = $ehAdmin || (!$atingiuLimiteProjetos && !Projeto::existeListadoNoStatus(1, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao')));
 		$this->view->permitirEditarExcluir = $ehAdmin || $this->view->mostrarBotaoNovo;
+		$this->view->atingiuLimiteProjetos = $atingiuLimiteProjetos;
 	}
 
 	public function cadastroAction()
@@ -86,11 +88,37 @@ class ProjetoController extends Zend_Controller_Action
 		$campos['objetivos'] = !empty($_REQUEST['objetivos']) ? $_REQUEST['objetivos'] : null;
 		$campos['ods_principal'] = !empty($_REQUEST['ods_principal']) ? $_REQUEST['ods_principal'] : null;
 		$campos['demais_ods_relacionados'] = isset($_REQUEST['demais_ods_relacionados']) ? $_REQUEST['demais_ods_relacionados'] : array();
+		$campos['tipo_item'] = !empty($_REQUEST['tipo_item']) ? $_REQUEST['tipo_item'] : null;
+		$campos['quantidade_itens'] = isset($_REQUEST['quantidade_itens']) && $_REQUEST['quantidade_itens'] !== '' ? $_REQUEST['quantidade_itens'] : null;
+		$campos['unidade_medida'] = !empty($_REQUEST['unidade_medida']) ? $_REQUEST['unidade_medida'] : null;
+		$campos['unidade_medida_outro'] = !empty($_REQUEST['unidade_medida_outro']) ? $_REQUEST['unidade_medida_outro'] : null;
+		$campos['publico_tipo'] = isset($_REQUEST['publico_tipo']) ? $_REQUEST['publico_tipo'] : array();
+		$campos['quantidade_publico_interno'] = isset($_REQUEST['quantidade_publico_interno']) && $_REQUEST['quantidade_publico_interno'] !== '' ? $_REQUEST['quantidade_publico_interno'] : null;
+		$campos['quantidade_publico_externo'] = isset($_REQUEST['quantidade_publico_externo']) && $_REQUEST['quantidade_publico_externo'] !== '' ? $_REQUEST['quantidade_publico_externo'] : null;
+		$campos['quantidade_parceiros'] = isset($_REQUEST['quantidade_parceiros']) && $_REQUEST['quantidade_parceiros'] !== '' ? $_REQUEST['quantidade_parceiros'] : null;
+		$campos['parceiros'] = !empty($_REQUEST['parceiros']) ? $_REQUEST['parceiros'] : null;
 
 		if (!$idProjeto) {
-			$result = Projeto::insert($campos, Zend_Registry::get('permissao'), Zend_Registry::get('id_usuario'), isset($_FILES['evidencias']) ? $_FILES['evidencias'] : null);
+			$result = Projeto::insert(
+				$campos,
+				Zend_Registry::get('permissao'),
+				Zend_Registry::get('id_usuario'),
+				isset($_FILES['evidencias']) ? $_FILES['evidencias'] : null,
+				isset($_FILES['evidencias_itens']) ? $_FILES['evidencias_itens'] : null,
+				isset($_FILES['evidencias_pessoas']) ? $_FILES['evidencias_pessoas'] : null,
+				isset($_FILES['evidencias_parceiros']) ? $_FILES['evidencias_parceiros'] : null
+			);
 		} else {
-			$result = Projeto::update($idProjeto, $campos, Zend_Registry::get('permissao'), Zend_Registry::get('id_usuario'), isset($_FILES['evidencias']) ? $_FILES['evidencias'] : null);
+			$result = Projeto::update(
+				$idProjeto,
+				$campos,
+				Zend_Registry::get('permissao'),
+				Zend_Registry::get('id_usuario'),
+				isset($_FILES['evidencias']) ? $_FILES['evidencias'] : null,
+				isset($_FILES['evidencias_itens']) ? $_FILES['evidencias_itens'] : null,
+				isset($_FILES['evidencias_pessoas']) ? $_FILES['evidencias_pessoas'] : null,
+				isset($_FILES['evidencias_parceiros']) ? $_FILES['evidencias_parceiros'] : null
+			);
 		}
 
 		if (!$result) echo Projeto::$erro;

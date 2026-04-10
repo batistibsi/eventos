@@ -1,0 +1,100 @@
+<? $registro = $this->registro; ?>
+<div class="content-page">
+	<div class="content-page__header">
+		<h1 class="content-page__title">Configurar Help</h1>
+		<div class="content-page__toolbar">
+			<button type="button" onclick="carregarTela('../../cadastro')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
+		</div>
+	</div>
+
+	<form id="form-help-config" class="projeto-form" novalidate>
+		<div class="section-card">
+			<div class="section-header">
+				<div>
+					<h2 class="section-title">Página de Help</h2>
+					<p class="section-subtitle">Personalize os textos e o contato apresentados ao usuário na área de ajuda.</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label for="help_titulo">Título: </label></span>
+					<input class="form-control" name="help_titulo" id="help_titulo" type="text" maxlength="150" value="<?= $this->escape($registro['help_titulo'] ?? '') ?>" required>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label for="help_subtitulo">Subtítulo: </label></span>
+					<input class="form-control" name="help_subtitulo" id="help_subtitulo" type="text" maxlength="255" value="<?= $this->escape($registro['help_subtitulo'] ?? '') ?>">
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label for="help_conteudo">Conteúdo: </label></span>
+					<textarea class="form-control" name="help_conteudo" id="help_conteudo" rows="10" required><?= $this->escape($registro['help_conteudo'] ?? '') ?></textarea>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-6">
+					<span><label for="help_contato_nome">Nome do contato: </label></span>
+					<input class="form-control" name="help_contato_nome" id="help_contato_nome" type="text" maxlength="150" value="<?= $this->escape($registro['help_contato_nome'] ?? '') ?>" required>
+				</div>
+				<div class="form-group col-md-6">
+					<span><label for="help_contato_whatsapp">WhatsApp: </label></span>
+					<input class="form-control" name="help_contato_whatsapp" id="help_contato_whatsapp" type="text" maxlength="20" value="<?= $this->escape($registro['help_contato_whatsapp'] ?? '') ?>" required>
+				</div>
+			</div>
+		</div>
+
+		<div class="row mt-4 mb-3">
+			<div class="form-group col-md-12 text-right">
+				<button class="btn btn-success salvar"><span class="glyphicon glyphicon-floppy-disk"></span><i class="fa fa-floppy-o fa-lg"></i> Salvar</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#form-help-config').submit(function(e) {
+			e.preventDefault();
+
+			if (!this.checkValidity()) {
+				this.reportValidity();
+				return false;
+			}
+
+			$('.salvar').hide();
+			$.ajax({
+				type: "POST",
+				url: "../../cadastro/salvahelp",
+				data: $(this).serialize(),
+				success: function(data) {
+					if (data.trim().length > 0) {
+						$('.salvar').show();
+						swal({
+							title: "Atenção!",
+							text: data,
+							type: "error"
+						});
+					} else {
+						swal({
+							title: "Sucesso!",
+							text: "Configurações da página de help salvas com sucesso.",
+							type: "success"
+						}, function() {
+							carregarTela('../../cadastro/help');
+						});
+					}
+				},
+				error: function() {
+					$('.salvar').show();
+					swal({
+						title: "Atenção!",
+						text: "Não foi possível salvar as configurações da página de help.",
+						type: "error"
+					});
+				}
+			});
+		});
+	});
+</script>

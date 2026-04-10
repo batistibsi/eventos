@@ -4,6 +4,7 @@ class Projeto
 	public static $erro;
 	const MAX_NOME = 150;
 	const MAX_RESPONSAVEL = 120;
+	const MAX_PROJETOS_POR_USUARIO = 15;
 
 	public static function statusOpcoes()
 	{
@@ -21,6 +22,11 @@ class Projeto
 		$status = (int) $status;
 		$opcoes = self::statusOpcoes();
 		return isset($opcoes[$status]) ? $opcoes[$status] : 'Desconhecido';
+	}
+
+	private static function tipoEvidenciaValido($tipo)
+	{
+		return in_array($tipo, array('qualitativa', 'itens', 'pessoas', 'parceiros'), true);
 	}
 
 	private static function podeEditarRegistro($registro, $permissao = null, $idUsuarioLogado = null)
@@ -100,8 +106,13 @@ class Projeto
 		return $extensao;
 	}
 
-	private static function salvarArquivosEvidencia($idProjeto, $arquivos)
+	private static function salvarArquivosEvidencia($idProjeto, $arquivos, $tipoEvidencia = 'qualitativa')
 	{
+		if (!self::tipoEvidenciaValido($tipoEvidencia)) {
+			self::$erro = 'Tipo de evidencia invalido.';
+			return false;
+		}
+
 		$arquivos = self::normalizarArquivos($arquivos);
 		if (!count($arquivos)) {
 			return array();
@@ -144,6 +155,7 @@ class Projeto
 
 			$registro = array(
 				'id_projeto' => (int) $idProjeto,
+				'tipo_evidencia' => $tipoEvidencia,
 				'nome_original' => substr((string) $arquivo['name'], 0, 255),
 				'caminho_arquivo' => 'projetos/' . $nomeFisico,
 				'tamanho_bytes' => (int) ($arquivo['size'] ?? 0),
@@ -157,10 +169,14 @@ class Projeto
 		return $salvos;
 	}
 
-	public static function listaArquivos($idProjeto)
+	public static function listaArquivos($idProjeto, $tipoEvidencia = null)
 	{
 		$db = Zend_Registry::get('db');
-		return $db->fetchAll('select * from eventos_projeto_arquivo where id_projeto = ' . (int) $idProjeto . ' order by id_projeto_arquivo asc');
+		$where = ' where id_projeto = ' . (int) $idProjeto;
+		if ($tipoEvidencia && self::tipoEvidenciaValido($tipoEvidencia)) {
+			$where .= " and coalesce(tipo_evidencia, 'qualitativa') = " . $db->quote($tipoEvidencia);
+		}
+		return $db->fetchAll('select * from eventos_projeto_arquivo' . $where . ' order by id_projeto_arquivo asc');
 	}
 
 	public static function removerArquivo($idProjetoArquivo, $idUsuarioLogado = null, $permissao = null)
@@ -173,7 +189,7 @@ class Projeto
 			return false;
 		}
 
-		$select = "select a.*, p.id_usuario
+		$select = "select a.*, p.id_usuario, p.status_projeto
 				from eventos_projeto_arquivo a
 				inner join eventos_projeto p on p.id_projeto = a.id_projeto
 				where a.id_projeto_arquivo = " . $idProjetoArquivo;
@@ -220,6 +236,13 @@ class Projeto
 
 		$select = "select p.*,
 					u.nome as nome_usuario,
+					(
+						select i.nome_organizacao
+						from eventos_inscricao i
+						where i.id_usuario = p.id_usuario
+						order by i.id_inscricao desc
+						limit 1
+					) as nome_organizacao,
 					e.titulo as titulo_evento,
 					e.data_hora
 				from eventos_projeto p
@@ -235,7 +258,11 @@ class Projeto
 
 		$registro = $registros[0];
 		$registro['status_projeto_label'] = self::statusLabel($registro['status_projeto']);
-		$registro['arquivos'] = self::listaArquivos($registro['id_projeto']);
+		$registro['arquivos'] = self::listaArquivos($registro['id_projeto'], 'qualitativa');
+		$registro['arquivos_qualitativos'] = $registro['arquivos'];
+		$registro['arquivos_itens'] = self::listaArquivos($registro['id_projeto'], 'itens');
+		$registro['arquivos_pessoas'] = self::listaArquivos($registro['id_projeto'], 'pessoas');
+		$registro['arquivos_parceiros'] = self::listaArquivos($registro['id_projeto'], 'parceiros');
 		return $registro;
 	}
 
@@ -250,6 +277,13 @@ class Projeto
 
 		$select = "select p.*,
 					u.nome as nome_usuario,
+					(
+						select i.nome_organizacao
+						from eventos_inscricao i
+						where i.id_usuario = p.id_usuario
+						order by i.id_inscricao desc
+						limit 1
+					) as nome_organizacao,
 					e.titulo as titulo_evento,
 					e.data_hora
 				from eventos_projeto p
@@ -298,6 +332,17 @@ class Projeto
 		return false;
 	}
 
+	public static function quantidadeProjetosUsuario($idUsuario)
+	{
+		$idUsuario = (int) $idUsuario;
+		if (!$idUsuario) {
+			return 0;
+		}
+
+		$db = Zend_Registry::get('db');
+		return (int) $db->fetchOne('select count(*) from eventos_projeto where ativo and id_usuario = ' . $idUsuario);
+	}
+
 	public static function submeterListados($idUsuarioLogado = null, $permissao = null)
 	{
 		if ((int) $permissao === 1) {
@@ -326,7 +371,7 @@ class Projeto
 		return true;
 	}
 
-	public static function prepararCampos($campos, $permissao = null, $idUsuarioLogado = null)
+	public static function prepararCampos($campos, $permissao = null, $idUsuarioLogado = null, $anoReferencia = null)
 	{
 		$idUsuario = isset($campos['id_usuario']) ? (int) $campos['id_usuario'] : 0;
 		if ((int) $permissao !== 1) {
@@ -382,6 +427,21 @@ class Projeto
 			return false;
 		}
 
+		$anoReferencia = $anoReferencia ? (int) $anoReferencia : (int) date('Y');
+		$anoPassado = $anoReferencia - 1;
+		$anoRetrasado = $anoReferencia - 2;
+		$anosPermitidos = array($anoRetrasado, $anoPassado);
+		$anoDataInicializacao = (int) date('Y', strtotime($dataInicializacao));
+		$anoDataFinalizacao = (int) date('Y', strtotime($dataFinalizacao));
+		if (!in_array($anoDataInicializacao, $anosPermitidos, true)) {
+			self::$erro = 'A data de inicializacao deve estar entre os anos de ' . $anoRetrasado . ' e ' . $anoPassado . '.';
+			return false;
+		}
+		if (!in_array($anoDataFinalizacao, $anosPermitidos, true)) {
+			self::$erro = 'A data de finalizacao deve estar entre os anos de ' . $anoRetrasado . ' e ' . $anoPassado . '.';
+			return false;
+		}
+
 		$justificativa = isset($campos['justificativa']) ? trim((string) $campos['justificativa']) : '';
 		if ($justificativa === '') {
 			self::$erro = 'Informe a justificativa do projeto.';
@@ -419,6 +479,93 @@ class Projeto
 		}
 		$demaisOdsValidos = array_values(array_unique($demaisOdsValidos));
 
+		$tipoItem = isset($campos['tipo_item']) ? trim((string) $campos['tipo_item']) : '';
+		if (strlen($tipoItem) > 150) {
+			self::$erro = 'O tipo de item deve ter no maximo 150 caracteres.';
+			return false;
+		}
+
+		$quantidadeItens = null;
+		if (isset($campos['quantidade_itens']) && $campos['quantidade_itens'] !== '' && $campos['quantidade_itens'] !== null) {
+			if (!is_numeric($campos['quantidade_itens'])) {
+				self::$erro = 'Informe uma quantidade de itens valida.';
+				return false;
+			}
+			$quantidadeItens = (float) $campos['quantidade_itens'];
+			if ($quantidadeItens < 0) {
+				self::$erro = 'A quantidade de itens nao pode ser negativa.';
+				return false;
+			}
+		}
+
+		$unidadeMedida = isset($campos['unidade_medida']) ? trim((string) $campos['unidade_medida']) : '';
+		$unidadeMedidaOutro = isset($campos['unidade_medida_outro']) ? trim((string) $campos['unidade_medida_outro']) : '';
+		if ($unidadeMedida === 'Outro') {
+			$unidadeMedida = $unidadeMedidaOutro;
+		}
+		if (strlen($unidadeMedida) > 80) {
+			self::$erro = 'A unidade de medida deve ter no maximo 80 caracteres.';
+			return false;
+		}
+
+		$publicoTipo = isset($campos['publico_tipo']) ? $campos['publico_tipo'] : array();
+		if (!is_array($publicoTipo)) {
+			$publicoTipo = array();
+		}
+		$publicoTipoValido = array();
+		foreach ($publicoTipo as $tipo) {
+			$tipo = trim((string) $tipo);
+			if (in_array($tipo, array('Interno', 'Externo'), true)) {
+				$publicoTipoValido[] = $tipo;
+			}
+		}
+		$publicoTipoValido = array_values(array_unique($publicoTipoValido));
+
+		$quantidadePublicoInterno = null;
+		if (isset($campos['quantidade_publico_interno']) && $campos['quantidade_publico_interno'] !== '' && $campos['quantidade_publico_interno'] !== null) {
+			if (!is_numeric($campos['quantidade_publico_interno'])) {
+				self::$erro = 'Informe uma quantidade valida para o publico interno.';
+				return false;
+			}
+			$quantidadePublicoInterno = (int) $campos['quantidade_publico_interno'];
+			if ($quantidadePublicoInterno < 0) {
+				self::$erro = 'A quantidade do publico interno nao pode ser negativa.';
+				return false;
+			}
+		}
+
+		$quantidadePublicoExterno = null;
+		if (isset($campos['quantidade_publico_externo']) && $campos['quantidade_publico_externo'] !== '' && $campos['quantidade_publico_externo'] !== null) {
+			if (!is_numeric($campos['quantidade_publico_externo'])) {
+				self::$erro = 'Informe uma quantidade valida para o publico externo.';
+				return false;
+			}
+			$quantidadePublicoExterno = (int) $campos['quantidade_publico_externo'];
+			if ($quantidadePublicoExterno < 0) {
+				self::$erro = 'A quantidade do publico externo nao pode ser negativa.';
+				return false;
+			}
+		}
+
+		$quantidadeParceiros = null;
+		if (isset($campos['quantidade_parceiros']) && $campos['quantidade_parceiros'] !== '' && $campos['quantidade_parceiros'] !== null) {
+			if (!is_numeric($campos['quantidade_parceiros'])) {
+				self::$erro = 'Informe uma quantidade valida de parceiros.';
+				return false;
+			}
+			$quantidadeParceiros = (int) $campos['quantidade_parceiros'];
+			if ($quantidadeParceiros < 0) {
+				self::$erro = 'A quantidade de parceiros nao pode ser negativa.';
+				return false;
+			}
+		}
+
+		$parceiros = isset($campos['parceiros']) ? trim((string) $campos['parceiros']) : '';
+		if (strlen($parceiros) > 255) {
+			self::$erro = 'O campo parceiros deve ter no maximo 255 caracteres.';
+			return false;
+		}
+
 		return array(
 			'id_usuario' => $idUsuario,
 			'id_evento' => $idEvento,
@@ -432,21 +579,39 @@ class Projeto
 			'area_atuacao' => $areaAtuacao,
 			'objetivos' => $objetivos,
 			'ods_principal' => $odsPrincipal,
-			'demais_ods_relacionados' => count($demaisOdsValidos) ? implode(', ', $demaisOdsValidos) : null
+			'demais_ods_relacionados' => count($demaisOdsValidos) ? implode(', ', $demaisOdsValidos) : null,
+			'tipo_item' => $tipoItem !== '' ? $tipoItem : null,
+			'quantidade_itens' => $quantidadeItens,
+			'unidade_medida' => $unidadeMedida !== '' ? $unidadeMedida : null,
+			'publico_tipo' => count($publicoTipoValido) ? implode(', ', $publicoTipoValido) : null,
+			'quantidade_publico_interno' => $quantidadePublicoInterno,
+			'quantidade_publico_externo' => $quantidadePublicoExterno,
+			'quantidade_parceiros' => $quantidadeParceiros,
+			'parceiros' => $parceiros !== '' ? $parceiros : null,
+			'updated_at' => new Zend_Db_Expr('now()')
 		);
 	}
 
-	public static function insert($campos, $permissao = null, $idUsuarioLogado = null, $arquivos = null)
+	public static function insert($campos, $permissao = null, $idUsuarioLogado = null, $arquivos = null, $arquivosItens = null, $arquivosPessoas = null, $arquivosParceiros = null)
 	{
-		$data = self::prepararCampos($campos, $permissao, $idUsuarioLogado);
+		$data = self::prepararCampos($campos, $permissao, $idUsuarioLogado, (int) date('Y'));
 		if ($data === false) {
 			return false;
+		}
+
+		if ((int) $permissao !== 1) {
+			$quantidadeProjetos = self::quantidadeProjetosUsuario($data['id_usuario']);
+			if ($quantidadeProjetos >= self::MAX_PROJETOS_POR_USUARIO) {
+				self::$erro = 'O usuario pode cadastrar no maximo ' . self::MAX_PROJETOS_POR_USUARIO . ' projetos.';
+				return false;
+			}
 		}
 
 		$db = Zend_Registry::get('db');
 		$db->beginTransaction();
 
 		try {
+			$data['created_at'] = new Zend_Db_Expr('now()');
 			$db->insert('eventos_projeto', $data);
 			$idProjeto = (int) $db->lastInsertId();
 			if (!$idProjeto) {
@@ -459,8 +624,29 @@ class Projeto
 			}
 
 			if ($arquivos) {
-				$resultadoArquivos = self::salvarArquivosEvidencia($idProjeto, $arquivos);
+				$resultadoArquivos = self::salvarArquivosEvidencia($idProjeto, $arquivos, 'qualitativa');
 				if ($resultadoArquivos === false) {
+					throw new Exception(self::$erro);
+				}
+			}
+
+			if ($arquivosItens) {
+				$resultadoArquivosItens = self::salvarArquivosEvidencia($idProjeto, $arquivosItens, 'itens');
+				if ($resultadoArquivosItens === false) {
+					throw new Exception(self::$erro);
+				}
+			}
+
+			if ($arquivosPessoas) {
+				$resultadoArquivosPessoas = self::salvarArquivosEvidencia($idProjeto, $arquivosPessoas, 'pessoas');
+				if ($resultadoArquivosPessoas === false) {
+					throw new Exception(self::$erro);
+				}
+			}
+
+			if ($arquivosParceiros) {
+				$resultadoArquivosParceiros = self::salvarArquivosEvidencia($idProjeto, $arquivosParceiros, 'parceiros');
+				if ($resultadoArquivosParceiros === false) {
 					throw new Exception(self::$erro);
 				}
 			}
@@ -479,7 +665,7 @@ class Projeto
 		return true;
 	}
 
-	public static function update($idProjeto, $campos, $permissao = null, $idUsuarioLogado = null, $arquivos = null)
+	public static function update($idProjeto, $campos, $permissao = null, $idUsuarioLogado = null, $arquivos = null, $arquivosItens = null, $arquivosPessoas = null, $arquivosParceiros = null)
 	{
 		$registro = self::buscaId($idProjeto, $idUsuarioLogado, $permissao);
 		if (!$registro) {
@@ -489,7 +675,8 @@ class Projeto
 			return false;
 		}
 
-		$data = self::prepararCampos($campos, $permissao, $idUsuarioLogado);
+		$anoReferencia = !empty($registro['created_at']) ? (int) date('Y', strtotime($registro['created_at'])) : (int) date('Y');
+		$data = self::prepararCampos($campos, $permissao, $idUsuarioLogado, $anoReferencia);
 		if ($data === false) {
 			return false;
 		}
@@ -501,7 +688,7 @@ class Projeto
 			$db->update('eventos_projeto', $data, 'id_projeto = ' . (int) $registro['id_projeto']);
 
 			if ($arquivos) {
-				$arquivosAtuais = self::listaArquivos($registro['id_projeto']);
+				$arquivosAtuais = self::listaArquivos($registro['id_projeto'], 'qualitativa');
 				$novosArquivos = self::normalizarArquivos($arquivos);
 				if (count($arquivosAtuais) + count($novosArquivos) > 5) {
 					self::$erro = 'O projeto pode ter no maximo 5 arquivos de evidencia.';
@@ -509,8 +696,56 @@ class Projeto
 				}
 
 				if (count($novosArquivos)) {
-					$resultadoArquivos = self::salvarArquivosEvidencia($registro['id_projeto'], $arquivos);
+					$resultadoArquivos = self::salvarArquivosEvidencia($registro['id_projeto'], $arquivos, 'qualitativa');
 					if ($resultadoArquivos === false) {
+						throw new Exception(self::$erro);
+					}
+				}
+			}
+
+			if ($arquivosItens) {
+				$arquivosAtuaisItens = self::listaArquivos($registro['id_projeto'], 'itens');
+				$novosArquivosItens = self::normalizarArquivos($arquivosItens);
+				if (count($arquivosAtuaisItens) + count($novosArquivosItens) > 5) {
+					self::$erro = 'A evidencia de itens pode ter no maximo 5 arquivos.';
+					throw new Exception(self::$erro);
+				}
+
+				if (count($novosArquivosItens)) {
+					$resultadoArquivosItens = self::salvarArquivosEvidencia($registro['id_projeto'], $arquivosItens, 'itens');
+					if ($resultadoArquivosItens === false) {
+						throw new Exception(self::$erro);
+					}
+				}
+			}
+
+			if ($arquivosPessoas) {
+				$arquivosAtuaisPessoas = self::listaArquivos($registro['id_projeto'], 'pessoas');
+				$novosArquivosPessoas = self::normalizarArquivos($arquivosPessoas);
+				if (count($arquivosAtuaisPessoas) + count($novosArquivosPessoas) > 5) {
+					self::$erro = 'A evidencia de pessoas pode ter no maximo 5 arquivos.';
+					throw new Exception(self::$erro);
+				}
+
+				if (count($novosArquivosPessoas)) {
+					$resultadoArquivosPessoas = self::salvarArquivosEvidencia($registro['id_projeto'], $arquivosPessoas, 'pessoas');
+					if ($resultadoArquivosPessoas === false) {
+						throw new Exception(self::$erro);
+					}
+				}
+			}
+
+			if ($arquivosParceiros) {
+				$arquivosAtuaisParceiros = self::listaArquivos($registro['id_projeto'], 'parceiros');
+				$novosArquivosParceiros = self::normalizarArquivos($arquivosParceiros);
+				if (count($arquivosAtuaisParceiros) + count($novosArquivosParceiros) > 5) {
+					self::$erro = 'A evidencia de parceiros pode ter no maximo 5 arquivos.';
+					throw new Exception(self::$erro);
+				}
+
+				if (count($novosArquivosParceiros)) {
+					$resultadoArquivosParceiros = self::salvarArquivosEvidencia($registro['id_projeto'], $arquivosParceiros, 'parceiros');
+					if ($resultadoArquivosParceiros === false) {
 						throw new Exception(self::$erro);
 					}
 				}

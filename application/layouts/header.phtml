@@ -119,6 +119,14 @@ $skyn = 'padrao';
               </a>
             </li>
           <? endif; ?>
+          <? if ($this->permissao == 1 || $this->permissao == 3): ?>
+            <li class="nav-item">
+              <a href="#" class="principal-link nav-link" data-menu-item="help" data-src="../../help">
+                <i class="fa fa-question-circle" aria-hidden="true"></i>
+                Ajuda
+              </a>
+            </li>
+          <? endif; ?>
           <? if ($this->permissao == 1 || $this->permissao == 2): ?>
             <li class="nav-item">
               <a href="#" class="principal-link nav-link" data-menu-item="auditoria" data-src="../../auditoria">

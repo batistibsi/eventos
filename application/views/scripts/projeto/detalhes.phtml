@@ -1,6 +1,9 @@
 <? $registro = $this->registro; ?>
 <? $odsRelacionados = $registro && !empty($registro['demais_ods_relacionados']) ? array_map('trim', explode(',', $registro['demais_ods_relacionados'])) : array(); ?>
-<? $arquivos = $registro && !empty($registro['arquivos']) ? $registro['arquivos'] : array(); ?>
+<? $arquivos = $registro && !empty($registro['arquivos_qualitativos']) ? $registro['arquivos_qualitativos'] : array(); ?>
+<? $arquivosItens = $registro && !empty($registro['arquivos_itens']) ? $registro['arquivos_itens'] : array(); ?>
+<? $arquivosPessoas = $registro && !empty($registro['arquivos_pessoas']) ? $registro['arquivos_pessoas'] : array(); ?>
+<? $arquivosParceiros = $registro && !empty($registro['arquivos_parceiros']) ? $registro['arquivos_parceiros'] : array(); ?>
 <? $empresaVinculada = !empty($this->empresaVinculada) && is_array($this->empresaVinculada) ? $this->empresaVinculada : false; ?>
 <div class="content-page">
 	<div class="content-page__header">
@@ -97,6 +100,14 @@
 				<span class="field-label">Data da finalização</span>
 				<div class="detalhe-valor"><?= !empty($registro['data_finalizacao']) ? Util::formatData($registro['data_finalizacao']) : '-' ?></div>
 			</div>
+			<div class="col-md-6 mb-3">
+				<span class="field-label">Data de criação</span>
+				<div class="detalhe-valor"><?= !empty($registro['created_at']) ? date('d/m/Y H:i', strtotime($registro['created_at'])) : '-' ?></div>
+			</div>
+			<div class="col-md-6 mb-3">
+				<span class="field-label">Data de atualização</span>
+				<div class="detalhe-valor"><?= !empty($registro['updated_at']) ? date('d/m/Y H:i', strtotime($registro['updated_at'])) : '-' ?></div>
+			</div>
 			<div class="col-md-12 mb-3">
 				<span class="field-label">Justificativa</span>
 				<div class="detalhe-valor"><?= nl2br($this->escape($registro['justificativa'])) ?></div>
@@ -172,16 +183,11 @@
 				</div>
 			</div>
 		</div>
-	</div>
-
-	<div class="section-card">
-		<div class="section-header">
-			<div>
-				<h2 class="section-title">Evidências</h2>
+		<div class="row mt-4">
+			<div class="col-md-12 mb-1">
+				<span class="field-label">Evidência qualitativa do projeto</span>
 			</div>
-		</div>
-		<? if (count($arquivos)) : ?>
-			<div class="row">
+			<? if (count($arquivos)) : ?>
 				<? foreach ($arquivos as $arquivo) : ?>
 					<div class="col-md-6 col-xl-4 mb-3">
 						<div class="detalhe-card projeto-evidencia-card h-100">
@@ -195,9 +201,145 @@
 						</div>
 					</div>
 				<? endforeach; ?>
+			<? else : ?>
+				<div class="col-md-12">
+					<div class="detalhe-valor">Nenhum arquivo qualitativo enviado.</div>
+				</div>
+			<? endif; ?>
+		</div>
+	</div>
+
+	<div class="section-card">
+		<div class="section-header">
+			<div>
+				<h2 class="section-title">Evidência de Itens</h2>
 			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4 mb-3">
+				<span class="field-label">Tipo de item</span>
+				<div class="detalhe-valor"><?= !empty($registro['tipo_item']) ? $this->escape($registro['tipo_item']) : '-' ?></div>
+			</div>
+			<div class="col-md-4 mb-3">
+				<span class="field-label">Quantidade de itens</span>
+				<div class="detalhe-valor"><?= isset($registro['quantidade_itens']) && $registro['quantidade_itens'] !== null && $registro['quantidade_itens'] !== '' ? $this->escape($registro['quantidade_itens']) : '-' ?></div>
+			</div>
+			<div class="col-md-4 mb-3">
+				<span class="field-label">Unidade de medida</span>
+				<div class="detalhe-valor"><?= !empty($registro['unidade_medida']) ? $this->escape($registro['unidade_medida']) : '-' ?></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 mb-1">
+				<span class="field-label">Evidência quantitativa do material relacionado ao projeto</span>
+			</div>
+		<? if (count($arquivosItens)) : ?>
+				<? foreach ($arquivosItens as $arquivo) : ?>
+					<div class="col-md-6 col-xl-4 mb-3">
+						<div class="detalhe-card projeto-evidencia-card h-100">
+							<div class="detalhe-card-body">
+								<span class="field-label">Arquivo</span>
+								<div class="detalhe-valor mb-3"><?= $this->escape($arquivo['nome_original']) ?></div>
+								<a href="../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>" target="_blank" class="btn btn-outline-primary btn-sm">
+									<i class="fa fa-download" aria-hidden="true"></i> Abrir arquivo
+								</a>
+							</div>
+						</div>
+					</div>
+				<? endforeach; ?>
 		<? else : ?>
-			<div class="detalhe-valor">Nenhum arquivo enviado.</div>
+			<div class="col-md-12">
+				<div class="detalhe-valor">Nenhum arquivo de itens enviado.</div>
+			</div>
 		<? endif; ?>
+		</div>
+	</div>
+
+	<div class="section-card">
+		<div class="section-header">
+			<div>
+				<h2 class="section-title">Evidência de Pessoas</h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4 mb-3">
+				<span class="field-label">Tipo de público</span>
+				<div class="detalhe-valor"><?= !empty($registro['publico_tipo']) ? $this->escape($registro['publico_tipo']) : '-' ?></div>
+			</div>
+			<div class="col-md-4 mb-3">
+				<span class="field-label">Quantidade do público interno</span>
+				<div class="detalhe-valor"><?= isset($registro['quantidade_publico_interno']) && $registro['quantidade_publico_interno'] !== null && $registro['quantidade_publico_interno'] !== '' ? $this->escape($registro['quantidade_publico_interno']) : '-' ?></div>
+			</div>
+			<div class="col-md-4 mb-3">
+				<span class="field-label">Quantidade do público externo</span>
+				<div class="detalhe-valor"><?= isset($registro['quantidade_publico_externo']) && $registro['quantidade_publico_externo'] !== null && $registro['quantidade_publico_externo'] !== '' ? $this->escape($registro['quantidade_publico_externo']) : '-' ?></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 mb-1">
+				<span class="field-label">Evidência quantitativa da participação de pessoas no projeto</span>
+			</div>
+		<? if (count($arquivosPessoas)) : ?>
+				<? foreach ($arquivosPessoas as $arquivo) : ?>
+					<div class="col-md-6 col-xl-4 mb-3">
+						<div class="detalhe-card projeto-evidencia-card h-100">
+							<div class="detalhe-card-body">
+								<span class="field-label">Arquivo</span>
+								<div class="detalhe-valor mb-3"><?= $this->escape($arquivo['nome_original']) ?></div>
+								<a href="../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>" target="_blank" class="btn btn-outline-primary btn-sm">
+									<i class="fa fa-download" aria-hidden="true"></i> Abrir arquivo
+								</a>
+							</div>
+						</div>
+					</div>
+				<? endforeach; ?>
+		<? else : ?>
+			<div class="col-md-12">
+				<div class="detalhe-valor">Nenhum arquivo de pessoas enviado.</div>
+			</div>
+		<? endif; ?>
+		</div>
+	</div>
+
+	<div class="section-card">
+		<div class="section-header">
+			<div>
+				<h2 class="section-title">Evidência de Parceiros</h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4 mb-3">
+				<span class="field-label">Quantidade de parceiros</span>
+				<div class="detalhe-valor"><?= isset($registro['quantidade_parceiros']) && $registro['quantidade_parceiros'] !== null && $registro['quantidade_parceiros'] !== '' ? $this->escape($registro['quantidade_parceiros']) : '-' ?></div>
+			</div>
+			<div class="col-md-8 mb-3">
+				<span class="field-label">Parceiros</span>
+				<div class="detalhe-valor"><?= !empty($registro['parceiros']) ? $this->escape($registro['parceiros']) : '-' ?></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 mb-1">
+				<span class="field-label">Evidência quantitativa de parceria do projeto</span>
+			</div>
+		<? if (count($arquivosParceiros)) : ?>
+				<? foreach ($arquivosParceiros as $arquivo) : ?>
+					<div class="col-md-6 col-xl-4 mb-3">
+						<div class="detalhe-card projeto-evidencia-card h-100">
+							<div class="detalhe-card-body">
+								<span class="field-label">Arquivo</span>
+								<div class="detalhe-valor mb-3"><?= $this->escape($arquivo['nome_original']) ?></div>
+								<a href="../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>" target="_blank" class="btn btn-outline-primary btn-sm">
+									<i class="fa fa-download" aria-hidden="true"></i> Abrir arquivo
+								</a>
+							</div>
+						</div>
+					</div>
+				<? endforeach; ?>
+		<? else : ?>
+			<div class="col-md-12">
+				<div class="detalhe-valor">Nenhum arquivo de parceiros enviado.</div>
+			</div>
+		<? endif; ?>
+		</div>
 	</div>
 </div>

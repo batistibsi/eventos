@@ -48,6 +48,7 @@ $normalizarYoutube = function ($url) {
 };
 
 $videoPrincipalEmbed = $normalizarYoutube($videoPrincipalLink);
+$videoPrincipalEhYoutube = $videoPrincipalLink !== '' && $videoPrincipalEmbed !== $videoPrincipalLink;
 ?>
 <div class="content-page dashboard-page">
     <div class="content-page__header">
@@ -60,10 +61,19 @@ $videoPrincipalEmbed = $normalizarYoutube($videoPrincipalLink);
     <div class="material-page section-card">
         <div class="material-layout">
             <div class="material-main-card">
-                <? if ($videoPrincipalEmbed): ?>
-                    <div class="material-embed">
-                        <iframe src="<?= $this->escape($videoPrincipalEmbed) ?>" title="Video principal" allowfullscreen></iframe>
-                    </div>
+                <? if ($videoPrincipalLink): ?>
+                    <? if ($videoPrincipalEhYoutube): ?>
+                        <div class="material-embed">
+                            <iframe src="<?= $this->escape($videoPrincipalEmbed) ?>" title="Video principal" allowfullscreen></iframe>
+                        </div>
+                    <? else: ?>
+                        <div class="material-embed">
+                            <video controls preload="metadata" style="width: 100%; height: 100%; border: 0; background: #000;">
+                                <source src="<?= $this->escape($videoPrincipalLink) ?>">
+                                Seu navegador nao suporta a exibicao do video.
+                            </video>
+                        </div>
+                    <? endif; ?>
                 <? else: ?>
                     <button type="button" class="material-main-placeholder" disabled>Video principal</button>
                 <? endif; ?>

@@ -399,7 +399,8 @@ class Inscricao
 
                 $select = "select a.id_evento,
                                   e.titulo,
-                                  e.data_hora
+                                  e.data_hora,
+                                  e.data_submissao
                              from eventos_inscricao a
                              inner join eventos_evento e on e.id_evento = a.id_evento
                              where a.id_usuario = " . $id_usuario . "
