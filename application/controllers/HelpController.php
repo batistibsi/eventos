@@ -1,5 +1,5 @@
 <?php
-if (Zend_Registry::get('permissao') != 3) exit();
+//if (Zend_Registry::get('permissao') != 3) exit();
 
 class HelpController extends Zend_Controller_Action
 {

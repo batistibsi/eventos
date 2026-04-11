@@ -35,8 +35,113 @@ $skyn = 'padrao';
   <link rel="icon" href="../../<?= $skyn ?>/favicon.ico">
   <style>
     :root {
-      --dt-primary: rgb(8, 68, 68);
-      --dt-active: color-mix(in srgb, var(--dt-primary) 80%, black 40%);
+      /* Brand */
+      --dt-primary: #084444;
+      --dt-active: #063c3c;
+      --color-brand: #084444;
+      --color-brand-dark: #063c3c;
+      --color-accent: #097f8c;
+
+      /* Neutrals */
+      --color-white: #ffffff;
+      --color-black: #000000;
+      --page-bg: #f5f8fc;
+      --page-text: #264061;
+      --page-text-muted: #5f7592;
+      --page-border-soft: #e7eef6;
+      --page-surface: var(--color-white);
+      --page-surface-soft-top: var(--color-white);
+      --page-surface-soft-bottom: #fbfdff;
+      --page-surface-soft: linear-gradient(180deg, var(--page-surface-soft-top) 0%, var(--page-surface-soft-bottom) 100%);
+
+      /* Shared support palette */
+      --color-support: #315d8f;
+      --color-support-strong: #1f5f99;
+      --color-support-soft: #5d8bb9;
+      --color-support-pale: #d6e3f0;
+      --color-success: #2f8f46;
+      --color-success-alt: #86c61c;
+      --color-warning: #d6ad00;
+      --color-warning-soft: #ffe29a;
+      --color-danger: #a33838;
+      --color-purple: #8b4ab3;
+
+      /* Layout */
+      --sidebar-bg: #eff5f1;
+      --navbar-bg: #eff5f1;
+      --scrollbar-thumb: #e5e5e5;
+      --scrollbar-thumb-active: var(--color-accent);
+
+      /* Cards and shadows */
+      --card-bg-top: var(--color-white);
+      --card-bg-bottom: #fbfdff;
+      --card-border: var(--page-border-soft);
+      --page-shadow: 0 10px 24px rgba(38, 64, 97, .08);
+      --page-shadow-strong: 0 18px 40px rgba(36, 69, 125, .22);
+
+      /* Form */
+      --input-border: #cfdae8;
+      --input-border-focus: var(--color-support-soft);
+      --input-focus-shadow: rgba(93, 139, 185, .14);
+
+      /* Buttons and links */
+      --button-primary-bg: var(--color-brand);
+      --button-primary-border: var(--color-brand);
+      --button-primary-text: var(--color-white);
+      --button-primary-hover: var(--color-brand-dark);
+      --button-outline-border: var(--color-support);
+      --button-outline-text: var(--color-support);
+
+      /* Dashboard timeline */
+      --timeline-inscricao: var(--color-success-alt);
+      --timeline-inscricao-soft: rgba(134, 198, 28, .12);
+      --timeline-inscricao-text: #5d9208;
+      --timeline-submissao: var(--color-support);
+      --timeline-submissao-soft: rgba(15, 116, 200, .12);
+      --timeline-submissao-text: var(--color-support);
+      --timeline-correcao: var(--color-warning);
+      --timeline-correcao-soft: rgba(255, 212, 0, .14);
+      --timeline-correcao-text: #9f8100;
+      --timeline-resultado: var(--color-warning);
+      --timeline-resultado-soft: rgba(255, 122, 31, .12);
+      --timeline-resultado-text: #d3600d;
+      --timeline-inscricao-summit: var(--color-accent);
+      --timeline-inscricao-summit-soft: rgba(11, 159, 138, .12);
+      --timeline-inscricao-summit-text: var(--color-accent);
+      --timeline-summit: var(--color-purple);
+      --timeline-summit-soft: rgba(139, 74, 179, .12);
+      --timeline-summit-text: #7b33a8;
+
+      /* Dashboard actions */
+      --dashboard-action-top: var(--color-support-strong);
+      --dashboard-action-bottom: var(--color-support);
+      --dashboard-action-border: var(--color-support);
+      --dashboard-action-shadow: rgba(23, 74, 120, .24);
+      --dashboard-action-hover-border: var(--color-brand-dark);
+      --dashboard-action-hover-shadow: rgba(15, 53, 86, .3);
+      --dashboard-action-icon-bg: rgba(255, 255, 255, .18);
+      --dashboard-action-text: var(--color-white);
+
+      /* Notices and alerts */
+      --notice-warning-top: #fff4cc;
+      --notice-warning-bottom: var(--color-warning-soft);
+      --notice-warning-border: var(--color-warning);
+      --notice-warning-text: #714e00;
+      --notice-warning-shadow: rgba(181, 128, 10, .16);
+      --danger-soft: rgba(179, 74, 74, .12);
+      --danger-text: var(--color-danger);
+      --success-soft: rgba(47, 143, 70, .12);
+      --success-text: var(--color-success);
+
+      /* Backward-compatible aliases */
+      --color-blue: var(--color-support);
+      --color-blue-strong: var(--color-support-strong);
+      --color-blue-soft: var(--color-support-soft);
+      --color-blue-pale: var(--color-support-pale);
+      --color-green: var(--color-success);
+      --color-lime: var(--color-success-alt);
+      --color-yellow: var(--color-warning);
+      --color-red: var(--color-danger);
     }
   </style>
 
