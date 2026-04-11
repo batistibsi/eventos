@@ -39,22 +39,22 @@
 	<div class="section-card">
 	<div class="row">
 		<div class="form-group col-md-12">
-			<span><label for="observacao">Observacao: </label></span>
+			<span><label for="observacao">Observação: </label></span>
 			<textarea class="form-control" name="observacao" id="observacao" rows="4"><?= $registro && !empty($registro['observacao']) ? $this->escape($registro['observacao']) : '' ?></textarea>
 		</div>
 	</div>
 
 	<div class="row">
 		<div class="form-group col-md-4">
-			<span><label for="data_inscricao">Data inscricao: </label></span>
+			<span><label for="data_inscricao">Data inscrição: </label></span>
 			<input class="form-control" name="data_inscricao" type="date" value="<?= $registro && !empty($registro['data_inscricao']) ? date('Y-m-d', strtotime($registro['data_inscricao'])) : '' ?>" id="data_inscricao" required>
 		</div>
 		<div class="form-group col-md-4">
-			<span><label for="data_submissao">Data submissao: </label></span>
+			<span><label for="data_submissao">Data submissão: </label></span>
 			<input class="form-control" name="data_submissao" type="date" value="<?= $registro && !empty($registro['data_submissao']) ? date('Y-m-d', strtotime($registro['data_submissao'])) : '' ?>" id="data_submissao" required>
 		</div>
 		<div class="form-group col-md-4">
-			<span><label for="data_correcao">Data correcao: </label></span>
+			<span><label for="data_correcao">Data correção: </label></span>
 			<input class="form-control" name="data_correcao" type="date" value="<?= $registro && !empty($registro['data_correcao']) ? date('Y-m-d', strtotime($registro['data_correcao'])) : '' ?>" id="data_correcao" required>
 		</div>
 	</div>
@@ -65,14 +65,14 @@
 			<input class="form-control" name="data_resultado" type="date" value="<?= $registro && !empty($registro['data_resultado']) ? date('Y-m-d', strtotime($registro['data_resultado'])) : '' ?>" id="data_resultado" required>
 		</div>
 		<div class="form-group col-md-6">
-			<span><label for="data_inscricao_summit">Data inscricao summit: </label></span>
+			<span><label for="data_inscricao_summit">Data inscrição Summit: </label></span>
 			<input class="form-control" name="data_inscricao_summit" type="date" value="<?= $registro && !empty($registro['data_inscricao_summit']) ? date('Y-m-d', strtotime($registro['data_inscricao_summit'])) : '' ?>" id="data_inscricao_summit" required>
 		</div>
 	</div>
 
 	<div class="row">
 		<div class="form-group col-md-6">
-			<span><label for="data_summit">Data summit: </label></span>
+			<span><label for="data_summit">Data Summit: </label></span>
 			<input class="form-control" name="data_summit" type="date" value="<?= $registro && !empty($registro['data_summit']) ? date('Y-m-d', strtotime($registro['data_summit'])) : '' ?>" id="data_summit" required>
 		</div>
 	</div>

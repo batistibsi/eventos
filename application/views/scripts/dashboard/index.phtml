@@ -25,10 +25,11 @@ $formatarData = function ($valor) {
 };
 
 $timeline = array(
-    array('classe' => 'inscricao', 'titulo' => 'Inscricao', 'data' => $formatarData($evento['data_inscricao'] ?? null)),
-    array('classe' => 'submissao', 'titulo' => 'Submissao', 'data' => $formatarData($evento['data_submissao'] ?? null)),
-    array('classe' => 'correcao', 'titulo' => 'Correcao', 'data' => $formatarData($evento['data_correcao'] ?? null)),
+    array('classe' => 'inscricao', 'titulo' => 'Inscrição', 'data' => $formatarData($evento['data_inscricao'] ?? null)),
+    array('classe' => 'submissao', 'titulo' => 'Submissão', 'data' => $formatarData($evento['data_submissao'] ?? null)),
+    array('classe' => 'correcao', 'titulo' => 'Correção', 'data' => $formatarData($evento['data_correcao'] ?? null)),
     array('classe' => 'resultado', 'titulo' => 'Resultado', 'data' => $formatarData($evento['data_resultado'] ?? null)),
+    array('classe' => 'inscricao-summit', 'titulo' => 'Inscrição Summit', 'data' => $formatarData($evento['data_inscricao_summit'] ?? null)),
     array('classe' => 'summit', 'titulo' => 'Summit', 'data' => $formatarData($evento['data_summit'] ?? null))
 );
 
@@ -103,7 +104,7 @@ $linkInscricao = $inscricao
                         <?= !$inscricao ? 'disabled' : '' ?>
                     >
                         <span class="dashboard-action-card__icon"><i class="fa fa-id-card-o" aria-hidden="true"></i></span>
-                        <span class="dashboard-action-card__label">Detalhes da inscricao</span>
+                        <span class="dashboard-action-card__label">Detalhes da inscrição</span>
                     </button>
 
                     <button type="button" class="dashboard-action-card" data-link="../../dashboard/material">

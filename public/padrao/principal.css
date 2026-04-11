@@ -1560,6 +1560,16 @@ table td .btn-group > .btn,
   color: #d3600d;
 }
 
+.dashboard-journey__step--inscricao-summit .dashboard-journey__marker,
+.dashboard-journey__step--inscricao-summit .dashboard-journey__card {
+  border-color: #0b9f8a;
+}
+
+.dashboard-journey__step--inscricao-summit .dashboard-journey__date {
+  background: rgba(11, 159, 138, .12);
+  color: #0b7f6f;
+}
+
 .dashboard-journey__step--summit .dashboard-journey__marker,
 .dashboard-journey__step--summit .dashboard-journey__card {
   border-color: #8b4ab3;
@@ -1626,7 +1636,7 @@ table td .btn-group > .btn,
 
 .dashboard-carousel .carousel-item img {
   display: block;
-  height: 258px;
+  height: 340px;
   max-width: 100%;
   object-fit: cover;
   width: 100%;
@@ -1645,7 +1655,7 @@ table td .btn-group > .btn,
   color: #4e6f95;
   display: flex;
   justify-content: center;
-  min-height: 258px;
+  min-height: 340px;
   padding: 22px;
   text-align: center;
 }
@@ -2133,8 +2143,8 @@ table td .btn-group > .btn,
 
   .dashboard-carousel .carousel-item img,
   .dashboard-carousel__empty {
-    min-height: 220px;
-    height: 220px;
+    min-height: 260px;
+    height: 260px;
   }
 
   .dashboard-journey__step {
