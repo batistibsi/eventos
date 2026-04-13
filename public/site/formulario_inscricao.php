@@ -191,9 +191,8 @@ function formatarDataHoraEvento($valor)
     }
 
     .hero-logo {
-      height: 72px;
+      height: 82px;
       width: auto;
-      padding: 6px;
     }
 
     .hero-wrap {
