@@ -7,9 +7,9 @@
 <? $anoRetrasado = $anoReferencia - 2; ?>
 <? $dataMinimaProjeto = $anoRetrasado . '-01-01'; ?>
 <? $dataMaximaProjeto = $anoPassado . '-12-31'; ?>
-<? $mensagemSucessoProjeto = 'Projeto inserido com sucesso. Você poderá editá-lo até que os projetos sejam submetidos à análise.'; ?>
+<? $mensagemSucessoProjeto = 'Projeto inserido com sucesso. Você poderá editá-lo até que os projetos sejam submetidos a análise.'; ?>
 <? if ($eventoVinculado && !empty($eventoVinculado['data_submissao'])): ?>
-	<? $mensagemSucessoProjeto = 'Projeto inserido com sucesso. Você poderá editá-lo até que se encerre a data de submissão do evento da sua inscrição (' . date('d/m/Y', strtotime($eventoVinculado['data_submissao'])) . ') ou até que os projetos sejam submetidos à análise.'; ?>
+	<? $mensagemSucessoProjeto = 'Projeto inserido com sucesso. Você poderá editá-lo até que se encerre a data de submissão do evento da sua inscrição (' . date('d/m/Y', strtotime($eventoVinculado['data_submissao'])) . ') ou até que os projetos sejam submetidos a análise.'; ?>
 <? endif; ?>
 <div class="content-page">
 	<div class="content-page__header">
