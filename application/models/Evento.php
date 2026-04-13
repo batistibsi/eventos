@@ -87,10 +87,11 @@ class Evento
                         $limite_vagas =  $evento['limite_vagas'];
                 }
 
+                $statusInativos = implode(',', array_map([$db, 'quote'], Inscricao::statusInativos()));
                 $select = "select count(*) as inscritos 
                                 from eventos_inscricao 
                                 where id_evento = " . $id_evento . " 
-                                and status not in ('DUPLICADO','CANCELADO','ENCERRADO');";
+                                and status not in (" . $statusInativos . ");";
 
                 $registros = $db->fetchAll($select);
                 $inscritos = $registros[0]['inscritos'];

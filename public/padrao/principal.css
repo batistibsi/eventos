@@ -651,6 +651,29 @@ table td .btn-group > .btn,
   padding: 0 0 20px;
 }
 
+.projeto-form .form-group > span > label,
+.projeto-form .form-group > label {
+  color: var(--page-text);
+  display: inline-block;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.projeto-form .form-group .form-text {
+  display: block;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  margin-top: 0;
+}
+
+.projeto-form .form-group .form-control,
+.projeto-form .form-group .custom-select,
+.projeto-form .form-group .select2-container,
+.projeto-form .form-group .ods-grid,
+.projeto-form .form-group .area-atuacao-group {
+  margin-top: 8px;
+}
+
 .section-header {
   align-items: center;
   border-bottom: 1px solid var(--page-border-soft);
@@ -754,6 +777,36 @@ table td .btn-group > .btn,
   color: var(--color-white);
   content: "\2713";
   font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+}
+
+.ods-option.is-disabled .ods-card {
+  background: #f4f6f8;
+  border-color: #d7dde5;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: .6;
+  transform: none;
+}
+
+.ods-option.is-disabled .ods-card:hover {
+  border-color: #d7dde5;
+  box-shadow: none;
+  transform: none;
+}
+
+.ods-option.is-disabled .ods-card span {
+  color: #6b778c;
+}
+
+.ods-option.is-disabled .ods-card::after {
+  background: rgba(107, 119, 140, .12);
+  border-color: #c1c7d0;
+  color: #6b778c;
+  content: "\00d7";
+  font-size: 16px;
   font-weight: 700;
   line-height: 20px;
   text-align: center;

@@ -478,6 +478,10 @@ class Projeto
 			}
 		}
 		$demaisOdsValidos = array_values(array_unique($demaisOdsValidos));
+		if (in_array($odsPrincipal, $demaisOdsValidos, true)) {
+			self::$erro = 'O ODS principal nao pode ser selecionado entre os ODS relacionados.';
+			return false;
+		}
 
 		$tipoItem = isset($campos['tipo_item']) ? trim((string) $campos['tipo_item']) : '';
 		if (strlen($tipoItem) > 150) {

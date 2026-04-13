@@ -358,6 +358,23 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('#nome').focus();
+
+		function sincronizarOdsRelacionados() {
+			var odsPrincipal = $('input[name="ods_principal"]:checked').val() || '';
+			$('input[name="demais_ods_relacionados[]"]').each(function() {
+				var mesmoOds = $(this).val() === odsPrincipal;
+				$(this).prop('disabled', mesmoOds);
+				$(this).closest('.ods-option').toggleClass('is-disabled', mesmoOds);
+				$(this).closest('.ods-option').attr('title', mesmoOds ? 'Esta ODS ja foi selecionada como principal.' : '');
+				if (mesmoOds) {
+					$(this).prop('checked', false);
+				}
+			});
+		}
+
+		$('input[name="ods_principal"]').on('change', sincronizarOdsRelacionados);
+		sincronizarOdsRelacionados();
+
 		function atualizarCampoUnidadeMedidaOutro() {
 			var exibirOutro = $('#unidade_medida_outro_opcao').is(':checked');
 			$('#unidade_medida_outro').toggle(exibirOutro);

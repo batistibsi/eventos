@@ -593,7 +593,7 @@ function formatarDataHoraEvento($valor)
                 <div class="consent-box">
                   <h3 class="mb-3">Confirmação de consentimento</h3>
                   <p>
-                    Em conformidade com a LGPD (Lei Geral de Proteção de Dados - Lei Nº 13.709), tenho ciência que as informações acima serão utilizadas pelo Instituto ACIM para realizar confirmação de inscrição na Certificação 2025.
+                    Em conformidade com a LGPD (Lei Geral de Proteção de Dados - Lei Nº 13.709), tenho ciência que as informações acima serão utilizadas pelo Instituto ACIM para realizar confirmação de inscrição na Certificação <?= date('Y')?>.
                   </p>
                   <p>
                     Informamos que ao concordar com a solicitação abaixo, serão fornecidos ao Instituto ACIM alguns dados pessoais tais como, nome completo, e-mail e telefone para efetuar contato com o(s) inscritos(s) no edital, quando necessário, motivo pelo qual manifesto a minha concordância, preenchendo os campos abaixo.

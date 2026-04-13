@@ -12,7 +12,12 @@ class Inscricao
 
         public static function statusDisponiveis()
         {
-                return ['CRIADO', 'CONFIRMADO', 'DUPLICADO', 'CANCELADO', 'ENCERRADO'];
+                return ['CRIADO', 'CONFIRMADO', 'BLOQUEADO', 'DUPLICADO', 'CANCELADO', 'ENCERRADO'];
+        }
+
+        public static function statusInativos()
+        {
+                return ['BLOQUEADO', 'DUPLICADO', 'CANCELADO', 'ENCERRADO'];
         }
 
         public static function buscaId($id_inscricao)
@@ -87,7 +92,7 @@ class Inscricao
         {
                 $db = Zend_Registry::get('db');
 
-                $select = "select * from eventos_inscricao where email = " . $db->quote($email) . " and status not in ('DUPLICADO','CANCELADO','ENCERRADO')";
+                $select = "select * from eventos_inscricao where email = " . $db->quote($email) . " and status not in (" . implode(',', array_map([$db, 'quote'], self::statusInativos())) . ")";
 
                 $registros = $db->fetchAll($select);
 
@@ -100,7 +105,7 @@ class Inscricao
         {
                 $db = Zend_Registry::get('db');
 
-                $select = "select * from eventos_inscricao where cnpj = " . $db->quote($cnpj) . " and status not in ('DUPLICADO','CANCELADO','ENCERRADO')";
+                $select = "select * from eventos_inscricao where cnpj = " . $db->quote($cnpj) . " and status not in (" . implode(',', array_map([$db, 'quote'], self::statusInativos())) . ")";
 
                 $registros = $db->fetchAll($select);
 
