@@ -193,11 +193,7 @@ function formatarDataHoraEvento($valor)
     .hero-logo {
       height: 72px;
       width: auto;
-      background: #fff;
-      border: 1px solid rgba(0, 0, 0, .08);
-      border-radius: 12px;
       padding: 6px;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, .06);
     }
 
     .hero-wrap {
@@ -540,7 +536,7 @@ function formatarDataHoraEvento($valor)
       <div class="row align-items-center">
         <div class="col-lg-8 mb-4 mb-lg-0">
           <div class="d-flex align-items-center mb-4">
-            <img src="./images/logo_header.png" alt="Logo Instituto ACIM" class="hero-logo mr-3">
+            <img src="./images/logo_formulario.png" alt="Logo Inscrição Social IMPACTACIM 2026" class="hero-logo mr-3">
             <div>
               <span class="hero-kicker">Instituto ACIM</span>
               <div class="brand" style="font-size:24px; line-height:1.1;">Inscrição Social IMPACTACIM 2026</div>
