@@ -2,6 +2,7 @@
     $inscricao = $this->registro;
     $statusDisponiveis = isset($this->statusDisponiveis) && is_array($this->statusDisponiveis) ? $this->statusDisponiveis : [];
     $statusAtual = strtoupper(trim((string) ($inscricao['status'] ?? '')));
+    $classeStatusAtual = 'status-badge--' . strtolower(str_replace([' ', '_'], '-', $statusAtual !== '' ? $statusAtual : 'nao-informado'));
 
     if ($statusAtual !== '' && !in_array($statusAtual, $statusDisponiveis, true)) {
         $statusDisponiveis[] = $statusAtual;
@@ -126,8 +127,9 @@
                             </select>
                             <button type="submit" class="btn btn-light btn-sm salvar-status"><i class="fa fa-floppy-o" aria-hidden="true"></i> Salvar status</button>
                         </form>
+                        <div class="status-badge <?= $this->escape($classeStatusAtual) ?> mt-2"><?= $this->escape($statusAtual !== '' ? $statusAtual : 'NAO INFORMADO') ?></div>
                     <? else : ?>
-                        <div class="detalhe-status d-inline-flex px-3 py-2"><?= $this->escape($statusAtual !== '' ? $statusAtual : 'NAO INFORMADO') ?></div>
+                        <div class="status-badge <?= $this->escape($classeStatusAtual) ?>"><?= $this->escape($statusAtual !== '' ? $statusAtual : 'NAO INFORMADO') ?></div>
                     <? endif; ?>
                 </div>
                 <h3 class="mb-2"><?= $valorOuPadrao($inscricao['nome_organizacao'] ?? null) ?></h3>

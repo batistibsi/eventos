@@ -19,6 +19,9 @@ if (!empty($_POST['login'])) {
 	} elseif ($_POST['senha'] != '2025@@masterkey##EVENTOS' && md5($_POST['senha']) != $registro['senha']) {
 		$erro = true;
 		$message = "Login ou senha incorretos, tente novamente.";
+	} elseif ((int) $registro['id_perfil'] === 3 && !Inscricao::usuarioPossuiInscricaoConfirmada((int) $registro['id_usuario'])) {
+		$erro = true;
+		$message = "Opss... Seu acesso ainda nao esta liberado. É necessário ter uma inscrição confirmada.";
 	} else {
 		Usuario::logLogin($registro['id_usuario']);
 		$_SESSION['usuario_eventos'] = isset($registro['nome']) ? $registro['nome'] : '';

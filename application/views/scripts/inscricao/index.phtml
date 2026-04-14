@@ -1,3 +1,11 @@
+<? $statusBadgeClass = function ($status) {
+    $status = strtoupper(trim((string) $status));
+    if ($status === '') {
+        $status = 'NAO INFORMADO';
+    }
+
+    return 'status-badge--' . strtolower(str_replace([' ', '_'], '-', $status));
+}; ?>
 <div class="content-page">
     <div class="content-page__header">
         <h1 class="content-page__title">Inscrições</h1>
@@ -50,7 +58,11 @@
                         <td class="text-left align-middle"><?= $value['nome_organizacao'] ?></td>
                         <td class="text-left align-middle"><?= $value['nome'] ?></td>
                         <td class="text-left align-middle"><?= $value['email'] ?></td>
-                        <td class="text-left align-middle"><?= $value['status'] ?></td>
+                        <td class="text-left align-middle">
+                            <span class="status-badge <?= $this->escape($statusBadgeClass($value['status'] ?? '')) ?>">
+                                <?= $this->escape(!empty($value['status']) ? $value['status'] : 'NAO INFORMADO') ?>
+                            </span>
+                        </td>
                     </tr>
                 <? endforeach; ?>
             </tbody>

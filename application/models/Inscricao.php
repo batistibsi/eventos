@@ -579,6 +579,26 @@ class Inscricao
                 return $registro;
         }
 
+        public static function usuarioPossuiInscricaoConfirmada($id_usuario)
+        {
+                $db = Zend_Registry::get('db');
+                $id_usuario = (int) $id_usuario;
+
+                if ($id_usuario <= 0) {
+                        self::$erro = 'Usuario nao informado.';
+                        return false;
+                }
+
+                $select = "select a.id_inscricao
+                             from eventos_inscricao a
+                            where a.id_usuario = " . $id_usuario . "
+                              and upper(coalesce(a.status, '')) = 'CONFIRMADO'
+                            order by a.id_inscricao desc
+                            limit 1";
+
+                return (bool) $db->fetchOne($select);
+        }
+
         public static function buscaResumoVinculadoUsuario($id_usuario)
         {
                 $db = Zend_Registry::get('db');

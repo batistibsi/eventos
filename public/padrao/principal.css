@@ -1321,6 +1321,54 @@ table td .btn-group > .btn,
   color: var(--color-white);
 }
 
+.status-badge {
+  align-items: center;
+  background: rgba(61, 100, 173, 0.10);
+  border: 1px solid rgba(61, 100, 173, 0.18);
+  border-radius: 999px;
+  color: var(--page-text);
+  display: inline-flex;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  line-height: 1;
+  min-height: 2rem;
+  padding: .45rem .8rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.status-badge--criado {
+  background: rgba(49, 93, 143, 0.10);
+  border-color: rgba(49, 93, 143, 0.20);
+  color: #28507f;
+}
+
+.status-badge--confirmado {
+  background: rgba(47, 143, 70, 0.12);
+  border-color: rgba(47, 143, 70, 0.24);
+  color: #216735;
+}
+
+.status-badge--bloqueado {
+  background: rgba(122, 31, 43, 0.12);
+  border-color: rgba(122, 31, 43, 0.22);
+  color: #7a1f2b;
+}
+
+.status-badge--duplicado,
+.status-badge--cancelado {
+  background: rgba(107, 119, 140, 0.12);
+  border-color: rgba(107, 119, 140, 0.24);
+  color: #566274;
+}
+
+.status-badge--encerrado {
+  background: rgba(91, 64, 31, 0.12);
+  border-color: rgba(91, 64, 31, 0.22);
+  color: #6b4b1f;
+}
+
 .inscricao-detalhe .logo-preview {
   align-items: center;
   background: #f5f8fd;
