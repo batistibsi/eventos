@@ -9,5 +9,7 @@ class AuditoriaController extends Zend_Controller_Action
 		$this->view->usuario = Zend_Registry::get('usuario');
 		$this->view->idUsuario = Zend_Registry::get('id_usuario');
 		$this->view->permissao = Zend_Registry::get('permissao');
+		$this->view->statusAuditoria = Auditoria::listaStatusPorPerfil(Zend_Registry::get('permissao'));
+		$this->view->inscricoesAuditoria = Auditoria::listaInscricoesPorPerfil(Zend_Registry::get('permissao'), Zend_Registry::get('id_usuario'));
 	}
 }

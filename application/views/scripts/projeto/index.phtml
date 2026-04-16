@@ -2,6 +2,9 @@
 	<div class="content-page__header">
 		<h1 class="content-page__title">Projetos</h1>
 		<div class="content-page__toolbar">
+			<? if (!empty($this->id_inscricao)) : ?>
+				<button type="button" onclick="carregarTela('../../inscricao/detalhe?id_inscricao=<?= (int) $this->id_inscricao ?>')" class="btn btn-info"><i class="fa fa-id-card-o" aria-hidden="true"></i> Inscri&ccedil;&atilde;o</button>
+			<? endif; ?>
 			<? if (!empty($this->mostrarBotaoSubmeter)) : ?>
 				<button type="button" id="submeter-projetos" class="btn btn-outline-primary"><i class="fa fa-send" aria-hidden="true"></i> Submeter Projetos</button>
 			<? endif; ?>
@@ -10,7 +13,7 @@
 			<? endif; ?>
 		</div>
 	</div>
-	<? if ($this->permissao != 1) : ?>
+	<? if ($this->permissao == 3) : ?>
 		<div class="alert alert-info mb-3">Cada empresa pode cadastrar até <?= (int) Projeto::MAX_PROJETOS_POR_USUARIO ?> projetos.</div>
 	<? endif; ?>
 	<? if ($this->permissao != 1 && !empty($this->mostrarBotaoSubmeter)) : ?>
@@ -142,9 +145,11 @@
 							title: "Sucesso!",
 							text: "Projetos submetidos com sucesso.",
 							type: "success"
-						}, function() {
-							carregarTela('../../projeto');
 						});
+
+						setTimeout(function() {
+							carregarTela('../../projeto');
+						}, 500);
 					},
 					error: function() {
 						swal({

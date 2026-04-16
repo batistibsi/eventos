@@ -1,5 +1,5 @@
 <?php
-if (Zend_Registry::get('permissao') != 1 && Zend_Registry::get('permissao') != 3) exit();
+if (Zend_Registry::get('permissao') != 1 && Zend_Registry::get('permissao') != 2 && Zend_Registry::get('permissao') != 3) exit();
 
 class ProjetoController extends Zend_Controller_Action
 {
@@ -8,17 +8,21 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->usuario = Zend_Registry::get('usuario');
 		$this->view->id_usuario = Zend_Registry::get('id_usuario');
 		$this->view->permissao = Zend_Registry::get('permissao');
-		$this->view->registros = Projeto::lista(Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+		$idInscricao = isset($_REQUEST['id_inscricao']) ? (int) $_REQUEST['id_inscricao'] : 0;
+		$this->view->id_inscricao = $idInscricao;
+		$this->view->registros = Projeto::lista(Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'), $idInscricao);
 		$ehAdmin = Zend_Registry::get('permissao') == 1;
 		$atingiuLimiteProjetos = !$ehAdmin && Projeto::quantidadeProjetosUsuario(Zend_Registry::get('id_usuario')) >= Projeto::MAX_PROJETOS_POR_USUARIO;
-		$this->view->mostrarBotaoSubmeter = !$ehAdmin && Projeto::todosListadosNoStatus(0, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
-		$this->view->mostrarBotaoNovo = $ehAdmin || (!$atingiuLimiteProjetos && !Projeto::existeListadoNoStatus(1, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao')));
+		$this->view->mostrarBotaoSubmeter = !$idInscricao && !$ehAdmin && Zend_Registry::get('permissao') != 2 && Projeto::todosListadosNoStatus(0, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+		$this->view->mostrarBotaoNovo = !$idInscricao && ($ehAdmin || (!$atingiuLimiteProjetos && Zend_Registry::get('permissao') != 2 && !Projeto::existeListadoNoStatus(1, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'))));
 		$this->view->permitirEditarExcluir = $ehAdmin || $this->view->mostrarBotaoNovo;
 		$this->view->atingiuLimiteProjetos = $atingiuLimiteProjetos;
 	}
 
 	public function cadastroAction()
 	{
+		if (Zend_Registry::get('permissao') == 2) exit();
+
 		$this->view->usuario = Zend_Registry::get('usuario');
 		$this->view->id_usuario = Zend_Registry::get('id_usuario');
 		$this->view->permissao = Zend_Registry::get('permissao');
@@ -73,6 +77,7 @@ class ProjetoController extends Zend_Controller_Action
 	public function salvarAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
+		if (Zend_Registry::get('permissao') == 2) die('Nao permitido!');
 
 		$idProjeto = isset($_REQUEST['id_projeto']) ? (int) $_REQUEST['id_projeto'] : 0;
 		$campos = [];
@@ -127,6 +132,7 @@ class ProjetoController extends Zend_Controller_Action
 	public function removerAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
+		if (Zend_Registry::get('permissao') == 2) die('Nao permitido!');
 
 		$idProjeto = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
 		$result = Projeto::delete($idProjeto, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
@@ -137,6 +143,7 @@ class ProjetoController extends Zend_Controller_Action
 	public function removerarquivoAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
+		if (Zend_Registry::get('permissao') == 2) die('Nao permitido!');
 
 		$idProjetoArquivo = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
 		$result = Projeto::removerArquivo($idProjetoArquivo, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
@@ -147,6 +154,7 @@ class ProjetoController extends Zend_Controller_Action
 	public function submeterlistadosAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
+		if (Zend_Registry::get('permissao') == 2) die('Nao permitido!');
 
 		if (Zend_Registry::get('permissao') == 1) {
 			echo 'A submissao em lote nao se aplica ao perfil administrador.';

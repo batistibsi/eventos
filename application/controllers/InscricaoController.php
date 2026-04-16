@@ -41,12 +41,27 @@ class InscricaoController extends Zend_Controller_Action
 			die('Inscricao nao encontrada');
 		}
 
-		if (Zend_Registry::get('permissao') != 1 && (int) ($this->view->registro['id_usuario'] ?? 0) !== (int) Zend_Registry::get('id_usuario')) {
+		$permissao = (int) Zend_Registry::get('permissao');
+		$idUsuarioLogado = (int) Zend_Registry::get('id_usuario');
+		$idUsuarioInscricao = (int) ($this->view->registro['id_usuario'] ?? 0);
+		$idAuditorInscricao = (int) ($this->view->registro['id_auditor'] ?? 0);
+
+		$podeVisualizar = false;
+		if ($permissao === 1) {
+			$podeVisualizar = true;
+		} elseif ($permissao === 2 && $idAuditorInscricao === $idUsuarioLogado) {
+			$podeVisualizar = true;
+		} elseif ($permissao === 3 && $idUsuarioInscricao === $idUsuarioLogado) {
+			$podeVisualizar = true;
+		}
+
+		if (!$podeVisualizar) {
 			die('Nao permitido!');
 		}
 
 		$this->view->statusDisponiveis = Inscricao::statusDisponiveis();
 		$this->view->summitInscricoes = Inscricao::listaInscricoesSummit($id_inscricao);
+		$this->view->auditores = Zend_Registry::get('permissao') == 1 ? Usuario::listaPorPerfil(2) : [];
 	}
 
 	public function alterarstatusAction()
@@ -75,6 +90,20 @@ class InscricaoController extends Zend_Controller_Action
 			Zend_Registry::get('id_usuario'),
 			Zend_Registry::get('permissao')
 		);
+
+		if (!$result) echo Inscricao::$erro;
+	}
+
+	public function definirauditorAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+
+		if (Zend_Registry::get('permissao') != 1) die('Nao permitido!');
+
+		$id_inscricao = !empty($_REQUEST['id_inscricao']) ? (int) $_REQUEST['id_inscricao'] : 0;
+		$id_auditor = isset($_REQUEST['id_auditor']) && $_REQUEST['id_auditor'] !== '' ? (int) $_REQUEST['id_auditor'] : null;
+
+		$result = Inscricao::definirAuditor($id_inscricao, $id_auditor);
 
 		if (!$result) echo Inscricao::$erro;
 	}

@@ -230,7 +230,15 @@ class Projeto
 		$db = Zend_Registry::get('db');
 
 		$where = ' where p.ativo and p.id_projeto = ' . $idProjeto;
-		if ((int) $permissao !== 1 && $idUsuarioLogado) {
+		if ((int) $permissao === 2 && $idUsuarioLogado) {
+			$where .= ' and exists (
+				select 1
+				from eventos_inscricao i
+				where i.id_usuario = p.id_usuario
+					and i.id_evento = p.id_evento
+					and i.id_auditor = ' . (int) $idUsuarioLogado . '
+			)';
+		} elseif ((int) $permissao !== 1 && $idUsuarioLogado) {
 			$where .= ' and p.id_usuario = ' . (int) $idUsuarioLogado;
 		}
 
@@ -266,12 +274,29 @@ class Projeto
 		return $registro;
 	}
 
-	public static function lista($idUsuarioLogado = null, $permissao = null)
+	public static function lista($idUsuarioLogado = null, $permissao = null, $idInscricao = null)
 	{
 		$db = Zend_Registry::get('db');
 
 		$where = ' where p.ativo';
-		if ((int) $permissao !== 1 && $idUsuarioLogado) {
+		if ($idInscricao) {
+			$inscricao = Inscricao::buscaId((int) $idInscricao);
+			if (!$inscricao || !is_array($inscricao)) {
+				return array();
+			}
+
+			if ((int) $permissao === 2 && (int) ($inscricao['id_auditor'] ?? 0) !== (int) $idUsuarioLogado) {
+				return array();
+			}
+			if ((int) $permissao === 3 && (int) ($inscricao['id_usuario'] ?? 0) !== (int) $idUsuarioLogado) {
+				return array();
+			}
+
+			$where .= ' and p.id_usuario = ' . (int) ($inscricao['id_usuario'] ?? 0);
+			$where .= ' and p.id_evento = ' . (int) ($inscricao['id_evento'] ?? 0);
+		} elseif ((int) $permissao === 2) {
+			return array();
+		} elseif ((int) $permissao !== 1 && $idUsuarioLogado) {
 			$where .= ' and p.id_usuario = ' . (int) $idUsuarioLogado;
 		}
 
@@ -362,9 +387,31 @@ class Projeto
 			$where .= ' AND id_usuario = ' . (int) $idUsuarioLogado;
 		}
 
-		$linhas = $db->update('eventos_projeto', array('status_projeto' => 1), $where);
-		if (!$linhas) {
-			self::$erro = 'Nenhum projeto foi submetido.';
+		$db->beginTransaction();
+
+		try {
+			$linhas = $db->update('eventos_projeto', array('status_projeto' => 1), $where);
+			if (!$linhas) {
+				self::$erro = 'Nenhum projeto foi submetido.';
+				$db->rollBack();
+				return false;
+			}
+
+			$whereInscricao = 'id_inscricao = (
+				select id_inscricao
+				from eventos_inscricao
+				where id_usuario = ' . (int) $idUsuarioLogado . '
+				order by id_inscricao desc
+				limit 1
+			)';
+			$db->update('eventos_inscricao', array('id_status_auditoria' => 1), $whereInscricao);
+
+			$db->commit();
+		} catch (Exception $e) {
+			if ($db->getConnection()->inTransaction()) {
+				$db->rollBack();
+			}
+			self::$erro = 'Nao foi possivel submeter os projetos.';
 			return false;
 		}
 

@@ -48,7 +48,7 @@ class UsuarioController extends Zend_Controller_Action
 
 		$this->view->registro = $registro;
 		$this->view->id_inscricao = $id_inscricao;
-		$this->view->perfilTravado = $perfilTravado;
+		$this->view->perfilTravado = $perfilTravado || ($registro && !empty($registro['id_usuario']) && Usuario::possuiVinculoInscricao((int) $registro['id_usuario']));
 
 		$this->view->comboPerfil = Usuario::comboPerfil();
 	}

@@ -57,14 +57,15 @@ class Evento
                 return $titulo . ' - ' . (new DateTime($data_hora))->format('d/m/Y H:i:s');
         }
 
-        public static function buscaId($id_evento)
-        {
+	public static function buscaId($id_evento)
+	{
 
-                $db = Zend_Registry::get('db');
+		$db = Zend_Registry::get('db');
+		$id_evento = (int) $id_evento;
 
-                $select = "select * 
+		$select = "select * 
                         from eventos_evento 
-                        where id_evento = " . $id_evento;
+                        where id_evento = " . $db->quote($id_evento);
 
                 $registros = $db->fetchAll($select);
 
@@ -78,9 +79,10 @@ class Evento
                 }
         }
 
-        public static function confereVagas($id_evento, $limite_vagas = false)
-        {
-                $db = Zend_Registry::get('db');
+	public static function confereVagas($id_evento, $limite_vagas = false)
+	{
+		$db = Zend_Registry::get('db');
+		$id_evento = (int) $id_evento;
 
                 if ($limite_vagas === false) {
                         $evento = self::buscaId($id_evento);
@@ -88,9 +90,9 @@ class Evento
                 }
 
                 $statusInativos = implode(',', array_map([$db, 'quote'], Inscricao::statusInativos()));
-                $select = "select count(*) as inscritos 
+		$select = "select count(*) as inscritos 
                                 from eventos_inscricao 
-                                where id_evento = " . $id_evento . " 
+                                where id_evento = " . $db->quote($id_evento) . " 
                                 and status not in (" . $statusInativos . ");";
 
                 $registros = $db->fetchAll($select);

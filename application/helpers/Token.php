@@ -63,7 +63,7 @@ class Token
 
 		$select = "select a.*
 			from gprc_token a
-			where a.nome = '" . $nome . "'";
+			where a.nome = " . $db->quote($nome);
 
 		$registros = $db->fetchAll($select);
 
@@ -92,7 +92,7 @@ class Token
 		);
 
 		if ($token)
-			$db->update("gprc_token", $data, "nome = '" . $nome . "'");
+			$db->update("gprc_token", $data, $db->quoteInto('nome = ?', $nome));
 		else
 			$db->insert("gprc_token", $data);
 

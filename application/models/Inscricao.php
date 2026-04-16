@@ -23,6 +23,7 @@ class Inscricao
         public static function buscaId($id_inscricao)
         {
                 $db = Zend_Registry::get('db');
+                $id_inscricao = (int) $id_inscricao;
 
                 $select = "select a.*,
                                     b.titulo as evento_titulo,
@@ -40,7 +41,7 @@ class Inscricao
                              left join eventos_evento b on b.id_evento = a.id_evento
                              left join eventos_usuario u on a.id_usuario = u.id_usuario and u.ativo
                              left join eventos_perfil p on u.id_perfil = p.id_perfil
-                             where a.id_inscricao = " . $id_inscricao . ";";
+                             where a.id_inscricao = " . $db->quote($id_inscricao) . ";";
 
                 $registros = $db->fetchAll($select);
 
@@ -449,6 +450,49 @@ class Inscricao
                         $db->update('eventos_inscricao', ['status' => $status], $where);
                 } catch (Exception $e) {
                         self::$erro = 'Nao foi possivel atualizar o status.';
+                        return false;
+                }
+
+                return true;
+        }
+
+        public static function definirAuditor($id_inscricao, $id_auditor)
+        {
+                $db = Zend_Registry::get('db');
+
+                $id_inscricao = (int) $id_inscricao;
+                $id_auditor = $id_auditor !== null && $id_auditor !== '' ? (int) $id_auditor : null;
+
+                if ($id_inscricao <= 0) {
+                        self::$erro = 'Inscricao nao informada.';
+                        return false;
+                }
+
+                $inscricao = self::buscaId($id_inscricao);
+                if (!$inscricao || !is_array($inscricao)) {
+                        self::$erro = 'Inscricao nao encontrada.';
+                        return false;
+                }
+
+                if ($id_auditor !== null) {
+                        $auditor = Usuario::buscaId($id_auditor);
+                        if (!$auditor || !is_array($auditor) || (int) ($auditor['id_perfil'] ?? 0) !== 2) {
+                                self::$erro = 'Auditor invalido.';
+                                return false;
+                        }
+                }
+
+                try {
+                        $where = $db->quoteInto('id_inscricao = ?', $id_inscricao);
+                        $data = ['id_auditor' => $id_auditor];
+
+                        if (empty($inscricao['id_auditor']) && $id_auditor !== null) {
+                                $data['id_status_auditoria'] = 2;
+                        }
+
+                        $db->update('eventos_inscricao', $data, $where);
+                } catch (Exception $e) {
+                        self::$erro = 'Nao foi possivel definir o auditor.';
                         return false;
                 }
 

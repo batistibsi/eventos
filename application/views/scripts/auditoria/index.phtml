@@ -2,12 +2,249 @@
     <div class="content-page__header">
         <h1 class="content-page__title">Auditoria</h1>
     </div>
-    <main class="col-sm-12 col-md-12 m-0">
-        <h1>Em construção</h1>
+
+    <main class="auditoria-kanban" aria-label="Kanban de auditoria">
+        <?
+        $statusAuditoria = !empty($this->statusAuditoria) ? $this->statusAuditoria : array();
+        $inscricoesPorStatus = array();
+        if (!empty($this->inscricoesAuditoria)) {
+            foreach ($this->inscricoesAuditoria as $inscricao) {
+                $idStatus = (int) $inscricao['id_status_auditoria'];
+                if (!isset($inscricoesPorStatus[$idStatus])) {
+                    $inscricoesPorStatus[$idStatus] = array();
+                }
+                $inscricoesPorStatus[$idStatus][] = $inscricao;
+            }
+        }
+        if (count($statusAuditoria) > 0): foreach ($statusAuditoria as $status):
+            $cor = !empty($status['cor']) && preg_match('/^#[0-9A-Fa-f]{6}$/', $status['cor']) ? $status['cor'] : '#475569';
+            $idStatus = (int) $status['id_status_auditoria'];
+            $inscricoes = isset($inscricoesPorStatus[$idStatus]) ? $inscricoesPorStatus[$idStatus] : array();
+        ?>
+                <section class="auditoria-kanban__lane" data-status-auditoria="<?= $idStatus ?>" style="--auditoria-cor: <?= $this->escape($cor) ?>;">
+                    <header class="auditoria-kanban__lane-header">
+                        <div class="auditoria-kanban__lane-heading">
+                            <span class="auditoria-kanban__lane-color" aria-hidden="true"></span>
+                            <h2 class="auditoria-kanban__lane-title"><?= $this->escape($status['nome']) ?></h2>
+                        </div>
+                        <span class="auditoria-kanban__lane-count"><?= count($inscricoes) ?></span>
+                    </header>
+                    <div class="auditoria-kanban__lane-body">
+                        <? if (count($inscricoes) > 0): foreach ($inscricoes as $inscricao): ?>
+                            <article class="auditoria-kanban__card" data-id-inscricao="<?= (int) $inscricao['id_inscricao'] ?>" role="button" tabindex="0">
+                                <h3 class="auditoria-kanban__card-title"><?= $this->escape($inscricao['nome_organizacao']) ?></h3>
+                                <div class="auditoria-kanban__card-row">
+                                    <span class="auditoria-kanban__card-label">Responsavel</span>
+                                    <span class="auditoria-kanban__card-value"><?= $this->escape($inscricao['nome']) ?></span>
+                                </div>
+                            </article>
+                        <? endforeach; else: ?>
+                            <div class="auditoria-kanban__empty">Nenhum item nesta raia.</div>
+                        <? endif; ?>
+                    </div>
+                </section>
+        <? endforeach;
+        else: ?>
+            <div class="alert alert-info mb-0">
+                Nenhuma raia de auditoria configurada para o seu perfil.
+            </div>
+        <? endif; ?>
     </main>
 </div>
+
+<style>
+    .auditoria-kanban {
+        align-items: stretch;
+        display: flex;
+        gap: 16px;
+        min-height: calc(100vh - 210px);
+        overflow-x: auto;
+        padding: 4px 0 16px;
+    }
+
+    .auditoria-kanban__lane {
+        background: #ffffff;
+        border: 1px solid #e1e5eb;
+        border-radius: 8px;
+        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+        display: flex;
+        flex: 0 0 280px;
+        flex-direction: column;
+        max-width: 320px;
+        min-height: calc(100vh - 230px);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .auditoria-kanban__lane:before {
+        background: var(--auditoria-cor);
+        content: "";
+        height: 4px;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+
+    .auditoria-kanban__lane-header {
+        align-items: center;
+        background: linear-gradient(180deg, rgba(248, 250, 252, 0.98), #ffffff);
+        border-bottom: 1px solid #eef1f5;
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        min-height: 66px;
+        padding: 16px 14px 12px;
+    }
+
+    .auditoria-kanban__lane-heading {
+        align-items: center;
+        display: flex;
+        gap: 9px;
+        min-width: 0;
+    }
+
+    .auditoria-kanban__lane-color {
+        background: var(--auditoria-cor);
+        border-radius: 6px;
+        box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08);
+        display: inline-block;
+        flex: 0 0 10px;
+        height: 10px;
+        width: 10px;
+    }
+
+    .auditoria-kanban__lane-title {
+        color: #1f2937;
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.25;
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .auditoria-kanban__lane-count {
+        align-items: center;
+        background: var(--auditoria-cor);
+        border-radius: 999px;
+        color: #ffffff;
+        display: inline-flex;
+        font-size: 12px;
+        font-weight: 700;
+        height: 24px;
+        justify-content: center;
+        min-width: 24px;
+        padding: 0 8px;
+    }
+
+    .auditoria-kanban__lane-body {
+        background: #f8fafc;
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px;
+    }
+
+    .auditoria-kanban__empty {
+        align-items: center;
+        background: #ffffff;
+        border: 1px dashed var(--auditoria-cor);
+        border-radius: 6px;
+        color: #64748b;
+        display: flex;
+        font-size: 13px;
+        justify-content: center;
+        min-height: 100%;
+        padding: 14px;
+        text-align: center;
+        width: 100%;
+    }
+
+    .auditoria-kanban__card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid var(--auditoria-cor);
+        border-radius: 6px;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+        cursor: pointer;
+        margin-bottom: 10px;
+        padding: 12px;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    }
+
+    .auditoria-kanban__card:hover,
+    .auditoria-kanban__card:focus {
+        border-color: var(--auditoria-cor);
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+        outline: none;
+        transform: translateY(-1px);
+    }
+
+    .auditoria-kanban__card-title {
+        color: #111827;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.3;
+        margin: 0 0 10px;
+        overflow-wrap: anywhere;
+    }
+
+    .auditoria-kanban__card-row {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .auditoria-kanban__card-label {
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .auditoria-kanban__card-value {
+        color: #334155;
+        font-size: 13px;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 767px) {
+        .auditoria-kanban {
+            flex-direction: column;
+            min-height: 0;
+            overflow-x: visible;
+        }
+
+        .auditoria-kanban__lane {
+            flex-basis: auto;
+            max-width: none;
+            min-height: 220px;
+            width: 100%;
+        }
+
+        .auditoria-kanban__empty {
+            min-height: 90px;
+        }
+    }
+</style>
+
 <script type="text/javascript">
     $(document).ready(function() {
+        $('.auditoria-kanban__card').on('click keydown', function(e) {
+            if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') {
+                return;
+            }
+
+            e.preventDefault();
+            var idInscricao = $(this).data('id-inscricao');
+            if (idInscricao) {
+                <? if ((int) ($this->permissao ?? 0) === 2) : ?>
+                    carregarTela('../../projeto?id_inscricao=' + idInscricao);
+                <? else : ?>
+                    carregarTela('../../inscricao/detalhe?id_inscricao=' + idInscricao);
+                <? endif; ?>
+            }
+        });
 
     });
 </script>

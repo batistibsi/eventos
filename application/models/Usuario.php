@@ -11,8 +11,9 @@ class Usuario
 	{
 
 		$db = Zend_Registry::get('db');
+		$id_usuario = (int) $id_usuario;
 
-		$select = "select * from eventos_usuario where id_usuario = " . $id_usuario;
+		$select = "select * from eventos_usuario where id_usuario = " . $db->quote($id_usuario);
 
 		$registros = $db->fetchAll($select);
 
@@ -29,7 +30,7 @@ class Usuario
 
 		$db = Zend_Registry::get('db');
 
-		$select = "select * from eventos_usuario where email = '" . $email . "' and ativo";
+		$select = "select * from eventos_usuario where email = " . $db->quote($email) . " and ativo";
 
 		$registros = $db->fetchAll($select);
 
@@ -58,7 +59,7 @@ class Usuario
 			"senha" => $novaSenha
 		);
 
-		$db->update("eventos_usuario", $data, "id_usuario = '" . $id_usuario . "'");
+		$db->update("eventos_usuario", $data, $db->quoteInto('id_usuario = ?', (int) $id_usuario));
 
 		return true;
 	}
@@ -66,8 +67,9 @@ class Usuario
 	public static function uniqueEmail($id, $email)
 	{
 		$db = Zend_Registry::get('db');
+		$id = (int) $id;
 
-		$select = "select * from eventos_usuario where id_usuario <> " . $id . " and email = '" . $email . "' and ativo";
+		$select = "select * from eventos_usuario where id_usuario <> " . $db->quote($id) . " and email = " . $db->quote($email) . " and ativo";
 
 		$registros = $db->fetchAll($select);
 
@@ -153,6 +155,8 @@ class Usuario
 
 	public static function update($email, $nome, $idPerfil, $ativo, $senha, $id_usuario, $confirmSenha)
 	{
+		$id_usuario = (int) $id_usuario;
+		$idPerfil = (int) $idPerfil;
 
 		if (strlen($email) < 3 || strlen($email) > self::MAX_EMAIL) {
 			Usuario::$erro = 'Email inválido!';
@@ -181,6 +185,15 @@ class Usuario
 		}
 
 		$db = Zend_Registry::get('db');
+		$registroAtual = self::buscaId($id_usuario);
+		if (!$registroAtual) {
+			return false;
+		}
+
+		if ((int) $registroAtual['id_perfil'] !== $idPerfil && self::possuiVinculoInscricao($id_usuario)) {
+			Usuario::$erro = 'Nao e permitido alterar o perfil de um usuario vinculado a uma inscricao.';
+			return false;
+		}
 
 		$data = array(
 			"email" => $email,
@@ -194,7 +207,7 @@ class Usuario
 			self::emailSenha($email, $senha);
 		}
 
-		$db->update("eventos_usuario", $data, "id_usuario = " . $id_usuario);
+		$db->update("eventos_usuario", $data, $db->quoteInto('id_usuario = ?', (int) $id_usuario));
 
 		return true;
 	}
@@ -206,6 +219,23 @@ class Usuario
 			. '<p><strong>' . $senha . '</strong></p>';
 
 		Email::enviar($email, 'Mudança de senha', $msg);
+	}
+
+	public static function possuiVinculoInscricao($id_usuario)
+	{
+		$db = Zend_Registry::get('db');
+		$id_usuario = (int) $id_usuario;
+
+		if (!$id_usuario) {
+			return false;
+		}
+
+		$select = "select count(*)
+				  from eventos_inscricao
+				  where id_usuario = " . $db->quote($id_usuario) . "
+				     or id_auditor = " . $db->quote($id_usuario);
+
+		return (int) $db->fetchOne($select) > 0;
 	}
 
 	public static function desativar($id_usuario)
@@ -222,7 +252,7 @@ class Usuario
 			"ativo" => false
 		);
 
-		$db->update("eventos_usuario", $data, "id_usuario = " . $id_usuario);
+		$db->update("eventos_usuario", $data, $db->quoteInto('id_usuario = ?', (int) $id_usuario));
 
 		return true;
 	}
@@ -243,6 +273,27 @@ class Usuario
 		$retorno = $db->fetchAll($select);
 
 		return $retorno;
+	}
+
+	public static function listaPorPerfil($idPerfil)
+	{
+		$db = Zend_Registry::get('db');
+		$idPerfil = (int) $idPerfil;
+
+		if (!$idPerfil) {
+			return array();
+		}
+
+		$select = "select eventos_usuario.*,
+					eventos_perfil.descricao as descricao_perfil
+				  from eventos_usuario
+				  left join eventos_perfil on eventos_usuario.id_perfil = eventos_perfil.id_perfil
+				   where eventos_usuario.ativo
+				   and eventos_usuario.id_usuario <> 1
+				   and eventos_usuario.id_perfil = " . $db->quote($idPerfil) . "
+				  order by eventos_usuario.nome";
+
+		return $db->fetchAll($select);
 	}
 
 	public static function logins()

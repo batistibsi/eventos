@@ -76,6 +76,10 @@
     $logoEhImagem = in_array($extensaoLogo, ['png', 'jpg', 'jpeg', 'gif', 'webp'], true);
     $usuarioVinculado = !empty($inscricao['usuario_id']);
     $summitInscricoes = isset($this->summitInscricoes) && is_array($this->summitInscricoes) ? $this->summitInscricoes : [];
+    $auditores = isset($this->auditores) && is_array($this->auditores) ? $this->auditores : [];
+    $idAuditorAtual = !empty($inscricao['id_auditor']) ? (int) $inscricao['id_auditor'] : 0;
+    $possuiStatusAuditoria = !empty($inscricao['id_status_auditoria']);
+    $mostrarSummit = (int) ($this->permissao ?? 0) !== 2;
 
     $dataSummitFormatada = !empty($inscricao['data_inscricao_summit']) ? Util::formatData($inscricao['data_inscricao_summit']) : 'Não informada';
     $prazoSummitEncerrado = true;
@@ -104,9 +108,14 @@
     <div class="content-page__header">
         <h1 class="h2 text-info mb-2 mb-md-0">Detalhe da inscrição</h1>
         <div class="content-page__toolbar">
-            <a href="#representantes-summit" class="btn btn-warning">
-                <i class="fa fa-calendar-check-o" aria-hidden="true"></i> Inscri&ccedil;&atilde;o no Summit
-            </a>
+            <button type="button" onclick="carregarTela('../../projeto?id_inscricao=<?= (int) ($inscricao['id_inscricao'] ?? 0) ?>')" class="btn btn-info">
+                <i class="fa fa-folder-open" aria-hidden="true"></i> Projetos
+            </button>
+            <? if ($mostrarSummit) : ?>
+                <a href="#representantes-summit" class="btn btn-warning">
+                    <i class="fa fa-calendar-check-o" aria-hidden="true"></i> Inscri&ccedil;&atilde;o no Summit
+                </a>
+            <? endif; ?>
             <button type="button" onclick="carregarTelaAnterior();" class="btn btn-primary">
                 <i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar
             </button>
@@ -127,7 +136,6 @@
                             </select>
                             <button type="submit" class="btn btn-light btn-sm salvar-status"><i class="fa fa-floppy-o" aria-hidden="true"></i> Salvar status</button>
                         </form>
-                        <div class="status-badge <?= $this->escape($classeStatusAtual) ?> mt-2"><?= $this->escape($statusAtual !== '' ? $statusAtual : 'NAO INFORMADO') ?></div>
                     <? else : ?>
                         <div class="status-badge <?= $this->escape($classeStatusAtual) ?>"><?= $this->escape($statusAtual !== '' ? $statusAtual : 'NAO INFORMADO') ?></div>
                     <? endif; ?>
@@ -138,6 +146,7 @@
                     E-mail: <?= $valorOuPadrao($inscricao['email'] ?? null) ?><br>
                     Telefone: <?= $formatarTelefone($inscricao['telefone'] ?? null) ?>
                 </p>
+                <? if ((int) ($this->permissao ?? 0) === 1) : ?>
                 <? if ($usuarioVinculado) : ?>
                     <div class="inscricao-usuario-vinculo mt-3">
                         <span class="field-label">Usuário vinculado</span>
@@ -153,6 +162,7 @@
                             <i class="fa fa-user-plus" aria-hidden="true"></i> Incluir usuário
                         </button>
                     </div>
+                <? endif; ?>
                 <? endif; ?>
             </div>
             <div class="col-12 col-lg-5">
@@ -188,6 +198,27 @@
                                     <div class="detalhe-valor"><?= nl2br($this->escape($valorOuPadrao($inscricao['evento_observacao'] ?? null))) ?></div>
                                 </div>
                             </div>
+                            <? if ((int) ($this->permissao ?? 0) === 1 && $possuiStatusAuditoria) : ?>
+                                <form id="form-auditor-inscricao" class="mt-3">
+                                    <input type="hidden" name="id_inscricao" value="<?= (int) ($inscricao['id_inscricao'] ?? 0) ?>">
+                                    <div class="form-group mb-2">
+                                        <label for="id_auditor" class="field-label">Auditor</label>
+                                        <select name="id_auditor" id="id_auditor" class="form-control">
+                                            <option value="">Sem auditor definido</option>
+                                            <? foreach ($auditores as $auditor) : ?>
+                                                <option value="<?= (int) $auditor['id_usuario'] ?>" <?= (int) $auditor['id_usuario'] === $idAuditorAtual ? 'selected' : '' ?>>
+                                                    <?= $this->escape($auditor['nome']) ?><?= !empty($auditor['email']) ? ' - ' . $this->escape($auditor['email']) : '' ?>
+                                                </option>
+                                            <? endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="text-right">
+                                        <button type="submit" class="btn btn-primary btn-sm salvar-auditor">
+                                            <i class="fa fa-floppy-o" aria-hidden="true"></i> Salvar auditor
+                                        </button>
+                                    </div>
+                                </form>
+                            <? endif; ?>
                         </div>
                     </div>
                 </div>
@@ -283,6 +314,7 @@
         </div>
     </div>
 
+    <? if ($mostrarSummit) : ?>
     <div class="detalhe-card mb-4" id="formulario-summit">
         <div class="detalhe-card-body">
             <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
@@ -392,6 +424,7 @@
             </form>
         </div>
     </div>
+    <? endif; ?>
 
     <? if ((int) ($this->permissao ?? 0) === 1 && (!empty($inscricao['token_confirmacao']) || !empty($inscricao['token_expira_em']))) : ?>
         <div class="detalhe-card">
@@ -448,6 +481,44 @@
                     swal({
                         title: "Atenção!",
                         text: "Não foi possível alterar o status.",
+                        type: "error"
+                    });
+                }
+            });
+        });
+
+        $('#form-auditor-inscricao').submit(function(e) {
+            e.preventDefault();
+
+            $('.salvar-auditor').prop('disabled', true);
+
+            $.ajax({
+                type: "POST",
+                url: "../../inscricao/definirauditor",
+                data: $(this).serialize(),
+                success: function(data) {
+                    if (data.trim().length > 0) {
+                        swal({
+                            title: "AtenÃ§Ã£o!",
+                            text: data,
+                            type: "error"
+                        });
+                    } else {
+                        swal({
+                            title: "Sucesso!",
+                            text: "Auditor definido com sucesso.",
+                            type: "success"
+                        });
+                    }
+
+                    $('.salvar-auditor').prop('disabled', false);
+                },
+                error: function() {
+                    $('.salvar-auditor').prop('disabled', false);
+
+                    swal({
+                        title: "AtenÃ§Ã£o!",
+                        text: "NÃ£o foi possÃ­vel definir o auditor.",
                         type: "error"
                     });
                 }

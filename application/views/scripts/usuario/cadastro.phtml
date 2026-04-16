@@ -23,7 +23,7 @@
 				<div class="form-group col-md-4">
 					<span><label for="id_perfil">Perfil: </label></span>
 					<? if (!empty($this->perfilTravado)) : ?>
-						<input type="hidden" name="id_perfil" value="3" id="id_perfil_hidden">
+						<input type="hidden" name="id_perfil" value="<?= $this->registro ? (int) $this->registro['id_perfil'] : 3 ?>" id="id_perfil_hidden">
 					<? endif; ?>
 					<select class="form-control" name="<?= !empty($this->perfilTravado) ? 'id_perfil_exibicao' : 'id_perfil' ?>" id="id_perfil" <?= !empty($this->perfilTravado) ? 'disabled' : '' ?>>
 						<option value="0">Escolha um perfil...</option>
