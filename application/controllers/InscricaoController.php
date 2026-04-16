@@ -41,21 +41,7 @@ class InscricaoController extends Zend_Controller_Action
 			die('Inscricao nao encontrada');
 		}
 
-		$permissao = (int) Zend_Registry::get('permissao');
-		$idUsuarioLogado = (int) Zend_Registry::get('id_usuario');
-		$idUsuarioInscricao = (int) ($this->view->registro['id_usuario'] ?? 0);
-		$idAuditorInscricao = (int) ($this->view->registro['id_auditor'] ?? 0);
-
-		$podeVisualizar = false;
-		if ($permissao === 1) {
-			$podeVisualizar = true;
-		} elseif ($permissao === 2 && $idAuditorInscricao === $idUsuarioLogado) {
-			$podeVisualizar = true;
-		} elseif ($permissao === 3 && $idUsuarioInscricao === $idUsuarioLogado) {
-			$podeVisualizar = true;
-		}
-
-		if (!$podeVisualizar) {
+		if (!Inscricao::podeVisualizar($this->view->registro, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'))) {
 			die('Nao permitido!');
 		}
 

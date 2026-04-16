@@ -1,5 +1,4 @@
 <?php
-if (Zend_Registry::get('permissao') != 1 && Zend_Registry::get('permissao') != 2 && Zend_Registry::get('permissao') != 3) exit();
 
 class ProjetoController extends Zend_Controller_Action
 {

@@ -179,6 +179,27 @@ class Projeto
 		return $db->fetchAll('select * from eventos_projeto_arquivo' . $where . ' order by id_projeto_arquivo asc');
 	}
 
+	private static function buscaInscricaoProjeto($idUsuario, $idEvento)
+	{
+		$db = Zend_Registry::get('db');
+		$idUsuario = (int) $idUsuario;
+		$idEvento = (int) $idEvento;
+
+		if (!$idUsuario || !$idEvento) {
+			return false;
+		}
+
+		$select = "select *
+				from eventos_inscricao
+				where id_usuario = " . $db->quote($idUsuario) . "
+					and id_evento = " . $db->quote($idEvento) . "
+				order by id_inscricao desc
+				limit 1";
+
+		$registro = $db->fetchRow($select);
+		return $registro ? $registro : false;
+	}
+
 	public static function removerArquivo($idProjetoArquivo, $idUsuarioLogado = null, $permissao = null)
 	{
 		$db = Zend_Registry::get('db');
@@ -230,15 +251,7 @@ class Projeto
 		$db = Zend_Registry::get('db');
 
 		$where = ' where p.ativo and p.id_projeto = ' . $idProjeto;
-		if ((int) $permissao === 2 && $idUsuarioLogado) {
-			$where .= ' and exists (
-				select 1
-				from eventos_inscricao i
-				where i.id_usuario = p.id_usuario
-					and i.id_evento = p.id_evento
-					and i.id_auditor = ' . (int) $idUsuarioLogado . '
-			)';
-		} elseif ((int) $permissao !== 1 && $idUsuarioLogado) {
+		if ((int) $permissao !== 1 && (int) $permissao !== 2 && $idUsuarioLogado) {
 			$where .= ' and p.id_usuario = ' . (int) $idUsuarioLogado;
 		}
 
@@ -265,6 +278,14 @@ class Projeto
 		}
 
 		$registro = $registros[0];
+		if ((int) $permissao !== 1) {
+			$inscricao = self::buscaInscricaoProjeto($registro['id_usuario'], $registro['id_evento']);
+			if (!Inscricao::podeVisualizar($inscricao, $idUsuarioLogado, $permissao)) {
+				self::$erro = 'Projeto nao encontrado.';
+				return false;
+			}
+		}
+
 		$registro['status_projeto_label'] = self::statusLabel($registro['status_projeto']);
 		$registro['arquivos'] = self::listaArquivos($registro['id_projeto'], 'qualitativa');
 		$registro['arquivos_qualitativos'] = $registro['arquivos'];
@@ -285,10 +306,7 @@ class Projeto
 				return array();
 			}
 
-			if ((int) $permissao === 2 && (int) ($inscricao['id_auditor'] ?? 0) !== (int) $idUsuarioLogado) {
-				return array();
-			}
-			if ((int) $permissao === 3 && (int) ($inscricao['id_usuario'] ?? 0) !== (int) $idUsuarioLogado) {
+			if (!Inscricao::podeVisualizar($inscricao, $idUsuarioLogado, $permissao)) {
 				return array();
 			}
 

@@ -456,6 +456,30 @@ class Inscricao
                 return true;
         }
 
+        public static function podeVisualizar($inscricao, $id_usuario, $permissao)
+        {
+                if (!$inscricao || !is_array($inscricao)) {
+                        return false;
+                }
+
+                $permissao = (int) $permissao;
+                $id_usuario = (int) $id_usuario;
+
+                if ($permissao === 1) {
+                        return true;
+                }
+
+                if ($permissao === 2) {
+                        return (int) ($inscricao['id_auditor'] ?? 0) === $id_usuario;
+                }
+
+                if ($permissao === 3) {
+                        return (int) ($inscricao['id_usuario'] ?? 0) === $id_usuario;
+                }
+
+                return false;
+        }
+
         public static function definirAuditor($id_inscricao, $id_auditor)
         {
                 $db = Zend_Registry::get('db');
