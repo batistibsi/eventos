@@ -535,10 +535,10 @@ function formatarDataHoraEvento($valor)
       <div class="row align-items-center">
         <div class="col-lg-8 mb-4 mb-lg-0">
           <div class="d-flex align-items-center mb-4">
-            <img src="./images/logo_formulario.png" alt="Logo Inscrição Social IMPACTACIM 2026" class="hero-logo mr-3">
+            <img src="./images/logo_formulario.png" alt="Logo Inscrição IMPACTACIM 2026" class="hero-logo mr-3">
             <div>
               <span class="hero-kicker">Instituto ACIM</span>
-              <div class="brand" style="font-size:24px; line-height:1.1;">Inscrição Social IMPACTACIM 2026</div>
+              <div class="brand" style="font-size:24px; line-height:1.1;">Inscrição IMPACTACIM 2026</div>
             </div>
           </div>
 

@@ -12,7 +12,7 @@ class Inscricao
 
         public static function statusDisponiveis()
         {
-                return ['CRIADO', 'CONFIRMADO', 'BLOQUEADO', 'DUPLICADO', 'CANCELADO', 'ENCERRADO'];
+                return ['CRIADO', 'CONFIRMADO', 'ISENTO CONFIRMADO', 'BLOQUEADO', 'DUPLICADO', 'CANCELADO', 'ENCERRADO'];
         }
 
         public static function statusInativos()
@@ -657,10 +657,12 @@ class Inscricao
                         return false;
                 }
 
+                $statusConfirmados = implode(',', array_map([$db, 'quote'], ['CONFIRMADO', 'ISENTO CONFIRMADO']));
+
                 $select = "select a.id_inscricao
                              from eventos_inscricao a
                             where a.id_usuario = " . $id_usuario . "
-                              and upper(coalesce(a.status, '')) = 'CONFIRMADO'
+                              and upper(coalesce(a.status, '')) in (" . $statusConfirmados . ")
                             order by a.id_inscricao desc
                             limit 1";
 
