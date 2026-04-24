@@ -58,6 +58,16 @@ class CadastroController extends Zend_Controller_Action
 		$this->view->registro = Config::help();
 	}
 
+	public function formaspagamentoAction()
+	{
+		if (Zend_Registry::get('permissao') != 1) exit();
+
+		$this->view->usuario = Zend_Registry::get('usuario');
+		$this->view->idUsuario = Zend_Registry::get('id_usuario');
+		$this->view->permissao = Zend_Registry::get('permissao');
+		$this->view->registros = FormaPagamento::listar();
+	}
+
 	public function salvamaterialAction()
 	{
 		if (Zend_Registry::get('permissao') != 1) exit();
@@ -93,6 +103,23 @@ class CadastroController extends Zend_Controller_Action
 
 		if (!Config::salvarHelp($campos)) {
 			echo Config::$erro;
+		}
+	}
+
+	public function salvarformapagamentoAction()
+	{
+		if (Zend_Registry::get('permissao') != 1) exit();
+
+		$this->_helper->viewRenderer->setNoRender();
+
+		$campos = array(
+			'id_forma_pagamento' => $_REQUEST['id_forma_pagamento'] ?? null,
+			'descricao' => $_REQUEST['descricao'] ?? null,
+			'ativo' => isset($_REQUEST['ativo']) ? (string) $_REQUEST['ativo'] === '1' : false
+		);
+
+		if (!FormaPagamento::salvar($campos)) {
+			echo FormaPagamento::$erro;
 		}
 	}
 }

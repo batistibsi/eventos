@@ -48,6 +48,7 @@ class InscricaoController extends Zend_Controller_Action
 		$this->view->statusDisponiveis = Inscricao::statusDisponiveis();
 		$this->view->summitInscricoes = Inscricao::listaInscricoesSummit($id_inscricao);
 		$this->view->auditores = Zend_Registry::get('permissao') == 1 ? Usuario::listaPorPerfil(2) : [];
+		$this->view->formasPagamento = FormaPagamento::listar();
 	}
 
 	public function alterarstatusAction()
@@ -90,6 +91,20 @@ class InscricaoController extends Zend_Controller_Action
 		$id_auditor = isset($_REQUEST['id_auditor']) && $_REQUEST['id_auditor'] !== '' ? (int) $_REQUEST['id_auditor'] : null;
 
 		$result = Inscricao::definirAuditor($id_inscricao, $id_auditor);
+
+		if (!$result) echo Inscricao::$erro;
+	}
+
+	public function salvarformapagamentoAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+
+		if (Zend_Registry::get('permissao') != 1) die('Nao permitido!');
+
+		$id_inscricao = !empty($_REQUEST['id_inscricao']) ? (int) $_REQUEST['id_inscricao'] : 0;
+		$id_forma_pagamento = !empty($_REQUEST['id_forma_pagamento']) ? (int) $_REQUEST['id_forma_pagamento'] : 0;
+
+		$result = Inscricao::salvarFormaPagamento($id_inscricao, $id_forma_pagamento);
 
 		if (!$result) echo Inscricao::$erro;
 	}

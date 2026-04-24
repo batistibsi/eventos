@@ -32,6 +32,7 @@ $campos['primeira_participacao'] = postValue('primeira_participacao');
 $campos['nome_certificado'] = postValue('nome_certificado');
 $campos['como_soube'] = postValue('como_soube');
 $campos['indicacao_organizacao'] = postValue('indicacao_organizacao');
+$campos['id_forma_pagamento'] = (int)($_POST['id_forma_pagamento'] ?? 0);
 
 $obrigatorios = [
   'nome' => 'nome do responsável',
@@ -58,6 +59,11 @@ foreach ($obrigatorios as $campo => $label) {
 
 if ($campos['numero_colaboradores'] <= 0 || $campos['id_evento'] <= 0) {
   echo json_encode(['success' => false, 'erro' => 'Informe a quantidade de colaboradores e selecione um evento.'], JSON_UNESCAPED_UNICODE);
+  exit;
+}
+
+if ($campos['id_forma_pagamento'] <= 0) {
+  echo json_encode(['success' => false, 'erro' => 'Informe a forma de pagamento.'], JSON_UNESCAPED_UNICODE);
   exit;
 }
 

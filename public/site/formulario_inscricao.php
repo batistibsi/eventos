@@ -3,6 +3,7 @@
 include_once "../zend.php";
 
 $eventos = Evento::lista(true);
+$formasPagamento = FormaPagamento::listar(true);
 
 if (count($eventos)) {
   foreach ($eventos as $key => $value) {
@@ -847,6 +848,17 @@ function formatarDataHoraEvento($valor)
                     <small class="help d-block mb-2">Se desejar, informe o nome e o contato de outra organização que possa se interessar pela certificação.</small>
                     <textarea class="form-control" name="indicacao_organizacao" rows="4" maxlength="500"
                       placeholder="Se sim, deixe o contato aqui."></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="mb-1">Forma de pagamento *</label>
+                    <small class="help d-block mb-2">Selecione a forma de pagamento utilizada pela organização para esta inscrição.</small>
+                    <select class="form-control" name="id_forma_pagamento" required>
+                      <option value="">Selecione...</option>
+                      <? foreach ($formasPagamento as $formaPagamento) : ?>
+                        <option value="<?= (int) $formaPagamento['id_forma_pagamento'] ?>"><?= htmlspecialchars($formaPagamento['descricao'], ENT_QUOTES, 'UTF-8') ?></option>
+                      <? endforeach; ?>
+                    </select>
                   </div>
 
                   <div class="d-flex align-items-center justify-content-between mt-4 flex-wrap">

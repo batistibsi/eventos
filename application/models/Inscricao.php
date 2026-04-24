@@ -33,12 +33,14 @@ class Inscricao
                                     b.limite_vagas as evento_limite_vagas,
                                     b.data_inscricao_summit as data_inscricao_summit,
                                     b.data_summit as data_summit,
+                                    fp.descricao as forma_pagamento_descricao,
                                     u.id_usuario as usuario_id,
                                     u.nome as usuario_nome,
                                     u.email as usuario_email,
                                     p.descricao as usuario_perfil
                              from eventos_inscricao a
                              left join eventos_evento b on b.id_evento = a.id_evento
+                             left join eventos_forma_pagamento fp on fp.id_forma_pagamento = a.id_forma_pagamento
                              left join eventos_usuario u on a.id_usuario = u.id_usuario and u.ativo
                              left join eventos_perfil p on u.id_perfil = p.id_perfil
                              where a.id_inscricao = " . $db->quote($id_inscricao) . ";";
@@ -307,6 +309,13 @@ class Inscricao
                         return false;
                 }
 
+                $idFormaPagamento = isset($campos['id_forma_pagamento']) ? (int) $campos['id_forma_pagamento'] : 0;
+                $formaPagamento = FormaPagamento::buscaId($idFormaPagamento);
+                if ($idFormaPagamento <= 0 || !$formaPagamento || empty($formaPagamento['ativo'])) {
+                        self::$erro = 'Informe uma forma de pagamento valida.';
+                        return false;
+                }
+
                 if (!self::uniqueInscricaoEmail($campos['email'])) {
                         self::$erro = 'Inscricao ja realizada para o email: ' . $campos['email'] . '!';
                         return false;
@@ -367,6 +376,7 @@ class Inscricao
                                 'logo_organizacao' => $logoPath,
                                 'como_soube' => $campos['como_soube'],
                                 'indicacao_organizacao' => !empty($campos['indicacao_organizacao']) ? $campos['indicacao_organizacao'] : null,
+                                'id_forma_pagamento' => $idFormaPagamento,
                                 'status' => 'CRIADO',
                                 'token_confirmacao' => $token,
                                 'token_expira_em' => $expiraEm
@@ -611,6 +621,46 @@ class Inscricao
                         $db->update('eventos_inscricao', ['id_usuario' => $id_usuario], $where);
                 } catch (Exception $e) {
                         self::$erro = 'Nao foi possivel vincular o usuario a inscricao.';
+                        return false;
+                }
+
+                return true;
+        }
+
+        public static function salvarFormaPagamento($id_inscricao, $id_forma_pagamento)
+        {
+                $db = Zend_Registry::get('db');
+
+                $id_inscricao = (int) $id_inscricao;
+                $id_forma_pagamento = (int) $id_forma_pagamento;
+
+                if ($id_inscricao <= 0) {
+                        self::$erro = 'Inscricao nao informada.';
+                        return false;
+                }
+
+                if ($id_forma_pagamento <= 0) {
+                        self::$erro = 'Forma de pagamento nao informada.';
+                        return false;
+                }
+
+                $inscricao = self::buscaId($id_inscricao);
+                if (!$inscricao || !is_array($inscricao)) {
+                        self::$erro = 'Inscricao nao encontrada.';
+                        return false;
+                }
+
+                $formaPagamento = FormaPagamento::buscaId($id_forma_pagamento);
+                if (!$formaPagamento) {
+                        self::$erro = 'Forma de pagamento invalida.';
+                        return false;
+                }
+
+                try {
+                        $where = $db->quoteInto('id_inscricao = ?', $id_inscricao);
+                        $db->update('eventos_inscricao', ['id_forma_pagamento' => $id_forma_pagamento], $where);
+                } catch (Exception $e) {
+                        self::$erro = 'Nao foi possivel salvar a forma de pagamento da inscricao.';
                         return false;
                 }
 
