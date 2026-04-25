@@ -5,7 +5,54 @@
 <? $arquivosPessoas = $registro && !empty($registro['arquivos_pessoas']) ? $registro['arquivos_pessoas'] : array(); ?>
 <? $arquivosParceiros = $registro && !empty($registro['arquivos_parceiros']) ? $registro['arquivos_parceiros'] : array(); ?>
 <? $empresaVinculada = !empty($this->empresaVinculada) && is_array($this->empresaVinculada) ? $this->empresaVinculada : false; ?>
-<div class="content-page">
+<? $podeAvaliarProjeto = !empty($this->podeAvaliarProjeto); ?>
+<? $avaliacoes = $registro && !empty($registro['avaliacoes']) && is_array($registro['avaliacoes']) ? $registro['avaliacoes'] : array(); ?>
+<? $view = $this; ?>
+<? $avaliacaoPadrao = function ($campo) use ($avaliacoes) {
+	if (!isset($avaliacoes[$campo]) || !is_array($avaliacoes[$campo])) {
+		return array('aprovado' => null, 'comentario' => '');
+	}
+	return array(
+		'aprovado' => array_key_exists('aprovado', $avaliacoes[$campo]) ? $avaliacoes[$campo]['aprovado'] : null,
+		'comentario' => isset($avaliacoes[$campo]['comentario']) ? $avaliacoes[$campo]['comentario'] : ''
+	);
+}; ?>
+<? $renderAvaliacao = function ($campo, $titulo) use ($avaliacaoPadrao, $podeAvaliarProjeto, $view) {
+	$avaliacao = $avaliacaoPadrao($campo);
+	$aprovado = $avaliacao['aprovado'];
+	$comentario = $avaliacao['comentario'];
+?>
+	<div class="projeto-avaliacao-box">
+		<div class="projeto-avaliacao-box__header">
+			<strong><?= $view->escape($titulo) ?></strong>
+			<? if ($podeAvaliarProjeto) : ?>
+				<span class="projeto-avaliacao-box__hint">Parecer</span>
+			<? endif; ?>
+		</div>
+		<div class="projeto-avaliacao-box__status">
+			<label class="projeto-avaliacao-opcao">
+				<input type="radio" name="avaliacao[<?= $view->escape($campo) ?>][aprovado]" value="1" <?= $aprovado === true ? 'checked' : '' ?>>
+				<span>Aprovado</span>
+			</label>
+			<label class="projeto-avaliacao-opcao">
+				<input type="radio" name="avaliacao[<?= $view->escape($campo) ?>][aprovado]" value="0" <?= $aprovado === false ? 'checked' : '' ?>>
+				<span>Reprovado</span>
+			</label>
+			<label class="projeto-avaliacao-opcao">
+				<input type="radio" name="avaliacao[<?= $view->escape($campo) ?>][aprovado]" value="" <?= $aprovado === null ? 'checked' : '' ?>>
+				<span>Pendente</span>
+			</label>
+		</div>
+		<textarea
+			class="form-control projeto-avaliacao-box__comentario"
+			name="avaliacao[<?= $view->escape($campo) ?>][comentario]"
+			rows="3"
+			placeholder="Comentario do auditor sobre este item"
+			<?= $podeAvaliarProjeto ? '' : 'readonly' ?>
+		><?= $view->escape($comentario) ?></textarea>
+	</div>
+<? }; ?>
+<div class="content-page projeto-detalhes-page">
 	<div class="content-page__header">
 		<h1 class="content-page__title">Detalhes do Projeto</h1>
 		<div class="content-page__toolbar">
@@ -13,17 +60,28 @@
 		</div>
 	</div>
 
+	<? if ($podeAvaliarProjeto) : ?>
+		<form id="form-avaliacao-projeto" class="section-card projeto-auditoria-toolbar">
+			<input type="hidden" name="id_projeto" value="<?= (int) ($registro['id_projeto'] ?? 0) ?>">
+			<div class="projeto-auditoria-toolbar__conteudo">
+				<div>
+					<h2 class="section-title mb-1">Painel de Auditoria</h2>
+					<p class="section-subtitle mb-0">Registre o parecer de cada item avaliado e salve a revisao do projeto.</p>
+				</div>
+			</div>
+	<? endif; ?>
+
 	<div class="section-card projeto-empresa-resumo">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Empresa Vinculada à Inscrição</h2>
-				<p class="section-subtitle">Esses dados vêm da inscrição vinculada ao usuário responsável por este projeto.</p>
+				<h2 class="section-title">Empresa Vinculada a Inscricao</h2>
+				<p class="section-subtitle">Esses dados vem da inscricao vinculada ao usuario responsavel por este projeto.</p>
 			</div>
 		</div>
 		<? if ($empresaVinculada) : ?>
 			<div class="row projeto-empresa-resumo__grid">
 				<div class="col-md-6 col-xl-4 mb-3">
-					<span class="field-label">Organização</span>
+					<span class="field-label">Organizacao</span>
 					<div class="detalhe-valor"><?= $this->escape($empresaVinculada['nome_organizacao']) ?></div>
 				</div>
 				<div class="col-md-6 col-xl-4 mb-3">
@@ -39,7 +97,7 @@
 					<div class="detalhe-valor"><?= (int) $empresaVinculada['numero_colaboradores'] ?></div>
 				</div>
 				<div class="col-md-6 col-xl-4 mb-3">
-					<span class="field-label">Responsável da inscrição</span>
+					<span class="field-label">Responsavel da inscricao</span>
 					<div class="detalhe-valor"><?= $this->escape($empresaVinculada['nome']) ?></div>
 				</div>
 				<div class="col-md-6 col-xl-4 mb-3">
@@ -51,14 +109,14 @@
 				</div>
 			</div>
 		<? else : ?>
-			<div class="projeto-empresa-resumo__empty detalhe-valor">Nenhuma inscrição vinculada encontrada para este usuário.</div>
+			<div class="projeto-empresa-resumo__empty detalhe-valor">Nenhuma inscricao vinculada encontrada para este usuario.</div>
 		<? endif; ?>
 	</div>
 
 	<div class="section-card">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Vínculos e Status</h2>
+				<h2 class="section-title">Vinculos e Status</h2>
 			</div>
 		</div>
 		<div class="row">
@@ -66,280 +124,547 @@
 				<span class="field-label">Status</span>
 				<div class="detalhe-valor"><?= $this->escape($registro['status_projeto_label']) ?></div>
 			</div>
-			<div class="col-md-4 mb-3">
-				<span class="field-label">Usuário</span>
+			<div class="col-md-3 mb-3">
+				<span class="field-label">Data de criacao</span>
+				<div class="detalhe-valor"><?= !empty($registro['created_at']) ? date('d/m/Y H:i', strtotime($registro['created_at'])) : '-' ?></div>
+			</div>
+			<div class="col-md-3 mb-3">
+				<span class="field-label">Data de atualizacao</span>
+				<div class="detalhe-valor"><?= !empty($registro['updated_at']) ? date('d/m/Y H:i', strtotime($registro['updated_at'])) : '-' ?></div>
+			</div>
+			<div class="col-md-3 mb-3">
+				<span class="field-label">Usuario</span>
 				<div class="detalhe-valor"><?= $this->escape($registro['nome_usuario']) ?></div>
 			</div>
-			<div class="col-md-5 mb-3">
+			<div class="col-md-3 mb-3">
 				<span class="field-label">Evento</span>
 				<div class="detalhe-valor"><?= $this->escape($registro['titulo_evento']) ?></div>
 			</div>
 		</div>
 	</div>
 
-	<div class="section-card">
+	<div class="section-card projeto-auditavel-card">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Informações do Projeto</h2>
+				<h2 class="section-title">Informacoes do Projeto</h2>
+				<p class="section-subtitle">Dados descritivos principais do projeto para conferencia e parecer.</p>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-12 mb-3">
-				<span class="field-label">Nome do projeto</span>
-				<div class="detalhe-valor"><?= $this->escape($registro['nome']) ?></div>
-			</div>
-			<div class="col-md-12 mb-3">
-				<span class="field-label">Responsável</span>
-				<div class="detalhe-valor"><?= !empty($registro['responsavel']) ? $this->escape($registro['responsavel']) : '-' ?></div>
-			</div>
-			<div class="col-md-6 mb-3">
-				<span class="field-label">Data da inicialização</span>
-				<div class="detalhe-valor"><?= !empty($registro['data_inicializacao']) ? Util::formatData($registro['data_inicializacao']) : '-' ?></div>
-			</div>
-			<div class="col-md-6 mb-3">
-				<span class="field-label">Data da finalização</span>
-				<div class="detalhe-valor"><?= !empty($registro['data_finalizacao']) ? Util::formatData($registro['data_finalizacao']) : '-' ?></div>
-			</div>
-			<div class="col-md-6 mb-3">
-				<span class="field-label">Data de criação</span>
-				<div class="detalhe-valor"><?= !empty($registro['created_at']) ? date('d/m/Y H:i', strtotime($registro['created_at'])) : '-' ?></div>
-			</div>
-			<div class="col-md-6 mb-3">
-				<span class="field-label">Data de atualização</span>
-				<div class="detalhe-valor"><?= !empty($registro['updated_at']) ? date('d/m/Y H:i', strtotime($registro['updated_at'])) : '-' ?></div>
-			</div>
-			<div class="col-md-12 mb-3">
-				<span class="field-label">Justificativa</span>
-				<div class="detalhe-valor"><?= nl2br($this->escape($registro['justificativa'])) ?></div>
-			</div>
-		</div>
-	</div>
-
-	<div class="section-card">
-		<div class="section-header">
-			<div>
-				<h2 class="section-title">Classificação e Objetivos</h2>
-			</div>
-		</div>
-		<div class="row projeto-detalhe-classificacao">
-			<div class="col-12 col-lg-3 projeto-detalhe-classificacao__item projeto-detalhe-classificacao__item--area mb-4">
-				<span class="field-label">Área de atuação</span>
-				<div class="detalhe-card projeto-detalhe-bloco h-100">
-					<div class="detalhe-card-body">
-					<? $areaAtuacaoClasse = 'area-governanca'; ?>
-					<? if (($registro['area_atuacao'] ?? '') === 'Ambiental') $areaAtuacaoClasse = 'area-ambiental'; ?>
-					<? if (($registro['area_atuacao'] ?? '') === 'Social') $areaAtuacaoClasse = 'area-social'; ?>
-					<span class="area-atuacao-card is-static <?= $areaAtuacaoClasse ?>">
-						<? if (($registro['area_atuacao'] ?? '') === 'Ambiental') : ?><i class="fa fa-leaf" aria-hidden="true"></i>&nbsp;<? endif; ?>
-						<? if (($registro['area_atuacao'] ?? '') === 'Social') : ?><i class="fa fa-heart" aria-hidden="true"></i>&nbsp;<? endif; ?>
-						<? if (($registro['area_atuacao'] ?? '') === 'Governanca') : ?><i class="fa fa-university" aria-hidden="true"></i>&nbsp;<? endif; ?>
-						<?= $this->escape($registro['area_atuacao']) ?>
-					</span>
+			<div class="<?= $podeAvaliarProjeto ? 'col-lg-8' : 'col-12' ?>">
+				<div class="row">
+					<div class="col-md-12 mb-3">
+						<span class="field-label">Nome do projeto</span>
+						<div class="detalhe-valor"><?= $this->escape($registro['nome']) ?></div>
+					</div>
+					<div class="col-md-12 mb-3">
+						<span class="field-label">Responsavel</span>
+						<div class="detalhe-valor"><?= !empty($registro['responsavel']) ? $this->escape($registro['responsavel']) : '-' ?></div>
+					</div>
+					<div class="col-md-6 mb-3">
+						<span class="field-label">Data da inicializacao</span>
+						<div class="detalhe-valor"><?= !empty($registro['data_inicializacao']) ? Util::formatData($registro['data_inicializacao']) : '-' ?></div>
+					</div>
+					<div class="col-md-6 mb-3">
+						<span class="field-label">Data da finalizacao</span>
+						<div class="detalhe-valor"><?= !empty($registro['data_finalizacao']) ? Util::formatData($registro['data_finalizacao']) : '-' ?></div>
+					</div>
+					<div class="col-md-12 mb-3">
+						<span class="field-label">Justificativa do projeto</span>
+						<div class="detalhe-valor"><?= nl2br($this->escape($registro['justificativa'])) ?></div>
 					</div>
 				</div>
 			</div>
-			<div class="col-12 col-lg-4 projeto-detalhe-classificacao__item projeto-detalhe-classificacao__item--principal mb-4">
-				<span class="field-label">ODS principal</span>
-				<div class="detalhe-card projeto-detalhe-bloco h-100">
-					<div class="detalhe-card-body">
-						<div class="projeto-detalhe-ods-principal">
-					<? if (!empty($registro['ods_principal']) && preg_match('/^ODS\s+([1-9]|1[0-7])$/', trim((string) $registro['ods_principal']), $matches)) : ?>
-						<img src="../../objetivos/<?= (int) $matches[1] ?>.png" alt="<?= $this->escape($registro['ods_principal']) ?>">
-					<? endif; ?>
-							<div class="detalhe-valor"><?= $this->escape($registro['ods_principal']) ?></div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-12 col-lg-5 projeto-detalhe-classificacao__item projeto-detalhe-classificacao__item--relacionados mb-4">
-				<span class="field-label">Demais ODS relacionados</span>
-				<div class="detalhe-card projeto-detalhe-bloco h-100">
-					<div class="detalhe-card-body">
-				<? if (count($odsRelacionados)) : ?>
-					<div class="projeto-detalhe-ods-secundarios">
-						<? foreach ($odsRelacionados as $ods) : ?>
-							<? if (preg_match('/^ODS\s+([1-9]|1[0-7])$/', trim((string) $ods), $matchesRelacionados)) : ?>
-								<div class="ods-card">
-									<img src="../../objetivos/<?= (int) $matchesRelacionados[1] ?>.png" alt="<?= $this->escape($ods) ?>">
-									<span><?= $this->escape($ods) ?></span>
-								</div>
-							<? endif; ?>
-						<? endforeach; ?>
-					</div>
-				<? else : ?>
-					<div class="detalhe-valor">-</div>
-				<? endif; ?>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row projeto-detalhe-objetivos-row">
-			<div class="col-md-12 mb-1">
-				<span class="field-label">Objetivo(s) do projeto</span>
-				<div class="detalhe-card projeto-objetivos-card">
-					<div class="detalhe-card-body">
-						<div class="detalhe-valor"><?= nl2br($this->escape($registro['objetivos'])) ?></div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row mt-4">
-			<div class="col-md-12 mb-1">
-				<span class="field-label">Evidência qualitativa do projeto</span>
-			</div>
-			<? if (count($arquivos)) : ?>
-				<? foreach ($arquivos as $arquivo) : ?>
-					<div class="col-md-6 col-xl-4 mb-3">
-						<div class="detalhe-card projeto-evidencia-card h-100">
-							<div class="detalhe-card-body">
-								<span class="field-label">Arquivo</span>
-								<div class="detalhe-valor mb-3"><?= $this->escape($arquivo['nome_original']) ?></div>
-								<a href="../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>" target="_blank" class="btn btn-outline-primary btn-sm">
-									<i class="fa fa-download" aria-hidden="true"></i> Abrir arquivo
-								</a>
-							</div>
-						</div>
-					</div>
-				<? endforeach; ?>
-			<? else : ?>
-				<div class="col-md-12">
-					<div class="detalhe-valor">Nenhum arquivo qualitativo enviado.</div>
+			<? if ($podeAvaliarProjeto) : ?>
+				<div class="col-lg-4">
+					<? $renderAvaliacao('nome', 'Nome do projeto'); ?>
+					<? $renderAvaliacao('periodo_execucao', 'Data Inicializacao e finalizacao'); ?>
+					<? $renderAvaliacao('justificativa', 'Justificativa do projeto'); ?>
 				</div>
 			<? endif; ?>
 		</div>
 	</div>
 
-	<div class="section-card">
+	<div class="section-card projeto-auditavel-card">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Evidência de Itens</h2>
+				<h2 class="section-title">Classificacao e Objetivos</h2>
+				<p class="section-subtitle">Elementos de enquadramento do projeto e aderencia aos objetivos declarados.</p>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-4 mb-3">
-				<span class="field-label">Tipo de item</span>
-				<div class="detalhe-valor"><?= !empty($registro['tipo_item']) ? $this->escape($registro['tipo_item']) : '-' ?></div>
-			</div>
-			<div class="col-md-4 mb-3">
-				<span class="field-label">Quantidade de itens</span>
-				<div class="detalhe-valor"><?= isset($registro['quantidade_itens']) && $registro['quantidade_itens'] !== null && $registro['quantidade_itens'] !== '' ? $this->escape($registro['quantidade_itens']) : '-' ?></div>
-			</div>
-			<div class="col-md-4 mb-3">
-				<span class="field-label">Unidade de medida</span>
-				<div class="detalhe-valor"><?= !empty($registro['unidade_medida']) ? $this->escape($registro['unidade_medida']) : '-' ?></div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12 mb-1">
-				<span class="field-label">Evidência quantitativa do material relacionado ao projeto</span>
-			</div>
-		<? if (count($arquivosItens)) : ?>
-				<? foreach ($arquivosItens as $arquivo) : ?>
-					<div class="col-md-6 col-xl-4 mb-3">
-						<div class="detalhe-card projeto-evidencia-card h-100">
+			<div class="<?= $podeAvaliarProjeto ? 'col-lg-8' : 'col-12' ?>">
+				<div class="row projeto-detalhe-classificacao">
+					<div class="col-12 col-lg-4 mb-4">
+						<span class="field-label">Area de atuacao</span>
+						<div class="detalhe-card projeto-detalhe-bloco h-100">
 							<div class="detalhe-card-body">
-								<span class="field-label">Arquivo</span>
-								<div class="detalhe-valor mb-3"><?= $this->escape($arquivo['nome_original']) ?></div>
-								<a href="../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>" target="_blank" class="btn btn-outline-primary btn-sm">
-									<i class="fa fa-download" aria-hidden="true"></i> Abrir arquivo
-								</a>
+								<? $areaAtuacaoClasse = 'area-governanca'; ?>
+								<? if (($registro['area_atuacao'] ?? '') === 'Ambiental') $areaAtuacaoClasse = 'area-ambiental'; ?>
+								<? if (($registro['area_atuacao'] ?? '') === 'Social') $areaAtuacaoClasse = 'area-social'; ?>
+								<span class="area-atuacao-card is-static <?= $areaAtuacaoClasse ?>">
+									<? if (($registro['area_atuacao'] ?? '') === 'Ambiental') : ?><i class="fa fa-leaf" aria-hidden="true"></i>&nbsp;<? endif; ?>
+									<? if (($registro['area_atuacao'] ?? '') === 'Social') : ?><i class="fa fa-heart" aria-hidden="true"></i>&nbsp;<? endif; ?>
+									<? if (($registro['area_atuacao'] ?? '') === 'Governanca') : ?><i class="fa fa-university" aria-hidden="true"></i>&nbsp;<? endif; ?>
+									<?= $this->escape($registro['area_atuacao']) ?>
+								</span>
 							</div>
 						</div>
 					</div>
-				<? endforeach; ?>
-		<? else : ?>
-			<div class="col-md-12">
-				<div class="detalhe-valor">Nenhum arquivo de itens enviado.</div>
+					<div class="col-12 col-lg-4 mb-4">
+						<span class="field-label">ODS principal</span>
+						<div class="detalhe-card projeto-detalhe-bloco h-100">
+							<div class="detalhe-card-body">
+								<div class="projeto-detalhe-ods-principal">
+									<? if (!empty($registro['ods_principal']) && preg_match('/^ODS\s+([1-9]|1[0-7])$/', trim((string) $registro['ods_principal']), $matches)) : ?>
+										<img src="../../objetivos/<?= (int) $matches[1] ?>.png" alt="<?= $this->escape($registro['ods_principal']) ?>">
+									<? endif; ?>
+									<div class="detalhe-valor"><?= $this->escape($registro['ods_principal']) ?></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-lg-4 mb-4">
+						<span class="field-label">Demais ODS relacionados</span>
+						<div class="detalhe-card projeto-detalhe-bloco h-100">
+							<div class="detalhe-card-body">
+								<? if (count($odsRelacionados)) : ?>
+									<div class="projeto-detalhe-ods-secundarios">
+										<? foreach ($odsRelacionados as $ods) : ?>
+											<? if (preg_match('/^ODS\s+([1-9]|1[0-7])$/', trim((string) $ods), $matchesRelacionados)) : ?>
+												<div class="ods-card">
+													<img src="../../objetivos/<?= (int) $matchesRelacionados[1] ?>.png" alt="<?= $this->escape($ods) ?>">
+													<span><?= $this->escape($ods) ?></span>
+												</div>
+											<? endif; ?>
+										<? endforeach; ?>
+									</div>
+								<? else : ?>
+									<div class="detalhe-valor">-</div>
+								<? endif; ?>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12 mb-1 mt-3">
+						<span class="field-label">Objetivo(s) do projeto</span>
+						<div class="detalhe-card projeto-objetivos-card">
+							<div class="detalhe-card-body">
+								<div class="detalhe-valor"><?= nl2br($this->escape($registro['objetivos'])) ?></div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
-		<? endif; ?>
+			<? if ($podeAvaliarProjeto) : ?>
+				<div class="col-lg-4">
+					<? $renderAvaliacao('area_atuacao', 'Area de atuacao'); ?>
+					<? $renderAvaliacao('ods_principal', 'ODS principal'); ?>
+					<? $renderAvaliacao('demais_ods_relacionados', 'Demais ODS relacionados'); ?>
+					<? $renderAvaliacao('objetivos', 'Objetivo(s) do projeto'); ?>
+				</div>
+			<? endif; ?>
 		</div>
 	</div>
 
-	<div class="section-card">
+	<div class="section-card projeto-auditavel-card">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Evidência de Pessoas</h2>
+				<h2 class="section-title">Evidencia Qualitativa do Projeto</h2>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-4 mb-3">
-				<span class="field-label">Tipo de público</span>
-				<div class="detalhe-valor"><?= !empty($registro['publico_tipo']) ? $this->escape($registro['publico_tipo']) : '-' ?></div>
-			</div>
-			<div class="col-md-4 mb-3">
-				<span class="field-label">Quantidade do público interno</span>
-				<div class="detalhe-valor"><?= isset($registro['quantidade_publico_interno']) && $registro['quantidade_publico_interno'] !== null && $registro['quantidade_publico_interno'] !== '' ? $this->escape($registro['quantidade_publico_interno']) : '-' ?></div>
-			</div>
-			<div class="col-md-4 mb-3">
-				<span class="field-label">Quantidade do público externo</span>
-				<div class="detalhe-valor"><?= isset($registro['quantidade_publico_externo']) && $registro['quantidade_publico_externo'] !== null && $registro['quantidade_publico_externo'] !== '' ? $this->escape($registro['quantidade_publico_externo']) : '-' ?></div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12 mb-1">
-				<span class="field-label">Evidência quantitativa da participação de pessoas no projeto</span>
-			</div>
-		<? if (count($arquivosPessoas)) : ?>
-				<? foreach ($arquivosPessoas as $arquivo) : ?>
-					<div class="col-md-6 col-xl-4 mb-3">
-						<div class="detalhe-card projeto-evidencia-card h-100">
-							<div class="detalhe-card-body">
-								<span class="field-label">Arquivo</span>
-								<div class="detalhe-valor mb-3"><?= $this->escape($arquivo['nome_original']) ?></div>
-								<a href="../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>" target="_blank" class="btn btn-outline-primary btn-sm">
-									<i class="fa fa-download" aria-hidden="true"></i> Abrir arquivo
-								</a>
+			<div class="<?= $podeAvaliarProjeto ? 'col-lg-8' : 'col-12' ?>">
+				<div class="row">
+					<? if (count($arquivos)) : ?>
+						<? foreach ($arquivos as $arquivo) : ?>
+							<div class="col-md-6 col-xl-4 mb-3">
+								<div class="detalhe-card projeto-evidencia-card h-100">
+									<div class="detalhe-card-body">
+										<span class="field-label">Arquivo</span>
+										<div class="detalhe-valor mb-3"><?= $this->escape($arquivo['nome_original']) ?></div>
+										<a href="../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>" target="_blank" class="btn btn-outline-primary btn-sm">
+											<i class="fa fa-download" aria-hidden="true"></i> Abrir arquivo
+										</a>
+									</div>
+								</div>
 							</div>
+						<? endforeach; ?>
+					<? else : ?>
+						<div class="col-md-12">
+							<div class="detalhe-valor">Nenhum arquivo qualitativo enviado.</div>
 						</div>
-					</div>
-				<? endforeach; ?>
-		<? else : ?>
-			<div class="col-md-12">
-				<div class="detalhe-valor">Nenhum arquivo de pessoas enviado.</div>
+					<? endif; ?>
+				</div>
 			</div>
-		<? endif; ?>
+			<? if ($podeAvaliarProjeto) : ?>
+				<div class="col-lg-4">
+					<? $renderAvaliacao('evidencia_qualitativa', 'Evidencia qualitativa do projeto'); ?>
+				</div>
+			<? endif; ?>
 		</div>
 	</div>
 
-	<div class="section-card">
+	<div class="section-card projeto-auditavel-card">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Evidência de Parceiros</h2>
+				<h2 class="section-title">Evidencia de Itens</h2>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-4 mb-3">
-				<span class="field-label">Quantidade de parceiros</span>
-				<div class="detalhe-valor"><?= isset($registro['quantidade_parceiros']) && $registro['quantidade_parceiros'] !== null && $registro['quantidade_parceiros'] !== '' ? $this->escape($registro['quantidade_parceiros']) : '-' ?></div>
-			</div>
-			<div class="col-md-8 mb-3">
-				<span class="field-label">Parceiros</span>
-				<div class="detalhe-valor"><?= !empty($registro['parceiros']) ? $this->escape($registro['parceiros']) : '-' ?></div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12 mb-1">
-				<span class="field-label">Evidência quantitativa de parceria do projeto</span>
-			</div>
-		<? if (count($arquivosParceiros)) : ?>
-				<? foreach ($arquivosParceiros as $arquivo) : ?>
-					<div class="col-md-6 col-xl-4 mb-3">
-						<div class="detalhe-card projeto-evidencia-card h-100">
-							<div class="detalhe-card-body">
-								<span class="field-label">Arquivo</span>
-								<div class="detalhe-valor mb-3"><?= $this->escape($arquivo['nome_original']) ?></div>
-								<a href="../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>" target="_blank" class="btn btn-outline-primary btn-sm">
-									<i class="fa fa-download" aria-hidden="true"></i> Abrir arquivo
-								</a>
-							</div>
-						</div>
+			<div class="<?= $podeAvaliarProjeto ? 'col-lg-8' : 'col-12' ?>">
+				<div class="row">
+					<div class="col-md-4 mb-3">
+						<span class="field-label">Tipo de item</span>
+						<div class="detalhe-valor"><?= !empty($registro['tipo_item']) ? $this->escape($registro['tipo_item']) : '-' ?></div>
 					</div>
-				<? endforeach; ?>
-		<? else : ?>
-			<div class="col-md-12">
-				<div class="detalhe-valor">Nenhum arquivo de parceiros enviado.</div>
+					<div class="col-md-4 mb-3">
+						<span class="field-label">Quantidade de itens</span>
+						<div class="detalhe-valor"><?= isset($registro['quantidade_itens']) && $registro['quantidade_itens'] !== null && $registro['quantidade_itens'] !== '' ? $this->escape($registro['quantidade_itens']) : '-' ?></div>
+					</div>
+					<div class="col-md-4 mb-3">
+						<span class="field-label">Unidade de medida</span>
+						<div class="detalhe-valor"><?= !empty($registro['unidade_medida']) ? $this->escape($registro['unidade_medida']) : '-' ?></div>
+					</div>
+				</div>
+				<div class="row">
+					<? if (count($arquivosItens)) : ?>
+						<? foreach ($arquivosItens as $arquivo) : ?>
+							<div class="col-md-6 col-xl-4 mb-3">
+								<div class="detalhe-card projeto-evidencia-card h-100">
+									<div class="detalhe-card-body">
+										<span class="field-label">Arquivo</span>
+										<div class="detalhe-valor mb-3"><?= $this->escape($arquivo['nome_original']) ?></div>
+										<a href="../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>" target="_blank" class="btn btn-outline-primary btn-sm">
+											<i class="fa fa-download" aria-hidden="true"></i> Abrir arquivo
+										</a>
+									</div>
+								</div>
+							</div>
+						<? endforeach; ?>
+					<? else : ?>
+						<div class="col-md-12">
+							<div class="detalhe-valor">Nenhum arquivo de itens enviado.</div>
+						</div>
+					<? endif; ?>
+				</div>
 			</div>
-		<? endif; ?>
+			<? if ($podeAvaliarProjeto) : ?>
+				<div class="col-lg-4">
+					<? $renderAvaliacao('evidencia_itens', 'Evidencia de Itens'); ?>
+				</div>
+			<? endif; ?>
 		</div>
 	</div>
+
+	<div class="section-card projeto-auditavel-card">
+		<div class="section-header">
+			<div>
+				<h2 class="section-title">Evidencia de Pessoas</h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="<?= $podeAvaliarProjeto ? 'col-lg-8' : 'col-12' ?>">
+				<div class="row">
+					<div class="col-md-4 mb-3">
+						<span class="field-label">Tipo de publico</span>
+						<div class="detalhe-valor"><?= !empty($registro['publico_tipo']) ? $this->escape($registro['publico_tipo']) : '-' ?></div>
+					</div>
+					<div class="col-md-4 mb-3">
+						<span class="field-label">Quantidade do publico interno</span>
+						<div class="detalhe-valor"><?= isset($registro['quantidade_publico_interno']) && $registro['quantidade_publico_interno'] !== null && $registro['quantidade_publico_interno'] !== '' ? $this->escape($registro['quantidade_publico_interno']) : '-' ?></div>
+					</div>
+					<div class="col-md-4 mb-3">
+						<span class="field-label">Quantidade do publico externo</span>
+						<div class="detalhe-valor"><?= isset($registro['quantidade_publico_externo']) && $registro['quantidade_publico_externo'] !== null && $registro['quantidade_publico_externo'] !== '' ? $this->escape($registro['quantidade_publico_externo']) : '-' ?></div>
+					</div>
+				</div>
+				<div class="row">
+					<? if (count($arquivosPessoas)) : ?>
+						<? foreach ($arquivosPessoas as $arquivo) : ?>
+							<div class="col-md-6 col-xl-4 mb-3">
+								<div class="detalhe-card projeto-evidencia-card h-100">
+									<div class="detalhe-card-body">
+										<span class="field-label">Arquivo</span>
+										<div class="detalhe-valor mb-3"><?= $this->escape($arquivo['nome_original']) ?></div>
+										<a href="../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>" target="_blank" class="btn btn-outline-primary btn-sm">
+											<i class="fa fa-download" aria-hidden="true"></i> Abrir arquivo
+										</a>
+									</div>
+								</div>
+							</div>
+						<? endforeach; ?>
+					<? else : ?>
+						<div class="col-md-12">
+							<div class="detalhe-valor">Nenhum arquivo de pessoas enviado.</div>
+						</div>
+					<? endif; ?>
+				</div>
+			</div>
+			<? if ($podeAvaliarProjeto) : ?>
+				<div class="col-lg-4">
+					<? $renderAvaliacao('evidencia_pessoas', 'Evidencia de Pessoas'); ?>
+				</div>
+			<? endif; ?>
+		</div>
+	</div>
+
+	<div class="section-card projeto-auditavel-card">
+		<div class="section-header">
+			<div>
+				<h2 class="section-title">Evidencia de Parceiros</h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="<?= $podeAvaliarProjeto ? 'col-lg-8' : 'col-12' ?>">
+				<div class="row">
+					<div class="col-md-4 mb-3">
+						<span class="field-label">Quantidade de parceiros</span>
+						<div class="detalhe-valor"><?= isset($registro['quantidade_parceiros']) && $registro['quantidade_parceiros'] !== null && $registro['quantidade_parceiros'] !== '' ? $this->escape($registro['quantidade_parceiros']) : '-' ?></div>
+					</div>
+					<div class="col-md-8 mb-3">
+						<span class="field-label">Parceiros</span>
+						<div class="detalhe-valor"><?= !empty($registro['parceiros']) ? $this->escape($registro['parceiros']) : '-' ?></div>
+					</div>
+				</div>
+				<div class="row">
+					<? if (count($arquivosParceiros)) : ?>
+						<? foreach ($arquivosParceiros as $arquivo) : ?>
+							<div class="col-md-6 col-xl-4 mb-3">
+								<div class="detalhe-card projeto-evidencia-card h-100">
+									<div class="detalhe-card-body">
+										<span class="field-label">Arquivo</span>
+										<div class="detalhe-valor mb-3"><?= $this->escape($arquivo['nome_original']) ?></div>
+										<a href="../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>" target="_blank" class="btn btn-outline-primary btn-sm">
+											<i class="fa fa-download" aria-hidden="true"></i> Abrir arquivo
+										</a>
+									</div>
+								</div>
+							</div>
+						<? endforeach; ?>
+					<? else : ?>
+						<div class="col-md-12">
+							<div class="detalhe-valor">Nenhum arquivo de parceiros enviado.</div>
+						</div>
+					<? endif; ?>
+				</div>
+			</div>
+			<? if ($podeAvaliarProjeto) : ?>
+				<div class="col-lg-4">
+					<? $renderAvaliacao('evidencia_parceiros', 'Evidencia de Parceiros'); ?>
+				</div>
+			<? endif; ?>
+		</div>
+	</div>
+
+	<? if ($podeAvaliarProjeto) : ?>
+		<div class="section-card projeto-auditavel-card">
+			<div class="section-header">
+				<div>
+					<h2 class="section-title">Criterios Complementares</h2>
+					<p class="section-subtitle">Avaliacoes adicionais independentes dos blocos principais do projeto.</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6">
+					<? $renderAvaliacao('encontro_formacao_1', 'Encontro de formacao 1'); ?>
+				</div>
+				<div class="col-lg-6">
+					<? $renderAvaliacao('encontro_formacao_2', 'Encontro de formacao 2'); ?>
+				</div>
+			</div>
+		</div>
+	<? endif; ?>
+
+	<? if ($podeAvaliarProjeto) : ?>
+		<div class="section-card projeto-auditoria-footer">
+			<div class="projeto-auditoria-footer__acoes">
+				<button type="submit" class="btn btn-success salvar-avaliacao-projeto">
+					<i class="fa fa-floppy-o" aria-hidden="true"></i> Salvar pareceres
+				</button>
+			</div>
+		</div>
+		</form>
+	<? endif; ?>
 </div>
+
+<style>
+	.projeto-detalhes-page .projeto-auditoria-toolbar {
+		background: linear-gradient(135deg, #f6fbf8 0%, #eef7ff 100%);
+		border: 1px solid #d8e7db;
+	}
+
+	.projeto-auditoria-toolbar__conteudo {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 16px;
+		flex-wrap: wrap;
+	}
+
+	.projeto-auditoria-footer {
+		background: linear-gradient(135deg, #f6fbf8 0%, #eef7ff 100%);
+		border: 1px solid #d8e7db;
+	}
+
+	.projeto-auditoria-footer__acoes {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.projeto-auditavel-card {
+		border: 1px solid #e4e8ef;
+		box-shadow: 0 10px 24px rgba(20, 39, 67, 0.05);
+	}
+
+	.projeto-avaliacao-box {
+		background: #f8fafc;
+		border: 1px solid #d7dee8;
+		border-radius: 14px;
+		padding: 16px;
+		margin-bottom: 16px;
+		transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.projeto-avaliacao-box.is-aprovado {
+		background: #edf9f0;
+		border-color: #9ed8ab;
+		box-shadow: inset 0 0 0 1px rgba(76, 175, 80, 0.08);
+	}
+
+	.projeto-avaliacao-box.is-reprovado {
+		background: #fdeeee;
+		border-color: #efb1b1;
+		box-shadow: inset 0 0 0 1px rgba(211, 47, 47, 0.08);
+	}
+
+	.projeto-avaliacao-box.is-pendente {
+		background: #fff8e8;
+		border-color: #ecd38f;
+		box-shadow: inset 0 0 0 1px rgba(240, 173, 78, 0.1);
+	}
+
+	.projeto-avaliacao-box__header {
+		display: flex;
+		justify-content: space-between;
+		gap: 8px;
+		margin-bottom: 12px;
+		font-size: 14px;
+	}
+
+	.projeto-avaliacao-box__hint {
+		color: #667085;
+		font-size: 12px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	.projeto-avaliacao-box__status {
+		display: flex;
+		gap: 8px;
+		flex-wrap: nowrap;
+		margin-bottom: 12px;
+		width: 100%;
+	}
+
+	.projeto-avaliacao-opcao {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		justify-content: center;
+		padding: 8px 10px;
+		border-radius: 999px;
+		background: #fff;
+		border: 1px solid #d0d5dd;
+		font-weight: 600;
+		font-size: 12px;
+		cursor: pointer;
+		white-space: nowrap;
+		flex: 1 1 0;
+		min-width: 0;
+	}
+
+	.projeto-avaliacao-box.is-aprovado .projeto-avaliacao-opcao input[value="1"] + span,
+	.projeto-avaliacao-box.is-reprovado .projeto-avaliacao-opcao input[value="0"] + span,
+	.projeto-avaliacao-box.is-pendente .projeto-avaliacao-opcao input[value=""] + span {
+		color: #243b2b;
+	}
+
+	.projeto-avaliacao-box__comentario {
+		min-height: 96px;
+		resize: vertical;
+	}
+
+	@media (max-width: 991px) {
+		.projeto-avaliacao-box {
+			margin-top: 8px;
+		}
+	}
+</style>
+
+<? if ($podeAvaliarProjeto) : ?>
+<script type="text/javascript">
+	$(document).ready(function() {
+		function atualizarCoresParecer() {
+			$('.projeto-avaliacao-box').each(function() {
+				var $box = $(this);
+				var valor = $box.find('input[type="radio"]:checked').val();
+
+				$box.removeClass('is-aprovado is-reprovado is-pendente');
+
+				if (valor === '1') {
+					$box.addClass('is-aprovado');
+				} else if (valor === '0') {
+					$box.addClass('is-reprovado');
+				} else {
+					$box.addClass('is-pendente');
+				}
+			});
+		}
+
+		atualizarCoresParecer();
+
+		$('.projeto-avaliacao-box input[type="radio"]').on('change', function() {
+			atualizarCoresParecer();
+		});
+
+		$('#form-avaliacao-projeto').submit(function(e) {
+			e.preventDefault();
+
+			$('.salvar-avaliacao-projeto').prop('disabled', true);
+
+			$.ajax({
+				type: "POST",
+				url: "../../projeto/salvaravaliacao",
+				data: $(this).serialize(),
+				success: function(data) {
+					if (data.trim().length > 0) {
+						swal({
+							title: "Atencao!",
+							text: data,
+							type: "error"
+						});
+					} else {
+						swal({
+							title: "Sucesso!",
+							text: "Pareceres salvos com sucesso.",
+							type: "success"
+						});
+					}
+
+					$('.salvar-avaliacao-projeto').prop('disabled', false);
+				},
+				error: function() {
+					$('.salvar-avaliacao-projeto').prop('disabled', false);
+
+					swal({
+						title: "Atencao!",
+						text: "Nao foi possivel salvar os pareceres do projeto.",
+						type: "error"
+					});
+				}
+			});
+		});
+	});
+</script>
+<? endif; ?>

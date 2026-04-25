@@ -71,6 +71,26 @@ class ProjetoController extends Zend_Controller_Action
 		$idProjeto = isset($_REQUEST['id_projeto']) ? (int) $_REQUEST['id_projeto'] : 0;
 		$this->view->registro = Projeto::buscaId($idProjeto, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
 		$this->view->empresaVinculada = $this->view->registro ? Inscricao::buscaResumoVinculadoUsuario((int) $this->view->registro['id_usuario']) : false;
+		$this->view->podeAvaliarProjeto = in_array((int) Zend_Registry::get('permissao'), array(1, 2), true);
+		$this->view->camposAvaliacaoProjeto = Projeto::camposAvaliacao();
+	}
+
+	public function salvaravaliacaoAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+		$idProjeto = isset($_REQUEST['id_projeto']) ? (int) $_REQUEST['id_projeto'] : 0;
+		$avaliacoes = isset($_REQUEST['avaliacao']) && is_array($_REQUEST['avaliacao']) ? $_REQUEST['avaliacao'] : array();
+
+		$result = Projeto::salvarAvaliacoes(
+			$idProjeto,
+			$avaliacoes,
+			Zend_Registry::get('id_usuario'),
+			Zend_Registry::get('permissao')
+		);
+
+		if (!$result) {
+			echo Projeto::$erro;
+		}
 	}
 
 	public function salvarAction()

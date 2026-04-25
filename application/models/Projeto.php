@@ -24,6 +24,30 @@ class Projeto
 		return isset($opcoes[$status]) ? $opcoes[$status] : 'Desconhecido';
 	}
 
+	public static function camposAvaliacao()
+	{
+		return array(
+			'nome' => 'Nome do projeto',
+			'area_atuacao' => 'Área de atuação',
+			'ods_principal' => 'ODS principal',
+			'demais_ods_relacionados' => 'Demais ODS relacionados',
+			'periodo_execucao' => 'Data Inicializacao e finalizacao',
+			'justificativa' => 'Justificativa do projeto',
+			'objetivos' => 'Objetivo(s) do projeto',
+			'evidencia_qualitativa' => 'Evidência qualitativa do projeto',
+			'evidencia_itens' => 'Evidência de Itens',
+			'evidencia_pessoas' => 'Evidência de Pessoas',
+			'evidencia_parceiros' => 'Evidência de Parceiros',
+			'encontro_formacao_1' => 'Encontro de formação 1',
+			'encontro_formacao_2' => 'Encontro de formação 2'
+		);
+	}
+
+	private static function podeAvaliarProjeto($permissao = null)
+	{
+		return in_array((int) $permissao, array(1, 2), true);
+	}
+
 	private static function tipoEvidenciaValido($tipo)
 	{
 		return in_array($tipo, array('qualitativa', 'itens', 'pessoas', 'parceiros'), true);
@@ -292,7 +316,134 @@ class Projeto
 		$registro['arquivos_itens'] = self::listaArquivos($registro['id_projeto'], 'itens');
 		$registro['arquivos_pessoas'] = self::listaArquivos($registro['id_projeto'], 'pessoas');
 		$registro['arquivos_parceiros'] = self::listaArquivos($registro['id_projeto'], 'parceiros');
+		$registro['avaliacoes'] = self::listaAvaliacoes($registro['id_projeto']);
 		return $registro;
+	}
+
+	public static function listaAvaliacoes($idProjeto)
+	{
+		$db = Zend_Registry::get('db');
+		$idProjeto = (int) $idProjeto;
+		if (!$idProjeto) {
+			return array();
+		}
+
+		$campos = self::camposAvaliacao();
+		$avaliacoes = array();
+		foreach ($campos as $campo => $label) {
+			$avaliacoes[$campo] = array(
+				'campo' => $campo,
+				'label' => $label,
+				'aprovado' => null,
+				'comentario' => '',
+				'id_usuario_avaliador' => null,
+				'updated_at' => null
+			);
+		}
+
+		$registros = $db->fetchAll(
+			'select *
+			from eventos_projeto_avaliacao
+			where id_projeto = ' . $idProjeto . '
+			order by campo asc'
+		);
+
+		foreach ($registros as $registro) {
+			$campo = (string) ($registro['campo'] ?? '');
+			if (!isset($avaliacoes[$campo])) {
+				continue;
+			}
+
+			$avaliacoes[$campo]['aprovado'] = $registro['aprovado'] === null ? null : (bool) $registro['aprovado'];
+			$avaliacoes[$campo]['comentario'] = (string) ($registro['comentario'] ?? '');
+			$avaliacoes[$campo]['id_usuario_avaliador'] = isset($registro['id_usuario_avaliador']) ? (int) $registro['id_usuario_avaliador'] : null;
+			$avaliacoes[$campo]['updated_at'] = $registro['updated_at'] ?? null;
+		}
+
+		return $avaliacoes;
+	}
+
+	public static function salvarAvaliacoes($idProjeto, $avaliacoes, $idUsuarioLogado = null, $permissao = null)
+	{
+		if (!self::podeAvaliarProjeto($permissao)) {
+			self::$erro = 'Voce nao tem permissao para avaliar este projeto.';
+			return false;
+		}
+
+		$registro = self::buscaId($idProjeto, $idUsuarioLogado, $permissao);
+		if (!$registro) {
+			return false;
+		}
+
+		if (!is_array($avaliacoes)) {
+			self::$erro = 'Nenhuma avaliacao foi informada.';
+			return false;
+		}
+
+		$camposPermitidos = self::camposAvaliacao();
+		$db = Zend_Registry::get('db');
+		$db->beginTransaction();
+
+		try {
+			foreach ($camposPermitidos as $campo => $label) {
+				$dadosCampo = isset($avaliacoes[$campo]) && is_array($avaliacoes[$campo]) ? $avaliacoes[$campo] : array();
+				$comentario = isset($dadosCampo['comentario']) ? trim((string) $dadosCampo['comentario']) : '';
+				if (strlen($comentario) > 5000) {
+					self::$erro = 'O comentario de "' . $label . '" deve ter no maximo 5000 caracteres.';
+					throw new Exception(self::$erro);
+				}
+
+				$aprovado = null;
+				if (array_key_exists('aprovado', $dadosCampo)) {
+					$valor = $dadosCampo['aprovado'];
+					if ($valor === '' || $valor === null) {
+						$aprovado = null;
+					} elseif ((string) $valor === '1') {
+						$aprovado = true;
+					} elseif ((string) $valor === '0') {
+						$aprovado = false;
+					} else {
+						self::$erro = 'O parecer de "' . $label . '" e invalido.';
+						throw new Exception(self::$erro);
+					}
+				}
+
+				$existente = $db->fetchRow(
+					'select id_projeto_avaliacao
+					from eventos_projeto_avaliacao
+					where id_projeto = ' . (int) $idProjeto . '
+						and campo = ' . $db->quote($campo)
+				);
+
+				$payload = array(
+					'id_projeto' => (int) $idProjeto,
+					'campo' => $campo,
+					'aprovado' => $aprovado,
+					'comentario' => $comentario !== '' ? $comentario : null,
+					'id_usuario_avaliador' => $idUsuarioLogado ? (int) $idUsuarioLogado : null,
+					'updated_at' => new Zend_Db_Expr('now()')
+				);
+
+				if ($existente) {
+					$db->update('eventos_projeto_avaliacao', $payload, 'id_projeto_avaliacao = ' . (int) $existente['id_projeto_avaliacao']);
+				} else {
+					$payload['created_at'] = new Zend_Db_Expr('now()');
+					$db->insert('eventos_projeto_avaliacao', $payload);
+				}
+			}
+
+			$db->commit();
+		} catch (Exception $e) {
+			if ($db->getConnection()->inTransaction()) {
+				$db->rollBack();
+			}
+			if (!self::$erro) {
+				self::$erro = 'Nao foi possivel salvar a avaliacao do projeto.';
+			}
+			return false;
+		}
+
+		return true;
 	}
 
 	public static function lista($idUsuarioLogado = null, $permissao = null, $idInscricao = null)
