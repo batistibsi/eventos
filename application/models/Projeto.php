@@ -309,8 +309,12 @@ class Projeto
 				return false;
 			}
 		}
+		if (empty($inscricao) || !is_array($inscricao)) {
+			$inscricao = self::buscaInscricaoProjeto($registro['id_usuario'], $registro['id_evento']);
+		}
 
 		$registro['status_projeto_label'] = self::statusLabel($registro['status_projeto']);
+		$registro['id_inscricao'] = !empty($inscricao['id_inscricao']) ? (int) $inscricao['id_inscricao'] : null;
 		$registro['arquivos'] = self::listaArquivos($registro['id_projeto'], 'qualitativa');
 		$registro['arquivos_qualitativos'] = $registro['arquivos'];
 		$registro['arquivos_itens'] = self::listaArquivos($registro['id_projeto'], 'itens');

@@ -7,6 +7,7 @@
 <? $empresaVinculada = !empty($this->empresaVinculada) && is_array($this->empresaVinculada) ? $this->empresaVinculada : false; ?>
 <? $podeAvaliarProjeto = !empty($this->podeAvaliarProjeto); ?>
 <? $avaliacoes = $registro && !empty($registro['avaliacoes']) && is_array($registro['avaliacoes']) ? $registro['avaliacoes'] : array(); ?>
+<? $urlRetornoProjeto = !empty($this->urlRetornoProjeto) ? $this->urlRetornoProjeto : '../../projeto'; ?>
 <? $view = $this; ?>
 <? $avaliacaoPadrao = function ($campo) use ($avaliacoes) {
 	if (!isset($avaliacoes[$campo]) || !is_array($avaliacoes[$campo])) {
@@ -47,7 +48,7 @@
 			class="form-control projeto-avaliacao-box__comentario"
 			name="avaliacao[<?= $view->escape($campo) ?>][comentario]"
 			rows="3"
-			placeholder="Comentario do auditor sobre este item"
+			placeholder="Comentário do auditor sobre este item"
 			<?= $podeAvaliarProjeto ? '' : 'readonly' ?>
 		><?= $view->escape($comentario) ?></textarea>
 	</div>
@@ -56,7 +57,7 @@
 	<div class="content-page__header">
 		<h1 class="content-page__title">Detalhes do Projeto</h1>
 		<div class="content-page__toolbar">
-			<button type="button" onclick="carregarTela('../../projeto')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
+			<button type="button" onclick="carregarTela('<?= $this->escape($urlRetornoProjeto) ?>')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
 		</div>
 	</div>
 
@@ -66,7 +67,7 @@
 			<div class="projeto-auditoria-toolbar__conteudo">
 				<div>
 					<h2 class="section-title mb-1">Painel de Auditoria</h2>
-					<p class="section-subtitle mb-0">Registre o parecer de cada item avaliado e salve a revisao do projeto.</p>
+					<p class="section-subtitle mb-0">Registre o parecer de cada item avaliado e salve a revisão do projeto.</p>
 				</div>
 			</div>
 	<? endif; ?>
@@ -74,14 +75,14 @@
 	<div class="section-card projeto-empresa-resumo">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Empresa Vinculada a Inscricao</h2>
-				<p class="section-subtitle">Esses dados vem da inscricao vinculada ao usuario responsavel por este projeto.</p>
+				<h2 class="section-title">Empresa Vinculada à Inscrição</h2>
+				<p class="section-subtitle">Esses dados vêm da inscrição vinculada ao usuário responsável por este projeto.</p>
 			</div>
 		</div>
 		<? if ($empresaVinculada) : ?>
 			<div class="row projeto-empresa-resumo__grid">
 				<div class="col-md-6 col-xl-4 mb-3">
-					<span class="field-label">Organizacao</span>
+					<span class="field-label">Organização</span>
 					<div class="detalhe-valor"><?= $this->escape($empresaVinculada['nome_organizacao']) ?></div>
 				</div>
 				<div class="col-md-6 col-xl-4 mb-3">
@@ -97,7 +98,7 @@
 					<div class="detalhe-valor"><?= (int) $empresaVinculada['numero_colaboradores'] ?></div>
 				</div>
 				<div class="col-md-6 col-xl-4 mb-3">
-					<span class="field-label">Responsavel da inscricao</span>
+					<span class="field-label">Responsável da inscrição</span>
 					<div class="detalhe-valor"><?= $this->escape($empresaVinculada['nome']) ?></div>
 				</div>
 				<div class="col-md-6 col-xl-4 mb-3">
@@ -109,14 +110,14 @@
 				</div>
 			</div>
 		<? else : ?>
-			<div class="projeto-empresa-resumo__empty detalhe-valor">Nenhuma inscricao vinculada encontrada para este usuario.</div>
+			<div class="projeto-empresa-resumo__empty detalhe-valor">Nenhuma inscrição vinculada encontrada para este usuário.</div>
 		<? endif; ?>
 	</div>
 
 	<div class="section-card">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Vinculos e Status</h2>
+				<h2 class="section-title">Vínculos e Status</h2>
 			</div>
 		</div>
 		<div class="row">
@@ -125,15 +126,15 @@
 				<div class="detalhe-valor"><?= $this->escape($registro['status_projeto_label']) ?></div>
 			</div>
 			<div class="col-md-3 mb-3">
-				<span class="field-label">Data de criacao</span>
+				<span class="field-label">Data de criação</span>
 				<div class="detalhe-valor"><?= !empty($registro['created_at']) ? date('d/m/Y H:i', strtotime($registro['created_at'])) : '-' ?></div>
 			</div>
 			<div class="col-md-3 mb-3">
-				<span class="field-label">Data de atualizacao</span>
+				<span class="field-label">Data de atualização</span>
 				<div class="detalhe-valor"><?= !empty($registro['updated_at']) ? date('d/m/Y H:i', strtotime($registro['updated_at'])) : '-' ?></div>
 			</div>
 			<div class="col-md-3 mb-3">
-				<span class="field-label">Usuario</span>
+				<span class="field-label">Usuário</span>
 				<div class="detalhe-valor"><?= $this->escape($registro['nome_usuario']) ?></div>
 			</div>
 			<div class="col-md-3 mb-3">
@@ -146,8 +147,8 @@
 	<div class="section-card projeto-auditavel-card">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Informacoes do Projeto</h2>
-				<p class="section-subtitle">Dados descritivos principais do projeto para conferencia e parecer.</p>
+				<h2 class="section-title">Informações do Projeto</h2>
+				<p class="section-subtitle">Dados descritivos principais do projeto para conferência e parecer.</p>
 			</div>
 		</div>
 		<div class="row">
@@ -158,15 +159,15 @@
 						<div class="detalhe-valor"><?= $this->escape($registro['nome']) ?></div>
 					</div>
 					<div class="col-md-12 mb-3">
-						<span class="field-label">Responsavel</span>
+						<span class="field-label">Responsável</span>
 						<div class="detalhe-valor"><?= !empty($registro['responsavel']) ? $this->escape($registro['responsavel']) : '-' ?></div>
 					</div>
 					<div class="col-md-6 mb-3">
-						<span class="field-label">Data da inicializacao</span>
+						<span class="field-label">Data da inicialização</span>
 						<div class="detalhe-valor"><?= !empty($registro['data_inicializacao']) ? Util::formatData($registro['data_inicializacao']) : '-' ?></div>
 					</div>
 					<div class="col-md-6 mb-3">
-						<span class="field-label">Data da finalizacao</span>
+						<span class="field-label">Data da finalização</span>
 						<div class="detalhe-valor"><?= !empty($registro['data_finalizacao']) ? Util::formatData($registro['data_finalizacao']) : '-' ?></div>
 					</div>
 					<div class="col-md-12 mb-3">
@@ -178,7 +179,7 @@
 			<? if ($podeAvaliarProjeto) : ?>
 				<div class="col-lg-4">
 					<? $renderAvaliacao('nome', 'Nome do projeto'); ?>
-					<? $renderAvaliacao('periodo_execucao', 'Data Inicializacao e finalizacao'); ?>
+					<? $renderAvaliacao('periodo_execucao', 'Data Inicialização e finalização'); ?>
 					<? $renderAvaliacao('justificativa', 'Justificativa do projeto'); ?>
 				</div>
 			<? endif; ?>
@@ -188,15 +189,15 @@
 	<div class="section-card projeto-auditavel-card">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Classificacao e Objetivos</h2>
-				<p class="section-subtitle">Elementos de enquadramento do projeto e aderencia aos objetivos declarados.</p>
+				<h2 class="section-title">Classificação e Objetivos</h2>
+				<p class="section-subtitle">Elementos de enquadramento do projeto e aderência aos objetivos declarados.</p>
 			</div>
 		</div>
 		<div class="row">
 			<div class="<?= $podeAvaliarProjeto ? 'col-lg-8' : 'col-12' ?>">
 				<div class="row projeto-detalhe-classificacao">
 					<div class="col-12 col-lg-4 mb-4">
-						<span class="field-label">Area de atuacao</span>
+						<span class="field-label">Área de atuação</span>
 						<div class="detalhe-card projeto-detalhe-bloco h-100">
 							<div class="detalhe-card-body">
 								<? $areaAtuacaoClasse = 'area-governanca'; ?>
@@ -257,7 +258,7 @@
 			</div>
 			<? if ($podeAvaliarProjeto) : ?>
 				<div class="col-lg-4">
-					<? $renderAvaliacao('area_atuacao', 'Area de atuacao'); ?>
+					<? $renderAvaliacao('area_atuacao', 'Área de atuação'); ?>
 					<? $renderAvaliacao('ods_principal', 'ODS principal'); ?>
 					<? $renderAvaliacao('demais_ods_relacionados', 'Demais ODS relacionados'); ?>
 					<? $renderAvaliacao('objetivos', 'Objetivo(s) do projeto'); ?>
@@ -269,7 +270,7 @@
 	<div class="section-card projeto-auditavel-card">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Evidencia Qualitativa do Projeto</h2>
+				<h2 class="section-title">Evidência Qualitativa do Projeto</h2>
 			</div>
 		</div>
 		<div class="row">
@@ -298,7 +299,7 @@
 			</div>
 			<? if ($podeAvaliarProjeto) : ?>
 				<div class="col-lg-4">
-					<? $renderAvaliacao('evidencia_qualitativa', 'Evidencia qualitativa do projeto'); ?>
+					<? $renderAvaliacao('evidencia_qualitativa', 'Evidência qualitativa do projeto'); ?>
 				</div>
 			<? endif; ?>
 		</div>
@@ -307,7 +308,7 @@
 	<div class="section-card projeto-auditavel-card">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Evidencia de Itens</h2>
+				<h2 class="section-title">Evidência de Itens</h2>
 			</div>
 		</div>
 		<div class="row">
@@ -350,7 +351,7 @@
 			</div>
 			<? if ($podeAvaliarProjeto) : ?>
 				<div class="col-lg-4">
-					<? $renderAvaliacao('evidencia_itens', 'Evidencia de Itens'); ?>
+					<? $renderAvaliacao('evidencia_itens', 'Evidência de Itens'); ?>
 				</div>
 			<? endif; ?>
 		</div>
@@ -359,22 +360,22 @@
 	<div class="section-card projeto-auditavel-card">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Evidencia de Pessoas</h2>
+				<h2 class="section-title">Evidência de Pessoas</h2>
 			</div>
 		</div>
 		<div class="row">
 			<div class="<?= $podeAvaliarProjeto ? 'col-lg-8' : 'col-12' ?>">
 				<div class="row">
 					<div class="col-md-4 mb-3">
-						<span class="field-label">Tipo de publico</span>
+						<span class="field-label">Tipo de público</span>
 						<div class="detalhe-valor"><?= !empty($registro['publico_tipo']) ? $this->escape($registro['publico_tipo']) : '-' ?></div>
 					</div>
 					<div class="col-md-4 mb-3">
-						<span class="field-label">Quantidade do publico interno</span>
+						<span class="field-label">Quantidade do público interno</span>
 						<div class="detalhe-valor"><?= isset($registro['quantidade_publico_interno']) && $registro['quantidade_publico_interno'] !== null && $registro['quantidade_publico_interno'] !== '' ? $this->escape($registro['quantidade_publico_interno']) : '-' ?></div>
 					</div>
 					<div class="col-md-4 mb-3">
-						<span class="field-label">Quantidade do publico externo</span>
+						<span class="field-label">Quantidade do público externo</span>
 						<div class="detalhe-valor"><?= isset($registro['quantidade_publico_externo']) && $registro['quantidade_publico_externo'] !== null && $registro['quantidade_publico_externo'] !== '' ? $this->escape($registro['quantidade_publico_externo']) : '-' ?></div>
 					</div>
 				</div>
@@ -402,7 +403,7 @@
 			</div>
 			<? if ($podeAvaliarProjeto) : ?>
 				<div class="col-lg-4">
-					<? $renderAvaliacao('evidencia_pessoas', 'Evidencia de Pessoas'); ?>
+					<? $renderAvaliacao('evidencia_pessoas', 'Evidência de Pessoas'); ?>
 				</div>
 			<? endif; ?>
 		</div>
@@ -411,7 +412,7 @@
 	<div class="section-card projeto-auditavel-card">
 		<div class="section-header">
 			<div>
-				<h2 class="section-title">Evidencia de Parceiros</h2>
+				<h2 class="section-title">Evidência de Parceiros</h2>
 			</div>
 		</div>
 		<div class="row">
@@ -450,7 +451,7 @@
 			</div>
 			<? if ($podeAvaliarProjeto) : ?>
 				<div class="col-lg-4">
-					<? $renderAvaliacao('evidencia_parceiros', 'Evidencia de Parceiros'); ?>
+					<? $renderAvaliacao('evidencia_parceiros', 'Evidência de Parceiros'); ?>
 				</div>
 			<? endif; ?>
 		</div>
@@ -460,16 +461,16 @@
 		<div class="section-card projeto-auditavel-card">
 			<div class="section-header">
 				<div>
-					<h2 class="section-title">Criterios Complementares</h2>
-					<p class="section-subtitle">Avaliacoes adicionais independentes dos blocos principais do projeto.</p>
+					<h2 class="section-title">Critérios Complementares</h2>
+					<p class="section-subtitle">Avaliações adicionais independentes dos blocos principais do projeto.</p>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-lg-6">
-					<? $renderAvaliacao('encontro_formacao_1', 'Encontro de formacao 1'); ?>
+					<? $renderAvaliacao('encontro_formacao_1', 'Encontro de formação 1'); ?>
 				</div>
 				<div class="col-lg-6">
-					<? $renderAvaliacao('encontro_formacao_2', 'Encontro de formacao 2'); ?>
+					<? $renderAvaliacao('encontro_formacao_2', 'Encontro de formação 2'); ?>
 				</div>
 			</div>
 		</div>
@@ -640,16 +641,12 @@
 				success: function(data) {
 					if (data.trim().length > 0) {
 						swal({
-							title: "Atencao!",
+							title: "Atenção!",
 							text: data,
 							type: "error"
 						});
 					} else {
-						swal({
-							title: "Sucesso!",
-							text: "Pareceres salvos com sucesso.",
-							type: "success"
-						});
+						carregarTela('<?= $this->escape($urlRetornoProjeto) ?>');
 					}
 
 					$('.salvar-avaliacao-projeto').prop('disabled', false);
@@ -658,8 +655,8 @@
 					$('.salvar-avaliacao-projeto').prop('disabled', false);
 
 					swal({
-						title: "Atencao!",
-						text: "Nao foi possivel salvar os pareceres do projeto.",
+						title: "Atenção!",
+                        text: "Não foi possível salvar os pareceres do projeto.",
 						type: "error"
 					});
 				}

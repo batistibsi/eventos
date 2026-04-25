@@ -71,6 +71,7 @@ class ProjetoController extends Zend_Controller_Action
 		$idProjeto = isset($_REQUEST['id_projeto']) ? (int) $_REQUEST['id_projeto'] : 0;
 		$this->view->registro = Projeto::buscaId($idProjeto, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
 		$this->view->empresaVinculada = $this->view->registro ? Inscricao::buscaResumoVinculadoUsuario((int) $this->view->registro['id_usuario']) : false;
+		$this->view->urlRetornoProjeto = '../../projeto' . (!empty($this->view->registro['id_inscricao']) ? '?id_inscricao=' . (int) $this->view->registro['id_inscricao'] : '');
 		$this->view->podeAvaliarProjeto = in_array((int) Zend_Registry::get('permissao'), array(1, 2), true);
 		$this->view->camposAvaliacaoProjeto = Projeto::camposAvaliacao();
 	}
