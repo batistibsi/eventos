@@ -48,6 +48,53 @@ class Projeto
 		return in_array((int) $permissao, array(1, 2), true);
 	}
 
+	public static function modoAuditoriaProjeto($registro, $permissao = null)
+	{
+		$idStatusAuditoria = !empty($registro['id_status_auditoria']) ? (int) $registro['id_status_auditoria'] : 0;
+		$permissao = (int) $permissao;
+
+		$modo = array(
+			'id_status_auditoria' => $idStatusAuditoria,
+			'codigo' => 'somente_leitura',
+			'pode_visualizar' => false,
+			'pode_salvar' => false
+		);
+
+		$permissoesPorStatus = array(
+			2 => array(1, 2),
+			3 => array(1, 3),
+			4 => array(1, 2)
+		);
+
+		if ($idStatusAuditoria >= 2 && $permissao === 1) {
+			$modo['pode_visualizar'] = true;
+		}
+
+		if ($idStatusAuditoria > 5 && in_array($permissao, array(1, 2, 3), true)) {
+			$modo['pode_visualizar'] = true;
+			return $modo;
+		}
+
+		if (!isset($permissoesPorStatus[$idStatusAuditoria]) || !in_array($permissao, $permissoesPorStatus[$idStatusAuditoria], true)) {
+			return $modo;
+		}
+
+		$modo['pode_visualizar'] = true;
+
+		if ($idStatusAuditoria === 2) {
+			$modo['codigo'] = 'etapa_2';
+			$modo['pode_salvar'] = true;
+		} elseif ($idStatusAuditoria === 3) {
+			$modo['codigo'] = 'etapa_3';
+			$modo['pode_salvar'] = true;
+		} elseif ($idStatusAuditoria === 4) {
+			$modo['codigo'] = 'etapa_4';
+			$modo['pode_salvar'] = true;
+		}
+
+		return $modo;
+	}
+
 	private static function tipoEvidenciaValido($tipo)
 	{
 		return in_array($tipo, array('qualitativa', 'itens', 'pessoas', 'parceiros'), true);
@@ -315,6 +362,7 @@ class Projeto
 
 		$registro['status_projeto_label'] = self::statusLabel($registro['status_projeto']);
 		$registro['id_inscricao'] = !empty($inscricao['id_inscricao']) ? (int) $inscricao['id_inscricao'] : null;
+		$registro['id_status_auditoria'] = !empty($inscricao['id_status_auditoria']) ? (int) $inscricao['id_status_auditoria'] : null;
 		$registro['arquivos'] = self::listaArquivos($registro['id_projeto'], 'qualitativa');
 		$registro['arquivos_qualitativos'] = $registro['arquivos'];
 		$registro['arquivos_itens'] = self::listaArquivos($registro['id_projeto'], 'itens');
@@ -340,6 +388,7 @@ class Projeto
 				'label' => $label,
 				'aprovado' => null,
 				'comentario' => '',
+				'justificativa' => '',
 				'id_usuario_avaliador' => null,
 				'updated_at' => null
 			);
@@ -360,6 +409,7 @@ class Projeto
 
 			$avaliacoes[$campo]['aprovado'] = $registro['aprovado'] === null ? null : (bool) $registro['aprovado'];
 			$avaliacoes[$campo]['comentario'] = (string) ($registro['comentario'] ?? '');
+			$avaliacoes[$campo]['justificativa'] = (string) ($registro['justificativa'] ?? '');
 			$avaliacoes[$campo]['id_usuario_avaliador'] = isset($registro['id_usuario_avaliador']) ? (int) $registro['id_usuario_avaliador'] : null;
 			$avaliacoes[$campo]['updated_at'] = $registro['updated_at'] ?? null;
 		}
@@ -369,13 +419,14 @@ class Projeto
 
 	public static function salvarAvaliacoes($idProjeto, $avaliacoes, $idUsuarioLogado = null, $permissao = null)
 	{
-		if (!self::podeAvaliarProjeto($permissao)) {
-			self::$erro = 'Voce nao tem permissao para avaliar este projeto.';
+		$registro = self::buscaId($idProjeto, $idUsuarioLogado, $permissao);
+		if (!$registro) {
 			return false;
 		}
 
-		$registro = self::buscaId($idProjeto, $idUsuarioLogado, $permissao);
-		if (!$registro) {
+		$modoAuditoria = self::modoAuditoriaProjeto($registro, $permissao);
+		if (empty($modoAuditoria['pode_salvar'])) {
+			self::$erro = 'Voce nao tem permissao para editar esta etapa da auditoria.';
 			return false;
 		}
 
@@ -394,24 +445,69 @@ class Projeto
 
 			foreach ($camposPermitidos as $campo => $label) {
 				$dadosCampo = isset($avaliacoes[$campo]) && is_array($avaliacoes[$campo]) ? $avaliacoes[$campo] : array();
-				$comentario = isset($dadosCampo['comentario']) ? trim((string) $dadosCampo['comentario']) : '';
-				if (strlen($comentario) > 5000) {
-					self::$erro = 'O comentario de "' . $label . '" deve ter no maximo 5000 caracteres.';
-					throw new Exception(self::$erro);
-				}
+				$existente = $db->fetchRow(
+					'select *
+					from eventos_projeto_avaliacao
+					where id_projeto = ' . (int) $idProjeto . '
+						and campo = ' . $db->quote($campo)
+				);
 
-				$aprovado = null;
-				if (array_key_exists('aprovado', $dadosCampo)) {
-					$valor = $dadosCampo['aprovado'];
-					if ($valor === '' || $valor === null) {
-						$aprovado = null;
-					} elseif ((string) $valor === '1') {
-						$aprovado = true;
-					} elseif ((string) $valor === '0') {
-						$aprovado = false;
-					} else {
-						self::$erro = 'O parecer de "' . $label . '" e invalido.';
+				$aprovadoAtual = null;
+				if ($existente && array_key_exists('aprovado', $existente)) {
+					$aprovadoAtual = $existente['aprovado'] === null ? null : (bool) $existente['aprovado'];
+				}
+				$comentarioAtual = $existente ? trim((string) ($existente['comentario'] ?? '')) : '';
+				$justificativaAtual = $existente ? trim((string) ($existente['justificativa'] ?? '')) : '';
+
+				$comentario = $comentarioAtual;
+				$justificativa = $justificativaAtual;
+				$aprovado = $aprovadoAtual;
+
+				if ($modoAuditoria['codigo'] === 'etapa_2') {
+					$comentario = isset($dadosCampo['comentario']) ? trim((string) $dadosCampo['comentario']) : '';
+					if (strlen($comentario) > 5000) {
+						self::$erro = 'O comentario de "' . $label . '" deve ter no maximo 5000 caracteres.';
 						throw new Exception(self::$erro);
+					}
+
+					if (array_key_exists('aprovado', $dadosCampo)) {
+						$valor = $dadosCampo['aprovado'];
+						if ($valor === '' || $valor === null) {
+							$aprovado = null;
+						} elseif ((string) $valor === '1') {
+							$aprovado = true;
+						} elseif ((string) $valor === '0') {
+							$aprovado = false;
+						} else {
+							self::$erro = 'O parecer de "' . $label . '" e invalido.';
+							throw new Exception(self::$erro);
+						}
+					}
+				} elseif ($modoAuditoria['codigo'] === 'etapa_3') {
+					$justificativa = isset($dadosCampo['justificativa']) ? trim((string) $dadosCampo['justificativa']) : '';
+					if (strlen($justificativa) > 5000) {
+						self::$erro = 'A justificativa de "' . $label . '" deve ter no maximo 5000 caracteres.';
+						throw new Exception(self::$erro);
+					}
+
+					if ($aprovadoAtual !== true && $justificativa === '') {
+						self::$erro = 'Informe a justificativa de "' . $label . '".';
+						throw new Exception(self::$erro);
+					}
+
+					if ($aprovadoAtual === true) {
+						$justificativa = '';
+					}
+				} elseif ($modoAuditoria['codigo'] === 'etapa_4') {
+					if ($aprovadoAtual !== null && array_key_exists('aprovado', $dadosCampo)) {
+						$valor = (string) $dadosCampo['aprovado'];
+						if ($valor === '1') {
+							$aprovado = true;
+						} elseif ($valor === '0') {
+							$aprovado = false;
+						} else {
+							$aprovado = $aprovadoAtual;
+						}
 					}
 				}
 
@@ -422,18 +518,12 @@ class Projeto
 					$todasQuestoesAprovadas = false;
 				}
 
-				$existente = $db->fetchRow(
-					'select id_projeto_avaliacao
-					from eventos_projeto_avaliacao
-					where id_projeto = ' . (int) $idProjeto . '
-						and campo = ' . $db->quote($campo)
-				);
-
 				$payload = array(
 					'id_projeto' => (int) $idProjeto,
 					'campo' => $campo,
 					'aprovado' => $aprovado,
 					'comentario' => $comentario !== '' ? $comentario : null,
+					'justificativa' => $justificativa !== '' ? $justificativa : null,
 					'id_usuario_avaliador' => $idUsuarioLogado ? (int) $idUsuarioLogado : null,
 					'updated_at' => new Zend_Db_Expr('now()')
 				);

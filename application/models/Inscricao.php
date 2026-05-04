@@ -535,6 +535,21 @@ class Inscricao
                 return true;
         }
 
+        public static function podeAvancarStatusAuditoria($id_status_auditoria, $permissao)
+        {
+                $id_status_auditoria = (int) $id_status_auditoria;
+                $permissao = (int) $permissao;
+
+                $permissoesPorStatus = array(
+                        2 => array(1, 2),
+                        3 => array(1, 3),
+                        4 => array(1, 2)
+                );
+
+                return isset($permissoesPorStatus[$id_status_auditoria])
+                        && in_array($permissao, $permissoesPorStatus[$id_status_auditoria], true);
+        }
+
         public static function avancarStatusAuditoria($id_inscricao, $id_usuario = 0, $permissao = 0)
         {
                 $db = Zend_Registry::get('db');
@@ -544,11 +559,6 @@ class Inscricao
 
                 if ($id_inscricao <= 0) {
                         self::$erro = 'Inscricao nao informada.';
-                        return false;
-                }
-
-                if (!in_array($permissao, array(1, 2), true)) {
-                        self::$erro = 'Nao permitido!';
                         return false;
                 }
 
@@ -569,18 +579,12 @@ class Inscricao
                         return false;
                 }
 
-                $permissoesPorStatus = array(
-                        2 => array(1, 2),
-                        3 => array(1, 3),
-                        4 => array(1, 2)
-                );
-
-                if (!isset($permissoesPorStatus[$idStatusAtual])) {
+                if (!in_array($idStatusAtual, array(2, 3, 4), true)) {
                         self::$erro = 'O avancar de status de auditoria nao esta disponivel nesta etapa.';
                         return false;
                 }
 
-                if (!in_array($permissao, $permissoesPorStatus[$idStatusAtual], true)) {
+                if (!self::podeAvancarStatusAuditoria($idStatusAtual, $permissao)) {
                         self::$erro = 'Voce nao tem permissao para avancar esta etapa da auditoria.';
                         return false;
                 }

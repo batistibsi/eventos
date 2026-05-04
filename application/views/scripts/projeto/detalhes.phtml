@@ -6,22 +6,38 @@
 <? $arquivosParceiros = $registro && !empty($registro['arquivos_parceiros']) ? $registro['arquivos_parceiros'] : array(); ?>
 <? $empresaVinculada = !empty($this->empresaVinculada) && is_array($this->empresaVinculada) ? $this->empresaVinculada : false; ?>
 <? $podeAvaliarProjeto = !empty($this->podeAvaliarProjeto); ?>
+<? $podeSalvarAvaliacaoProjeto = !empty($this->podeSalvarAvaliacaoProjeto); ?>
 <? $avaliacoes = $registro && !empty($registro['avaliacoes']) && is_array($registro['avaliacoes']) ? $registro['avaliacoes'] : array(); ?>
 <? $urlRetornoProjeto = !empty($this->urlRetornoProjeto) ? $this->urlRetornoProjeto : '../../projeto'; ?>
+<? $modoAuditoriaProjeto = !empty($this->modoAuditoriaProjeto) && is_array($this->modoAuditoriaProjeto) ? $this->modoAuditoriaProjeto : array(); ?>
+<? $codigoModoAuditoria = !empty($modoAuditoriaProjeto['codigo']) ? $modoAuditoriaProjeto['codigo'] : 'somente_leitura'; ?>
 <? $view = $this; ?>
 <? $avaliacaoPadrao = function ($campo) use ($avaliacoes) {
 	if (!isset($avaliacoes[$campo]) || !is_array($avaliacoes[$campo])) {
-		return array('aprovado' => null, 'comentario' => '');
+		return array('aprovado' => null, 'comentario' => '', 'justificativa' => '');
 	}
 	return array(
 		'aprovado' => array_key_exists('aprovado', $avaliacoes[$campo]) ? $avaliacoes[$campo]['aprovado'] : null,
-		'comentario' => isset($avaliacoes[$campo]['comentario']) ? $avaliacoes[$campo]['comentario'] : ''
+		'comentario' => isset($avaliacoes[$campo]['comentario']) ? $avaliacoes[$campo]['comentario'] : '',
+		'justificativa' => isset($avaliacoes[$campo]['justificativa']) ? $avaliacoes[$campo]['justificativa'] : ''
 	);
 }; ?>
-<? $renderAvaliacao = function ($campo, $titulo) use ($avaliacaoPadrao, $podeAvaliarProjeto, $view) {
+<? $renderAvaliacao = function ($campo, $titulo) use ($avaliacaoPadrao, $podeAvaliarProjeto, $podeSalvarAvaliacaoProjeto, $codigoModoAuditoria, $view) {
 	$avaliacao = $avaliacaoPadrao($campo);
 	$aprovado = $avaliacao['aprovado'];
 	$comentario = $avaliacao['comentario'];
+	$justificativa = $avaliacao['justificativa'];
+	$etapa2 = $codigoModoAuditoria === 'etapa_2';
+	$etapa3 = $codigoModoAuditoria === 'etapa_3';
+	$etapa4 = $codigoModoAuditoria === 'etapa_4';
+	$somenteLeitura = !$podeSalvarAvaliacaoProjeto;
+	$mostrarJustificativaRetorno = ($etapa3 && $aprovado !== true) || ((!$etapa2) && $justificativa !== '');
+	$etapa4PodeAlternar = $etapa4 && ($aprovado === false || $aprovado === true);
+	$radioAprovadoDesabilitado = $somenteLeitura || ($etapa4 ? !$etapa4PodeAlternar : !$etapa2 && !$etapa4);
+	$radioReprovadoDesabilitado = $somenteLeitura || ($etapa4 ? !$etapa4PodeAlternar : !$etapa2);
+	$radioPendenteDesabilitado = $somenteLeitura || !$etapa2;
+	$comentarioReadonly = !$etapa2;
+	$justificativaReadonly = !$etapa3;
 ?>
 	<div class="projeto-avaliacao-box">
 		<div class="projeto-avaliacao-box__header">
@@ -32,15 +48,15 @@
 		</div>
 		<div class="projeto-avaliacao-box__status">
 			<label class="projeto-avaliacao-opcao">
-				<input type="radio" name="avaliacao[<?= $view->escape($campo) ?>][aprovado]" value="1" <?= $aprovado === true ? 'checked' : '' ?>>
+				<input type="radio" name="avaliacao[<?= $view->escape($campo) ?>][aprovado]" value="1" <?= $aprovado === true ? 'checked' : '' ?> <?= $radioAprovadoDesabilitado ? 'disabled' : '' ?>>
 				<span>Aprovado</span>
 			</label>
 			<label class="projeto-avaliacao-opcao">
-				<input type="radio" name="avaliacao[<?= $view->escape($campo) ?>][aprovado]" value="0" <?= $aprovado === false ? 'checked' : '' ?>>
+				<input type="radio" name="avaliacao[<?= $view->escape($campo) ?>][aprovado]" value="0" <?= $aprovado === false ? 'checked' : '' ?> <?= $radioReprovadoDesabilitado ? 'disabled' : '' ?>>
 				<span>Reprovado</span>
 			</label>
 			<label class="projeto-avaliacao-opcao">
-				<input type="radio" name="avaliacao[<?= $view->escape($campo) ?>][aprovado]" value="" <?= $aprovado === null ? 'checked' : '' ?>>
+				<input type="radio" name="avaliacao[<?= $view->escape($campo) ?>][aprovado]" value="" <?= $aprovado === null ? 'checked' : '' ?> <?= $radioPendenteDesabilitado ? 'disabled' : '' ?>>
 				<span>Pendente</span>
 			</label>
 		</div>
@@ -49,8 +65,20 @@
 			name="avaliacao[<?= $view->escape($campo) ?>][comentario]"
 			rows="3"
 			placeholder="Comentário do auditor sobre este item"
-			<?= $podeAvaliarProjeto ? '' : 'readonly' ?>
+			<?= $comentarioReadonly ? 'readonly' : '' ?>
 		><?= $view->escape($comentario) ?></textarea>
+		<? if ($mostrarJustificativaRetorno) : ?>
+			<div class="projeto-avaliacao-box__justificativa-wrap">
+				<label class="field-label mb-1">Justificativa</label>
+				<textarea
+					class="form-control projeto-avaliacao-box__justificativa"
+					name="avaliacao[<?= $view->escape($campo) ?>][justificativa]"
+					rows="3"
+					placeholder="Informe a justificativa desta devolutiva"
+					<?= $justificativaReadonly ? 'readonly' : '' ?>
+				><?= $view->escape($justificativa) ?></textarea>
+			</div>
+		<? endif; ?>
 	</div>
 <? }; ?>
 <div class="content-page projeto-detalhes-page">
@@ -476,7 +504,7 @@
 		</div>
 	<? endif; ?>
 
-	<? if ($podeAvaliarProjeto) : ?>
+	<? if ($podeAvaliarProjeto && $podeSalvarAvaliacaoProjeto) : ?>
 		<div class="section-card projeto-auditoria-footer">
 			<div class="projeto-auditoria-footer__acoes">
 				<button type="submit" class="btn btn-success salvar-avaliacao-projeto">
@@ -592,6 +620,15 @@
 	}
 
 	.projeto-avaliacao-box__comentario {
+		min-height: 96px;
+		resize: vertical;
+	}
+
+	.projeto-avaliacao-box__justificativa-wrap {
+		margin-top: 12px;
+	}
+
+	.projeto-avaliacao-box__justificativa {
 		min-height: 96px;
 		resize: vertical;
 	}

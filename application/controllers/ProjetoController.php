@@ -8,6 +8,12 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->id_usuario = Zend_Registry::get('id_usuario');
 		$this->view->permissao = Zend_Registry::get('permissao');
 		$idInscricao = isset($_REQUEST['id_inscricao']) ? (int) $_REQUEST['id_inscricao'] : 0;
+		if (!$idInscricao && (int) Zend_Registry::get('permissao') === 3) {
+			$resumoInscricao = Inscricao::buscaResumoVinculadoUsuario((int) Zend_Registry::get('id_usuario'));
+			if ($resumoInscricao && !empty($resumoInscricao['id_inscricao'])) {
+				$idInscricao = (int) $resumoInscricao['id_inscricao'];
+			}
+		}
 		$this->view->id_inscricao = $idInscricao;
 		$this->view->registros = Projeto::lista(Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'), $idInscricao);
 		$ehAdmin = Zend_Registry::get('permissao') == 1;
@@ -26,13 +32,8 @@ class ProjetoController extends Zend_Controller_Action
 				$this->view->inscricaoProjeto = $inscricao;
 				$idStatusAuditoria = !empty($inscricao['id_status_auditoria']) ? (int) $inscricao['id_status_auditoria'] : 0;
 				$permissaoAtual = (int) Zend_Registry::get('permissao');
-				$permissoesPorStatus = array(
-					2 => array(1, 2),
-					3 => array(1, 3),
-					4 => array(1, 2)
-				);
 
-				if (isset($permissoesPorStatus[$idStatusAuditoria]) && in_array($permissaoAtual, $permissoesPorStatus[$idStatusAuditoria], true)) {
+				if (Inscricao::podeAvancarStatusAuditoria($idStatusAuditoria, $permissaoAtual)) {
 					$this->view->proximoStatusAuditoria = Auditoria::buscaProximoStatus($idStatusAuditoria);
 					$this->view->mostrarBotaoAvancarAuditoria = !empty($this->view->proximoStatusAuditoria['id_status_auditoria']);
 				}
@@ -94,7 +95,9 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->registro = Projeto::buscaId($idProjeto, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
 		$this->view->empresaVinculada = $this->view->registro ? Inscricao::buscaResumoVinculadoUsuario((int) $this->view->registro['id_usuario']) : false;
 		$this->view->urlRetornoProjeto = '../../projeto' . (!empty($this->view->registro['id_inscricao']) ? '?id_inscricao=' . (int) $this->view->registro['id_inscricao'] : '');
-		$this->view->podeAvaliarProjeto = in_array((int) Zend_Registry::get('permissao'), array(1, 2), true);
+		$this->view->modoAuditoriaProjeto = $this->view->registro ? Projeto::modoAuditoriaProjeto($this->view->registro, Zend_Registry::get('permissao')) : array();
+		$this->view->podeAvaliarProjeto = !empty($this->view->modoAuditoriaProjeto['pode_visualizar']);
+		$this->view->podeSalvarAvaliacaoProjeto = !empty($this->view->modoAuditoriaProjeto['pode_salvar']);
 		$this->view->camposAvaliacaoProjeto = Projeto::camposAvaliacao();
 	}
 

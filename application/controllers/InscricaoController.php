@@ -100,7 +100,7 @@ class InscricaoController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 
 		$permissao = (int) Zend_Registry::get('permissao');
-		if (!in_array($permissao, array(1, 2), true)) die('Nao permitido!');
+		if (!in_array($permissao, array(1, 2, 3), true)) die('Nao permitido!');
 
 		$id_inscricao = !empty($_REQUEST['id_inscricao']) ? (int) $_REQUEST['id_inscricao'] : 0;
 
