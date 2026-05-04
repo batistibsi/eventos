@@ -675,13 +675,14 @@ function formatarDataHoraEvento($valor)
                       <label class="mb-1">E-mail do responsável *</label>
                       <small class="help d-block mb-2">Utilize um e-mail válido para receber confirmações e comunicados da inscrição.</small>
                       <input type="email" class="form-control" name="email" required maxlength="120"
-                        placeholder="responsavel@organizacao.com.br">
+                        placeholder="responsavel@organizacao.com.br" autocomplete="email">
                     </div>
                     <div class="form-group col-md-4">
                       <label class="mb-1">Telefone do responsável *</label>
                       <small class="help d-block mb-2">Informe um telefone com DDD para contato com o responsável pela inscrição.</small>
                       <input required type="tel" class="form-control" name="telefone" maxlength="20"
-                        placeholder="(00) 00000-0000">
+                        placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="tel"
+                        pattern="\(\d{2}\)\s\d{4,5}-\d{4}" title="Informe um telefone válido com DDD, por exemplo: (44) 99853-0909">
                     </div>
                   </div>
 
@@ -741,13 +742,14 @@ function formatarDataHoraEvento($valor)
                         <label class="mb-1">Telefone do representante 1 *</label>
                         <small class="help d-block mb-2">Informe um telefone com DDD para contato direto com o representante.</small>
                         <input type="tel" class="form-control" name="representante_1_telefone" required maxlength="20"
-                          placeholder="(00) 00000-0000">
+                          placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="tel"
+                          pattern="\(\d{2}\)\s\d{4,5}-\d{4}" title="Informe um telefone válido com DDD, por exemplo: (44) 99853-0909">
                       </div>
                       <div class="form-group col-md-6">
                         <label class="mb-1">E-mail do representante 1 *</label>
                         <small class="help d-block mb-2">Utilize um e-mail válido para envio de informações e materiais do evento.</small>
                         <input type="email" class="form-control" name="representante_1_email" required maxlength="120"
-                          placeholder="representante1@organizacao.com.br">
+                          placeholder="representante1@organizacao.com.br" autocomplete="email">
                       </div>
                     </div>
                   </div>
@@ -766,13 +768,14 @@ function formatarDataHoraEvento($valor)
                         <label class="mb-1">Telefone do representante 2</label>
                         <small class="help d-block mb-2">Informe um telefone com DDD caso este representante também participe da comunicação.</small>
                         <input type="tel" class="form-control" name="representante_2_telefone" maxlength="20"
-                          placeholder="(00) 00000-0000">
+                          placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="tel"
+                          pattern="\(\d{2}\)\s\d{4,5}-\d{4}" title="Informe um telefone válido com DDD, por exemplo: (44) 99853-0909">
                       </div>
                       <div class="form-group col-md-6">
                         <label class="mb-1">E-mail do representante 2</label>
                         <small class="help d-block mb-2">Utilize um e-mail válido para compartilhar orientações e atualizações do evento.</small>
                         <input type="email" class="form-control" name="representante_2_email" maxlength="120"
-                          placeholder="representante2@organizacao.com.br">
+                          placeholder="representante2@organizacao.com.br" autocomplete="email">
                       </div>
                     </div>
                   </div>
@@ -791,13 +794,14 @@ function formatarDataHoraEvento($valor)
                         <label class="mb-1">Telefone do representante 3</label>
                         <small class="help d-block mb-2">Informe um telefone com DDD caso este representante precise receber contato.</small>
                         <input type="tel" class="form-control" name="representante_3_telefone" maxlength="20"
-                          placeholder="(00) 00000-0000">
+                          placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="tel"
+                          pattern="\(\d{2}\)\s\d{4,5}-\d{4}" title="Informe um telefone válido com DDD, por exemplo: (44) 99853-0909">
                       </div>
                       <div class="form-group col-md-6">
                         <label class="mb-1">E-mail do representante 3</label>
                         <small class="help d-block mb-2">Utilize um e-mail válido para envio de comunicados, se houver participação.</small>
                         <input type="email" class="form-control" name="representante_3_email" maxlength="120"
-                          placeholder="representante3@organizacao.com.br">
+                          placeholder="representante3@organizacao.com.br" autocomplete="email">
                       </div>
                     </div>
                   </div>
@@ -890,6 +894,70 @@ function formatarDataHoraEvento($valor)
         const mensagemNaoConcorda = $('#mensagemNaoConcorda');
         const btnEnviar = $('#btnEnviar');
         const camposObrigatorios = camposFormulario.find(':input').not('[type="button"], [type="submit"], [type="reset"], [disabled]');
+        const camposTelefone = $('input[type="tel"]');
+        const camposEmail = $('input[type="email"]');
+
+        function extrairDigitos(valor) {
+          return (valor || '').replace(/\D/g, '');
+        }
+
+        function aplicarMascaraTelefone(valor) {
+          const digitos = extrairDigitos(valor).slice(0, 11);
+
+          if (digitos.length <= 2) {
+            return digitos.length ? '(' + digitos : '';
+          }
+
+          if (digitos.length <= 6) {
+            return '(' + digitos.slice(0, 2) + ') ' + digitos.slice(2);
+          }
+
+          if (digitos.length <= 10) {
+            return '(' + digitos.slice(0, 2) + ') ' + digitos.slice(2, 6) + '-' + digitos.slice(6);
+          }
+
+          return '(' + digitos.slice(0, 2) + ') ' + digitos.slice(2, 7) + '-' + digitos.slice(7);
+        }
+
+        function telefoneValido(valor) {
+          const digitos = extrairDigitos(valor);
+          return digitos.length === 10 || digitos.length === 11;
+        }
+
+        function emailValido(valor) {
+          if (!valor) {
+            return false;
+          }
+
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
+        }
+
+        function validarTelefoneCampo(campo) {
+          const valor = campo.value.trim();
+
+          if (!valor) {
+            campo.setCustomValidity('');
+            return;
+          }
+
+          campo.setCustomValidity(
+            telefoneValido(valor) ? '' : 'Informe um telefone válido com DDD.'
+          );
+        }
+
+        function validarEmailCampo(campo) {
+          const valor = campo.value.trim();
+          campo.value = valor;
+
+          if (!valor) {
+            campo.setCustomValidity('');
+            return;
+          }
+
+          campo.setCustomValidity(
+            emailValido(valor) ? '' : 'Informe um e-mail válido.'
+          );
+        }
 
         function atualizarConsentimento() {
           const consentimento = $('input[name="lgpd_consentimento"]:checked').val();
@@ -931,6 +999,20 @@ function formatarDataHoraEvento($valor)
         $('input[name="lgpd_consentimento"]').on('change', atualizarConsentimento);
         atualizarConsentimento();
 
+        camposTelefone.on('input', function() {
+          this.value = aplicarMascaraTelefone(this.value);
+          validarTelefoneCampo(this);
+        });
+
+        camposTelefone.on('blur', function() {
+          this.value = aplicarMascaraTelefone(this.value);
+          validarTelefoneCampo(this);
+        });
+
+        camposEmail.on('input blur', function() {
+          validarEmailCampo(this);
+        });
+
         $(document).on('change', 'input[name="id_evento"]', function() {
           $('.turma-table tbody tr').removeClass('turma-selecionada');
           $(this).closest('tr').addClass('turma-selecionada');
@@ -946,6 +1028,15 @@ function formatarDataHoraEvento($valor)
             showAlert('warning', 'Para prosseguir com a inscrição, é necessário concordar com o uso dos dados informados.');
             return;
           }
+
+          camposTelefone.each(function() {
+            this.value = aplicarMascaraTelefone(this.value);
+            validarTelefoneCampo(this);
+          });
+
+          camposEmail.each(function() {
+            validarEmailCampo(this);
+          });
 
           if (!form.checkValidity()) {
             form.reportValidity();

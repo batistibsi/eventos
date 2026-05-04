@@ -371,17 +371,22 @@
                                             id="representante_<?= (int) $representante['indice'] ?>_email"
                                             name="representante_<?= (int) $representante['indice'] ?>_email"
                                             maxlength="150"
+                                            autocomplete="email"
                                             value="<?= $this->escape((string) ($representante['email'] ?? '')) ?>"
                                         >
                                     </div>
                                     <div class="form-group mb-0">
                                         <label for="representante_<?= (int) $representante['indice'] ?>_telefone">Telefone</label>
                                         <input
-                                            type="text"
+                                            type="tel"
                                             class="form-control representante-telefone"
                                             id="representante_<?= (int) $representante['indice'] ?>_telefone"
                                             name="representante_<?= (int) $representante['indice'] ?>_telefone"
                                             maxlength="20"
+                                            inputmode="numeric"
+                                            autocomplete="tel"
+                                            pattern="\(\d{2}\)\s\d{4,5}-\d{4}"
+                                            title="Informe um telefone válido com DDD, por exemplo: (44) 99853-0909"
                                             value="<?= $this->escape((string) ($representante['telefone'] ?? '')) ?>"
                                         >
                                     </div>
@@ -477,11 +482,15 @@
                                 <div class="form-group mb-0">
                                     <label for="summit_telefone_<?= (int) $slot['indice'] ?>">Telefone para Contato</label>
                                     <input
-                                        type="text"
+                                        type="tel"
                                         class="form-control summit-telefone"
                                         id="summit_telefone_<?= (int) $slot['indice'] ?>"
                                         name="summit_telefone_<?= (int) $slot['indice'] ?>"
                                         maxlength="20"
+                                        inputmode="numeric"
+                                        autocomplete="tel"
+                                        pattern="\(\d{2}\)\s\d{4,5}-\d{4}"
+                                        title="Informe um telefone válido com DDD, por exemplo: (44) 99853-0909"
                                         value="<?= $this->escape($slot['telefone']) ?>"
                                         <?= $prazoSummitEncerrado ? 'disabled' : '' ?>
                                     >
@@ -525,6 +534,77 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
+        function extrairDigitos(valor) {
+            return (valor || '').replace(/\D/g, '');
+        }
+
+        function aplicarMascaraTelefone(valor) {
+            const digitos = extrairDigitos(valor).slice(0, 11);
+
+            if (digitos.length <= 2) {
+                return digitos.length ? '(' + digitos : '';
+            }
+
+            if (digitos.length <= 6) {
+                return '(' + digitos.slice(0, 2) + ') ' + digitos.slice(2);
+            }
+
+            if (digitos.length <= 10) {
+                return '(' + digitos.slice(0, 2) + ') ' + digitos.slice(2, 6) + '-' + digitos.slice(6);
+            }
+
+            return '(' + digitos.slice(0, 2) + ') ' + digitos.slice(2, 7) + '-' + digitos.slice(7);
+        }
+
+        function telefoneValido(valor) {
+            const digitos = extrairDigitos(valor);
+            return digitos.length === 10 || digitos.length === 11;
+        }
+
+        function emailValido(valor) {
+            if (!valor) {
+                return false;
+            }
+
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
+        }
+
+        function validarTelefoneCampo(campo) {
+            if (campo.disabled || campo.readOnly) {
+                return true;
+            }
+
+            const valor = campo.value.trim();
+
+            if (!valor) {
+                campo.setCustomValidity('');
+                return true;
+            }
+
+            campo.value = aplicarMascaraTelefone(valor);
+            const valido = telefoneValido(campo.value);
+            campo.setCustomValidity(valido ? '' : 'Informe um telefone válido com DDD.');
+            return valido;
+        }
+
+        function validarEmailCampo(campo) {
+            if (campo.disabled || campo.readOnly) {
+                return true;
+            }
+
+            const valor = campo.value.trim();
+            campo.value = valor;
+
+            if (!valor) {
+                campo.setCustomValidity('');
+                return true;
+            }
+
+            const valido = emailValido(valor);
+            campo.setCustomValidity(valido ? '' : 'Informe um e-mail válido.');
+            return valido;
+        }
+
         $('#form-status-inscricao').submit(function(e) {
             e.preventDefault();
 
@@ -642,8 +722,36 @@
         $('.representante-telefone').mask('(00) 00000-0000');
         $('.summit-telefone').mask('(00) 00000-0000');
 
+        $(document).on('input blur', '.representante-telefone, .summit-telefone', function() {
+            validarTelefoneCampo(this);
+        });
+
+        $(document).on('input blur', 'input[type="email"]', function() {
+            validarEmailCampo(this);
+        });
+
         $('#form-representantes-inscricao').submit(function(e) {
             e.preventDefault();
+
+            const form = this;
+            let valido = true;
+
+            $(form).find('.representante-telefone').each(function() {
+                if (!validarTelefoneCampo(this)) {
+                    valido = false;
+                }
+            });
+
+            $(form).find('input[type="email"]').each(function() {
+                if (!validarEmailCampo(this)) {
+                    valido = false;
+                }
+            });
+
+            if (!valido || !form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
 
             $('.salvar-representantes-inscricao').prop('disabled', true);
 
@@ -682,6 +790,20 @@
 
         $('#form-summit-inscricao').submit(function(e) {
             e.preventDefault();
+
+            const form = this;
+            let valido = true;
+
+            $(form).find('.summit-telefone').each(function() {
+                if (!validarTelefoneCampo(this)) {
+                    valido = false;
+                }
+            });
+
+            if (!valido || !form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
 
             $('.salvar-summit-inscricao').prop('disabled', true);
 

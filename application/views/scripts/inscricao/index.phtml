@@ -77,6 +77,105 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
+        function extrairDigitos(valor) {
+            return (valor || '').replace(/\D/g, '');
+        }
+
+        function aplicarMascaraTelefone(valor) {
+            const digitos = extrairDigitos(valor).slice(0, 11);
+
+            if (digitos.length <= 2) {
+                return digitos.length ? '(' + digitos : '';
+            }
+
+            if (digitos.length <= 6) {
+                return '(' + digitos.slice(0, 2) + ') ' + digitos.slice(2);
+            }
+
+            if (digitos.length <= 10) {
+                return '(' + digitos.slice(0, 2) + ') ' + digitos.slice(2, 6) + '-' + digitos.slice(6);
+            }
+
+            return '(' + digitos.slice(0, 2) + ') ' + digitos.slice(2, 7) + '-' + digitos.slice(7);
+        }
+
+        function telefoneValido(valor) {
+            const digitos = extrairDigitos(valor);
+            return digitos.length === 10 || digitos.length === 11;
+        }
+
+        function emailValido(valor) {
+            if (!valor) {
+                return false;
+            }
+
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
+        }
+
+        function campoEditavel(campo) {
+            return !campo.readOnly && !campo.disabled;
+        }
+
+        function validarTelefoneCampo(campo) {
+            if (!campoEditavel(campo)) {
+                return;
+            }
+
+            const valor = campo.value.trim();
+
+            if (!valor) {
+                campo.setCustomValidity('');
+                return;
+            }
+
+            campo.value = aplicarMascaraTelefone(valor);
+            campo.setCustomValidity(
+                telefoneValido(campo.value) ? '' : 'Informe um telefone válido com DDD.'
+            );
+        }
+
+        function validarEmailCampo(campo) {
+            if (!campoEditavel(campo)) {
+                return;
+            }
+
+            const valor = campo.value.trim();
+            campo.value = valor;
+
+            if (!valor) {
+                campo.setCustomValidity('');
+                return;
+            }
+
+            campo.setCustomValidity(
+                emailValido(valor) ? '' : 'Informe um e-mail válido.'
+            );
+        }
+
+        $(document).on('input blur', 'input[type="tel"]', function() {
+            validarTelefoneCampo(this);
+        });
+
+        $(document).on('focus', 'input[type="tel"]', function() {
+            if (campoEditavel(this)) {
+                this.setAttribute('inputmode', 'numeric');
+                this.setAttribute('autocomplete', 'tel');
+                this.setAttribute('maxlength', '20');
+                this.setAttribute('placeholder', '(00) 00000-0000');
+                this.setAttribute('pattern', '\\(\\d{2}\\)\\s\\d{4,5}-\\d{4}');
+                this.setAttribute('title', 'Informe um telefone válido com DDD, por exemplo: (44) 99853-0909');
+            }
+        });
+
+        $(document).on('input blur', 'input[type="email"]', function() {
+            validarEmailCampo(this);
+        });
+
+        $(document).on('focus', 'input[type="email"]', function() {
+            if (campoEditavel(this)) {
+                this.setAttribute('autocomplete', 'email');
+            }
+        });
 
         let periodo = $('#periodo').daterangepicker({
             startDate: new Date('<?= $this->inicio ?> 00:00:00'),

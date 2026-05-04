@@ -9,11 +9,26 @@ function postValue($key)
   return trim($_POST[$key] ?? '');
 }
 
+function normalizarTelefone($valor)
+{
+  return preg_replace('/\D+/', '', trim((string) $valor));
+}
+
+function telefoneValido($valor)
+{
+  return (bool) preg_match('/^\d{10,11}$/', $valor);
+}
+
+function emailValido($valor)
+{
+  return filter_var($valor, FILTER_VALIDATE_EMAIL) !== false;
+}
+
 $campos = [];
 $campos['nome'] = postValue('nome');
 $campos['cpf_responsavel'] = postValue('cpf_responsavel');
 $campos['email'] = postValue('email');
-$campos['telefone'] = postValue('telefone');
+$campos['telefone'] = normalizarTelefone(postValue('telefone'));
 $campos['nome_organizacao'] = postValue('nome_organizacao');
 $campos['cnpj'] = postValue('cnpj');
 $campos['endereco'] = postValue('endereco');
@@ -21,13 +36,13 @@ $campos['numero_colaboradores'] = (int)($_POST['numero_colaboradores'] ?? 0);
 $campos['id_evento'] = (int)($_POST['id_evento'] ?? 0);
 $campos['representante_1_nome'] = postValue('representante_1_nome');
 $campos['representante_1_email'] = postValue('representante_1_email');
-$campos['representante_1_telefone'] = postValue('representante_1_telefone');
+$campos['representante_1_telefone'] = normalizarTelefone(postValue('representante_1_telefone'));
 $campos['representante_2_nome'] = postValue('representante_2_nome');
 $campos['representante_2_email'] = postValue('representante_2_email');
-$campos['representante_2_telefone'] = postValue('representante_2_telefone');
+$campos['representante_2_telefone'] = normalizarTelefone(postValue('representante_2_telefone'));
 $campos['representante_3_nome'] = postValue('representante_3_nome');
 $campos['representante_3_email'] = postValue('representante_3_email');
-$campos['representante_3_telefone'] = postValue('representante_3_telefone');
+$campos['representante_3_telefone'] = normalizarTelefone(postValue('representante_3_telefone'));
 $campos['primeira_participacao'] = postValue('primeira_participacao');
 $campos['nome_certificado'] = postValue('nome_certificado');
 $campos['como_soube'] = postValue('como_soube');
@@ -53,6 +68,54 @@ $obrigatorios = [
 foreach ($obrigatorios as $campo => $label) {
   if ($campos[$campo] === '') {
     echo json_encode(['success' => false, 'erro' => 'Informe ' . $label . '.'], JSON_UNESCAPED_UNICODE);
+    exit;
+  }
+}
+
+$emailsObrigatorios = [
+  'email' => 'e-mail do responsável',
+  'representante_1_email' => 'e-mail do representante 1',
+];
+
+foreach ($emailsObrigatorios as $campo => $label) {
+  if (!emailValido($campos[$campo])) {
+    echo json_encode(['success' => false, 'erro' => 'Informe um ' . $label . ' válido.'], JSON_UNESCAPED_UNICODE);
+    exit;
+  }
+}
+
+$emailsOpcionais = [
+  'representante_2_email' => 'e-mail do representante 2',
+  'representante_3_email' => 'e-mail do representante 3',
+];
+
+foreach ($emailsOpcionais as $campo => $label) {
+  if ($campos[$campo] !== '' && !emailValido($campos[$campo])) {
+    echo json_encode(['success' => false, 'erro' => 'Informe um ' . $label . ' válido.'], JSON_UNESCAPED_UNICODE);
+    exit;
+  }
+}
+
+$telefonesObrigatorios = [
+  'telefone' => 'telefone do responsável',
+  'representante_1_telefone' => 'telefone do representante 1',
+];
+
+foreach ($telefonesObrigatorios as $campo => $label) {
+  if (!telefoneValido($campos[$campo])) {
+    echo json_encode(['success' => false, 'erro' => 'Informe um ' . $label . ' válido com DDD.'], JSON_UNESCAPED_UNICODE);
+    exit;
+  }
+}
+
+$telefonesOpcionais = [
+  'representante_2_telefone' => 'telefone do representante 2',
+  'representante_3_telefone' => 'telefone do representante 3',
+];
+
+foreach ($telefonesOpcionais as $campo => $label) {
+  if ($campos[$campo] !== '' && !telefoneValido($campos[$campo])) {
+    echo json_encode(['success' => false, 'erro' => 'Informe um ' . $label . ' válido com DDD.'], JSON_UNESCAPED_UNICODE);
     exit;
   }
 }

@@ -239,7 +239,7 @@ class Inscricao
                 for ($i = 1; $i <= self::MAX_SUMMIT_INSCRICOES; $i++) {
                         $nome = trim((string) ($campos['summit_nome_' . $i] ?? ''));
                         $cargo = trim((string) ($campos['summit_cargo_' . $i] ?? ''));
-                        $telefone = trim((string) ($campos['summit_telefone_' . $i] ?? ''));
+                        $telefone = self::normalizarTelefone($campos['summit_telefone_' . $i] ?? '');
                         $temAlgumValor = ($nome !== '' || $cargo !== '' || $telefone !== '');
 
                         if (!$temAlgumValor) {
@@ -261,8 +261,8 @@ class Inscricao
                                 return false;
                         }
 
-                        if (strlen($telefone) > 20) {
-                                self::$erro = 'O telefone para contato do representante do Summit ' . $i . ' deve ter no maximo 20 caracteres.';
+                        if (!self::telefoneValido($telefone)) {
+                                self::$erro = 'Informe um telefone valido com DDD para o representante do Summit ' . $i . '.';
                                 return false;
                         }
 
@@ -275,6 +275,21 @@ class Inscricao
                 }
 
                 return $inscricoes;
+        }
+
+        private static function normalizarTelefone($valor)
+        {
+                return preg_replace('/\D+/', '', trim((string) $valor));
+        }
+
+        private static function telefoneValido($valor)
+        {
+                return (bool) preg_match('/^\d{10,11}$/', (string) $valor);
+        }
+
+        private static function emailValido($valor)
+        {
+                return filter_var((string) $valor, FILTER_VALIDATE_EMAIL) !== false;
         }
 
         public static function novo($campos)
@@ -770,9 +785,9 @@ class Inscricao
                         }
 
                         $email = trim((string) ($campos['representante_' . $i . '_email'] ?? ''));
-                        $telefone = trim((string) ($campos['representante_' . $i . '_telefone'] ?? ''));
+                        $telefone = self::normalizarTelefone($campos['representante_' . $i . '_telefone'] ?? '');
 
-                        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        if ($email !== '' && !self::emailValido($email)) {
                                 self::$erro = 'Informe um e-mail valido para o representante ' . $i . '.';
                                 return false;
                         }
@@ -782,8 +797,8 @@ class Inscricao
                                 return false;
                         }
 
-                        if ($telefone !== '' && strlen($telefone) > 20) {
-                                self::$erro = 'O telefone do representante ' . $i . ' deve ter no maximo 20 caracteres.';
+                        if ($telefone !== '' && !self::telefoneValido($telefone)) {
+                                self::$erro = 'Informe um telefone valido com DDD para o representante ' . $i . '.';
                                 return false;
                         }
 

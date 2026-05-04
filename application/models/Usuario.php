@@ -78,6 +78,16 @@ class Usuario
 		return false;
 	}
 
+	private static function normalizarEmail($email)
+	{
+		return trim((string) $email);
+	}
+
+	private static function emailValido($email)
+	{
+		return filter_var((string) $email, FILTER_VALIDATE_EMAIL) !== false;
+	}
+
 	public static function logLogin($id_usuario)
 	{
 
@@ -94,11 +104,13 @@ class Usuario
 
 	public static function insert($email, $nome, $idPerfil, $ativo, $senha, $confirmSenha)
 	{
+		$email = self::normalizarEmail($email);
+		$nome = trim((string) $nome);
 
 		if ($ativo) {
 			$idPerfil = (int) $idPerfil;
 
-			if (strlen($email) < 3 || strlen($email) > self::MAX_EMAIL) {
+			if (!self::emailValido($email) || strlen($email) > self::MAX_EMAIL) {
 				Usuario::$erro = 'Email inválido!';
 				return false;
 			}
@@ -157,8 +169,10 @@ class Usuario
 	{
 		$id_usuario = (int) $id_usuario;
 		$idPerfil = (int) $idPerfil;
+		$email = self::normalizarEmail($email);
+		$nome = trim((string) $nome);
 
-		if (strlen($email) < 3 || strlen($email) > self::MAX_EMAIL) {
+		if (!self::emailValido($email) || strlen($email) > self::MAX_EMAIL) {
 			Usuario::$erro = 'Email inválido!';
 			return false;
 		}

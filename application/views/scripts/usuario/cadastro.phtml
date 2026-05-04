@@ -1,6 +1,6 @@
 <div class="content-page">
 	<div class="content-page__header">
-		<h1 class="content-page__title">Usuário</h1>
+		<h1 class="content-page__title">UsuÃ¡rio</h1>
 		<div class="content-page__toolbar">
 			<button type="button" onclick="carregarTela('../../usuario')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
 		</div>
@@ -16,7 +16,7 @@
 				</div>
 				<div class="form-group col-md-7">
 					<span><label for="email">E-mail: </label></span>
-					<input class="form-control" name="email" type="text" value="<?= $this->registro ? $this->registro['email'] : '' ?>" id="email">
+					<input class="form-control" name="email" type="email" value="<?= $this->registro ? $this->registro['email'] : '' ?>" id="email" maxlength="80" autocomplete="email">
 				</div>
 			</div>
 			<div class="row">
@@ -59,15 +59,42 @@
 	$(document).ready(function() {
 		$('#nome').focus();
 
+		function emailValido(valor) {
+			if (!valor) {
+				return false;
+			}
+
+			return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
+		}
+
+		function validarEmailCampo() {
+			var campo = $('#email')[0];
+			var valor = $('#email').val().trim();
+			campo.value = valor;
+
+			if (!valor) {
+				campo.setCustomValidity('Informe um e-mail válido.');
+				return false;
+			}
+
+			var valido = emailValido(valor) && valor.length <= 80;
+			campo.setCustomValidity(valido ? '' : 'Informe um e-mail válido.');
+			return valido;
+		}
+
+		$('#email').on('input blur', function() {
+			validarEmailCampo();
+		});
+
 		$("#formulario").submit(function(e) {
 
 			var erro = "";
 
-			if ($('#email').val().trim() < 3 || $('#email').val().trim() > 80) {
-				erro = "Email inválido!";
+			if (!validarEmailCampo()) {
+				erro = "Email invÃ¡lido!";
 			}
-			else if ($('#nome').val().trim() < 3 || $('#nome').val().trim() > 80) {
-				erro = "Nome inválido!";
+			else if ($('#nome').val().trim().length < 3 || $('#nome').val().trim().length > 80) {
+				erro = "Nome invÃ¡lido!";
 			}
 			else if ($('#id_perfil').val().trim() == "0") {
 				erro = "Escolha um perfil!";
@@ -87,7 +114,7 @@
 						if (data.trim().length > 0) {
 							$('.salvar').show();
 							swal({
-								title: "Atenção!",
+								title: "AtenÃ§Ã£o!",
 								text: data,
 								type: "error"
 							});
@@ -103,7 +130,7 @@
 				});
 			} else {
 				swal({
-					title: "Atenção!",
+					title: "AtenÃ§Ã£o!",
 					text: erro,
 					type: "error"
 				});
