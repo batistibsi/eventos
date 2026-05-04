@@ -96,7 +96,19 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->empresaVinculada = $this->view->registro ? Inscricao::buscaResumoVinculadoUsuario((int) $this->view->registro['id_usuario']) : false;
 		$this->view->urlRetornoProjeto = '../../projeto' . (!empty($this->view->registro['id_inscricao']) ? '?id_inscricao=' . (int) $this->view->registro['id_inscricao'] : '');
 		$this->view->modoAuditoriaProjeto = $this->view->registro ? Projeto::modoAuditoriaProjeto($this->view->registro, Zend_Registry::get('permissao')) : array();
-		$this->view->podeAvaliarProjeto = !empty($this->view->modoAuditoriaProjeto['pode_visualizar']);
+		$possuiRespostasAuditoria = false;
+		if (!empty($this->view->registro['avaliacoes']) && is_array($this->view->registro['avaliacoes'])) {
+			foreach ($this->view->registro['avaliacoes'] as $avaliacao) {
+				$aprovadoPreenchido = is_array($avaliacao) && array_key_exists('aprovado', $avaliacao) && $avaliacao['aprovado'] !== null;
+				$comentarioPreenchido = is_array($avaliacao) && !empty(trim((string) ($avaliacao['comentario'] ?? '')));
+				$justificativaPreenchida = is_array($avaliacao) && !empty(trim((string) ($avaliacao['justificativa'] ?? '')));
+				if ($aprovadoPreenchido || $comentarioPreenchido || $justificativaPreenchida) {
+					$possuiRespostasAuditoria = true;
+					break;
+				}
+			}
+		}
+		$this->view->podeAvaliarProjeto = !empty($this->view->modoAuditoriaProjeto['pode_visualizar']) || $possuiRespostasAuditoria;
 		$this->view->podeSalvarAvaliacaoProjeto = !empty($this->view->modoAuditoriaProjeto['pode_salvar']);
 		$this->view->camposAvaliacaoProjeto = Projeto::camposAvaliacao();
 	}
