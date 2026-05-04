@@ -499,7 +499,7 @@ class Projeto
 						$justificativa = '';
 					}
 				} elseif ($modoAuditoria['codigo'] === 'etapa_4') {
-					if ($aprovadoAtual !== null && array_key_exists('aprovado', $dadosCampo)) {
+					if ($justificativaAtual !== '' && $aprovadoAtual !== null && array_key_exists('aprovado', $dadosCampo)) {
 						$valor = (string) $dadosCampo['aprovado'];
 						if ($valor === '1') {
 							$aprovado = true;

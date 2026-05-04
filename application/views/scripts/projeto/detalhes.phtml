@@ -32,7 +32,7 @@
 	$etapa4 = $codigoModoAuditoria === 'etapa_4';
 	$somenteLeitura = !$podeSalvarAvaliacaoProjeto;
 	$mostrarJustificativaRetorno = ($etapa3 && $aprovado !== true) || ((!$etapa2) && $justificativa !== '');
-	$etapa4PodeAlternar = $etapa4 && ($aprovado === false || $aprovado === true);
+	$etapa4PodeAlternar = $etapa4 && $justificativa !== '' && ($aprovado === false || $aprovado === true);
 	$radioAprovadoDesabilitado = $somenteLeitura || ($etapa4 ? !$etapa4PodeAlternar : !$etapa2 && !$etapa4);
 	$radioReprovadoDesabilitado = $somenteLeitura || ($etapa4 ? !$etapa4PodeAlternar : !$etapa2);
 	$radioPendenteDesabilitado = $somenteLeitura || !$etapa2;
