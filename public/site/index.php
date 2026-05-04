@@ -416,6 +416,12 @@
                     Participar da Certificação
                 </a>
             </p>
+
+            <br>
+
+            <h3>
+                <p>Já fiz a minha inscrição.</p>
+            </h3>
             
             <p>
                 <a class="btn" href="https://eventos.isesg.com.br" target="_blank">
