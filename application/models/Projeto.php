@@ -389,6 +389,9 @@ class Projeto
 		$db->beginTransaction();
 
 		try {
+			$todasQuestoesRespondidas = true;
+			$todasQuestoesAprovadas = true;
+
 			foreach ($camposPermitidos as $campo => $label) {
 				$dadosCampo = isset($avaliacoes[$campo]) && is_array($avaliacoes[$campo]) ? $avaliacoes[$campo] : array();
 				$comentario = isset($dadosCampo['comentario']) ? trim((string) $dadosCampo['comentario']) : '';
@@ -410,6 +413,13 @@ class Projeto
 						self::$erro = 'O parecer de "' . $label . '" e invalido.';
 						throw new Exception(self::$erro);
 					}
+				}
+
+				if ($aprovado === null) {
+					$todasQuestoesRespondidas = false;
+					$todasQuestoesAprovadas = false;
+				} elseif ($aprovado !== true) {
+					$todasQuestoesAprovadas = false;
 				}
 
 				$existente = $db->fetchRow(
@@ -435,6 +445,17 @@ class Projeto
 					$db->insert('eventos_projeto_avaliacao', $payload);
 				}
 			}
+
+			$statusProjetoAtualizado = 1;
+			if ($todasQuestoesRespondidas) {
+				$statusProjetoAtualizado = $todasQuestoesAprovadas ? 3 : 2;
+			}
+
+			$db->update(
+				'eventos_projeto',
+				array('status_projeto' => $statusProjetoAtualizado),
+				'id_projeto = ' . (int) $idProjeto
+			);
 
 			$db->commit();
 		} catch (Exception $e) {
