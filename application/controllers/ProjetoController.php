@@ -16,6 +16,28 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->mostrarBotaoNovo = !$idInscricao && ($ehAdmin || (!$atingiuLimiteProjetos && Zend_Registry::get('permissao') != 2 && !Projeto::existeListadoNoStatus(1, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'))));
 		$this->view->permitirEditarExcluir = $ehAdmin || $this->view->mostrarBotaoNovo;
 		$this->view->atingiuLimiteProjetos = $atingiuLimiteProjetos;
+		$this->view->inscricaoProjeto = false;
+		$this->view->proximoStatusAuditoria = false;
+		$this->view->mostrarBotaoAvancarAuditoria = false;
+
+		if ($idInscricao) {
+			$inscricao = Inscricao::buscaId($idInscricao);
+			if ($inscricao && Inscricao::podeVisualizar($inscricao, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'))) {
+				$this->view->inscricaoProjeto = $inscricao;
+				$idStatusAuditoria = !empty($inscricao['id_status_auditoria']) ? (int) $inscricao['id_status_auditoria'] : 0;
+				$permissaoAtual = (int) Zend_Registry::get('permissao');
+				$permissoesPorStatus = array(
+					2 => array(1, 2),
+					3 => array(1, 3),
+					4 => array(1, 2)
+				);
+
+				if (isset($permissoesPorStatus[$idStatusAuditoria]) && in_array($permissaoAtual, $permissoesPorStatus[$idStatusAuditoria], true)) {
+					$this->view->proximoStatusAuditoria = Auditoria::buscaProximoStatus($idStatusAuditoria);
+					$this->view->mostrarBotaoAvancarAuditoria = !empty($this->view->proximoStatusAuditoria['id_status_auditoria']);
+				}
+			}
+		}
 	}
 
 	public function cadastroAction()

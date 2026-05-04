@@ -33,6 +33,7 @@ class Inscricao
                                     b.limite_vagas as evento_limite_vagas,
                                     b.data_inscricao_summit as data_inscricao_summit,
                                     b.data_summit as data_summit,
+                                    sa.nome as status_auditoria_nome,
                                     fp.descricao as forma_pagamento_descricao,
                                     u.id_usuario as usuario_id,
                                     u.nome as usuario_nome,
@@ -40,6 +41,7 @@ class Inscricao
                                     p.descricao as usuario_perfil
                              from eventos_inscricao a
                              left join eventos_evento b on b.id_evento = a.id_evento
+                             left join eventos_status_auditoria sa on sa.id_status_auditoria = a.id_status_auditoria
                              left join eventos_forma_pagamento fp on fp.id_forma_pagamento = a.id_forma_pagamento
                              left join eventos_usuario u on a.id_usuario = u.id_usuario and u.ativo
                              left join eventos_perfil p on u.id_perfil = p.id_perfil
@@ -527,6 +529,77 @@ class Inscricao
                         $db->update('eventos_inscricao', $data, $where);
                 } catch (Exception $e) {
                         self::$erro = 'Nao foi possivel definir o auditor.';
+                        return false;
+                }
+
+                return true;
+        }
+
+        public static function avancarStatusAuditoria($id_inscricao, $id_usuario = 0, $permissao = 0)
+        {
+                $db = Zend_Registry::get('db');
+                $id_inscricao = (int) $id_inscricao;
+                $id_usuario = (int) $id_usuario;
+                $permissao = (int) $permissao;
+
+                if ($id_inscricao <= 0) {
+                        self::$erro = 'Inscricao nao informada.';
+                        return false;
+                }
+
+                if (!in_array($permissao, array(1, 2), true)) {
+                        self::$erro = 'Nao permitido!';
+                        return false;
+                }
+
+                $inscricao = self::buscaId($id_inscricao);
+                if (!$inscricao || !is_array($inscricao)) {
+                        self::$erro = 'Inscricao nao encontrada.';
+                        return false;
+                }
+
+                if (!self::podeVisualizar($inscricao, $id_usuario, $permissao)) {
+                        self::$erro = 'Nao permitido!';
+                        return false;
+                }
+
+                $idStatusAtual = !empty($inscricao['id_status_auditoria']) ? (int) $inscricao['id_status_auditoria'] : 0;
+                if (!$idStatusAtual) {
+                        self::$erro = 'A inscricao ainda nao entrou no fluxo de auditoria.';
+                        return false;
+                }
+
+                $permissoesPorStatus = array(
+                        2 => array(1, 2),
+                        3 => array(1, 3),
+                        4 => array(1, 2)
+                );
+
+                if (!isset($permissoesPorStatus[$idStatusAtual])) {
+                        self::$erro = 'O avancar de status de auditoria nao esta disponivel nesta etapa.';
+                        return false;
+                }
+
+                if (!in_array($permissao, $permissoesPorStatus[$idStatusAtual], true)) {
+                        self::$erro = 'Voce nao tem permissao para avancar esta etapa da auditoria.';
+                        return false;
+                }
+
+                $proximoStatus = Auditoria::buscaProximoStatus($idStatusAtual);
+                if (!$proximoStatus || !is_array($proximoStatus) || empty($proximoStatus['id_status_auditoria'])) {
+                        self::$erro = 'Nao existe proximo status de auditoria para esta inscricao.';
+                        return false;
+                }
+
+                try {
+                        $where = $db->quoteInto('id_inscricao = ?', $id_inscricao);
+                        $db->update(
+                                'eventos_inscricao',
+                                array('id_status_auditoria' => (int) $proximoStatus['id_status_auditoria']),
+                                $where
+                        );
+                } catch (Exception $e) {
+                        self::$erro = 'Nao foi possivel avancar o status de auditoria.';
                         return false;
                 }
 

@@ -4,6 +4,18 @@
 		<div class="content-page__toolbar">
 			<? if (!empty($this->id_inscricao)) : ?>
 				<button type="button" onclick="carregarTela('../../inscricao/detalhe?id_inscricao=<?= (int) $this->id_inscricao ?>')" class="btn btn-info"><i class="fa fa-id-card-o" aria-hidden="true"></i> Inscri&ccedil;&atilde;o</button>
+				<? if (!empty($this->mostrarBotaoAvancarAuditoria) && !empty($this->proximoStatusAuditoria['id_status_auditoria'])) : ?>
+					<button
+						type="button"
+						id="avancar-status-auditoria"
+						class="btn btn-success"
+						data-id-inscricao="<?= (int) $this->id_inscricao ?>"
+						data-status-atual="<?= (int) ($this->inscricaoProjeto['id_status_auditoria'] ?? 0) ?>"
+						data-status-atual-nome="<?= $this->escape($this->inscricaoProjeto['status_auditoria_nome'] ?? '') ?>"
+						data-proximo-status="<?= (int) $this->proximoStatusAuditoria['id_status_auditoria'] ?>"
+						data-proximo-status-nome="<?= $this->escape($this->proximoStatusAuditoria['nome'] ?? '') ?>"
+					><i class="fa fa-arrow-right" aria-hidden="true"></i> Submeter Projetos</button>
+				<? endif; ?>
 			<? endif; ?>
 			<? if (!empty($this->mostrarBotaoSubmeter)) : ?>
 				<button type="button" id="submeter-projetos" class="btn btn-outline-primary"><i class="fa fa-send" aria-hidden="true"></i> Submeter Projetos</button>
@@ -155,6 +167,63 @@
 						swal({
 							title: "Atenção!",
 							text: "Não foi possível submeter os projetos.",
+							type: "error"
+						});
+					}
+				});
+			});
+		});
+
+		$('#avancar-status-auditoria').on('click', function() {
+			var botao = $(this);
+			var idInscricao = botao.data('id-inscricao');
+			var statusAtualNome = botao.data('status-atual-nome') || ('#' + botao.data('status-atual'));
+			var proximoStatusNome = botao.data('proximo-status-nome') || ('#' + botao.data('proximo-status'));
+
+			swal({
+				title: "Prosseguir inscricao?",
+				text: "A inscricao avancara de " + statusAtualNome + " para " + proximoStatusNome + ".",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonText: "Sim, prosseguir",
+				cancelButtonText: "Cancelar"
+			}, function(confirmado) {
+				if (!confirmado) return;
+
+				botao.prop('disabled', true);
+
+				$.ajax({
+					type: "POST",
+					url: "../../inscricao/avancarstatusauditoria",
+					data: {
+						id_inscricao: idInscricao
+					},
+					success: function(data) {
+						if (data.trim().length > 0) {
+							botao.prop('disabled', false);
+							swal({
+								title: "Atencao!",
+								text: data,
+								type: "error"
+							});
+							return;
+						}
+
+						swal({
+							title: "Sucesso!",
+							text: "Inscricao encaminhada para o proximo status de auditoria.",
+							type: "success"
+						});
+
+						setTimeout(function() {
+							carregarTela('../../projeto?id_inscricao=<?= (int) $this->id_inscricao ?>');
+						}, 500);
+					},
+					error: function() {
+						botao.prop('disabled', false);
+						swal({
+							title: "Atencao!",
+							text: "Nao foi possivel prosseguir a inscricao.",
 							type: "error"
 						});
 					}

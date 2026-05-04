@@ -22,6 +22,37 @@ class Auditoria
 		return $db->fetchAll($select);
 	}
 
+	public static function buscaProximoStatus($idStatusAtual)
+	{
+		$db = Zend_Registry::get('db');
+		$idStatusAtual = (int) $idStatusAtual;
+
+		if (!$idStatusAtual) {
+			return false;
+		}
+
+		$statusAtual = $db->fetchRow(
+			'select id_status_auditoria, nome, ordem
+			from eventos_status_auditoria
+			where id_status_auditoria = ' . $db->quote($idStatusAtual) . '
+			limit 1'
+		);
+
+		if (!$statusAtual || !is_array($statusAtual)) {
+			return false;
+		}
+
+		$proximoStatus = $db->fetchRow(
+			'select id_status_auditoria, nome, ordem
+			from eventos_status_auditoria
+			where ordem > ' . $db->quote((int) $statusAtual['ordem']) . '
+			order by ordem asc, id_status_auditoria asc
+			limit 1'
+		);
+
+		return $proximoStatus && is_array($proximoStatus) ? $proximoStatus : false;
+	}
+
 	public static function listaInscricoesPorPerfil($idPerfil, $idUsuario = null)
 	{
 		$db = Zend_Registry::get('db');
