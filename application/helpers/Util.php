@@ -521,6 +521,21 @@ class Util
 		return $maskared;
 	}
 
+	public static function formatCpfCnpj($documento)
+	{
+		$documento = self::limparNumero((string) $documento);
+
+		if (strlen($documento) === 11) {
+			return self::mask($documento, self::$mask['fisica']);
+		}
+
+		if (strlen($documento) === 14) {
+			return self::mask($documento, self::$mask['juridica']);
+		}
+
+		return $documento;
+	}
+
 
 	public static function validaCNPJ($cnpj)
 	{

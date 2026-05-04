@@ -29,12 +29,14 @@
                     <th class="text-left">EVENTO</th>
                     <th class="text-left">DATA</th>
                     <th class="text-left">EMPRESA</th>
+                    <th class="text-left">CNPJ</th>
                     <th class="text-left">NOME</th>
                     <th class="text-left">E-MAIL</th>
                     <th class="text-left">STATUS</th>
                 </tr>
                 <tr>
                     <th></th>
+                    <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
                     <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
                     <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
                     <th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
@@ -56,6 +58,7 @@
                         <td class="text-left align-middle"><?= $value['titulo'] ?></td>
                         <td class="text-left align-middle"><?= Util::formatData($value['data_hora']) ?> <?= Util::formatHora($value['data_hora']) ?></td>
                         <td class="text-left align-middle"><?= $value['nome_organizacao'] ?></td>
+                        <td class="text-left align-middle text-nowrap"><?= Util::formatCpfCnpj($value['cnpj']) ?></td>
                         <td class="text-left align-middle"><?= $value['nome'] ?></td>
                         <td class="text-left align-middle"><?= $value['email'] ?></td>
                         <td class="text-left align-middle">
@@ -154,19 +157,17 @@
      <'col-12 col-md-3 text-md-right d-none d-md-block'f>>" +
                 "<'row'<'col-12'tr>>" +
                 "<'row align-items-center mt-2'<'col-12 col-md-5'i><'col-12 col-md-7'p>>",
-            buttons: [
-                {
-                    extend: 'excel',
-                    titleAttr: 'Excel',
-                    text: '<i class=\"fas fa-file-excel\"></i>',
-                    className: 'text-info',
-                    filename: 'eventos',
-                    exportOptions: {
-                        search: 'applied',
-                        columns: [1, 2, 3, 4, 5, 6, 7]
-                    }
+            buttons: [{
+                extend: 'excel',
+                titleAttr: 'Excel',
+                text: '<i class=\"fas fa-file-excel\"></i>',
+                className: 'text-info',
+                filename: 'eventos',
+                exportOptions: {
+                    search: 'applied',
+                    columns: [1, 2, 3, 4, 5, 6, 7,8]
                 }
-            ]
+            }]
         });
 
         $('#tabela_inscricao thead tr:eq(1) th').each(function(i) {

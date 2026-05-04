@@ -15,16 +15,8 @@
         return $valor !== '' ? $valor : $padrao;
     };
 
-    $formatarDocumento = function ($numero, $tipo = 'cpf') use ($valorOuPadrao) {
-        $numero = preg_replace('/\D/', '', (string) $numero);
-
-        if ($tipo === 'cpf' && strlen($numero) === 11) {
-            return Util::mask($numero, '###.###.###-##');
-        }
-
-        if ($tipo === 'cnpj' && strlen($numero) === 14) {
-            return Util::mask($numero, '##.###.###/####-##');
-        }
+    $formatarDocumento = function ($numero) use ($valorOuPadrao) {
+        $numero = Util::formatCpfCnpj($numero);
 
         return $valorOuPadrao($numero);
     };
@@ -52,18 +44,21 @@
 
     $representantes = [
         [
+            'indice' => 1,
             'titulo' => 'Representante 1',
             'nome' => $inscricao['representante_1_nome'] ?? null,
             'email' => $inscricao['representante_1_email'] ?? null,
             'telefone' => $inscricao['representante_1_telefone'] ?? null
         ],
         [
+            'indice' => 2,
             'titulo' => 'Representante 2',
             'nome' => $inscricao['representante_2_nome'] ?? null,
             'email' => $inscricao['representante_2_email'] ?? null,
             'telefone' => $inscricao['representante_2_telefone'] ?? null
         ],
         [
+            'indice' => 3,
             'titulo' => 'Representante 3',
             'nome' => $inscricao['representante_3_nome'] ?? null,
             'email' => $inscricao['representante_3_email'] ?? null,
@@ -266,7 +261,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <span class="field-label">CPF</span>
-                            <div class="detalhe-valor"><?= $formatarDocumento($inscricao['cpf_responsavel'] ?? null, 'cpf') ?></div>
+                            <div class="detalhe-valor"><?= $formatarDocumento($inscricao['cpf_responsavel'] ?? null) ?></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <span class="field-label">E-mail</span>
@@ -296,7 +291,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <span class="field-label">CNPJ</span>
-                            <div class="detalhe-valor"><?= $formatarDocumento($inscricao['cnpj'] ?? null, 'cnpj') ?></div>
+                            <div class="detalhe-valor text-nowrap"><?= $formatarDocumento($inscricao['cnpj'] ?? null) ?></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <span class="field-label">Nome no certificado</span>
@@ -349,27 +344,80 @@
                 <div class="section-title mb-0">Representantes</div>
                 <small class="text-muted"></small>
             </div>
-            <div class="row" id="representantes-summit">
-                <? foreach ($representantes as $representante) : ?>
-                    <div class="col-12 col-lg-4 mb-3">
-                        <div class="border rounded h-100 p-3">
-                            <div class="font-weight-bold text-info mb-3"><?= $representante['titulo'] ?></div>
-                            <div class="mb-3">
-                                <span class="field-label">Nome</span>
-                                <div class="detalhe-valor"><?= $valorOuPadrao($representante['nome']) ?></div>
+            <? if ((int) ($this->permissao ?? 0) === 1) : ?>
+                <form id="form-representantes-inscricao">
+                    <input type="hidden" name="id_inscricao" value="<?= (int) ($inscricao['id_inscricao'] ?? 0) ?>">
+                    <div class="row" id="representantes-summit">
+                        <? foreach ($representantes as $representante) : ?>
+                            <div class="col-12 col-lg-4 mb-3">
+                                <div class="border rounded h-100 p-3">
+                                    <div class="font-weight-bold text-info mb-3"><?= $representante['titulo'] ?></div>
+                                    <div class="form-group">
+                                        <label for="representante_<?= (int) $representante['indice'] ?>_nome">Nome</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="representante_<?= (int) $representante['indice'] ?>_nome"
+                                            name="representante_<?= (int) $representante['indice'] ?>_nome"
+                                            maxlength="120"
+                                            value="<?= $this->escape((string) ($representante['nome'] ?? '')) ?>"
+                                        >
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="representante_<?= (int) $representante['indice'] ?>_email">E-mail</label>
+                                        <input
+                                            type="email"
+                                            class="form-control"
+                                            id="representante_<?= (int) $representante['indice'] ?>_email"
+                                            name="representante_<?= (int) $representante['indice'] ?>_email"
+                                            maxlength="150"
+                                            value="<?= $this->escape((string) ($representante['email'] ?? '')) ?>"
+                                        >
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label for="representante_<?= (int) $representante['indice'] ?>_telefone">Telefone</label>
+                                        <input
+                                            type="text"
+                                            class="form-control representante-telefone"
+                                            id="representante_<?= (int) $representante['indice'] ?>_telefone"
+                                            name="representante_<?= (int) $representante['indice'] ?>_telefone"
+                                            maxlength="20"
+                                            value="<?= $this->escape((string) ($representante['telefone'] ?? '')) ?>"
+                                        >
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <span class="field-label">E-mail</span>
-                                <div class="detalhe-valor"><?= $valorOuPadrao($representante['email']) ?></div>
-                            </div>
-                            <div>
-                                <span class="field-label">Telefone</span>
-                                <div class="detalhe-valor"><?= $formatarTelefone($representante['telefone']) ?></div>
+                        <? endforeach; ?>
+                    </div>
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-primary salvar-representantes-inscricao">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i> Salvar representantes
+                        </button>
+                    </div>
+                </form>
+            <? else : ?>
+                <div class="row" id="representantes-summit">
+                    <? foreach ($representantes as $representante) : ?>
+                        <div class="col-12 col-lg-4 mb-3">
+                            <div class="border rounded h-100 p-3">
+                                <div class="font-weight-bold text-info mb-3"><?= $representante['titulo'] ?></div>
+                                <div class="mb-3">
+                                    <span class="field-label">Nome</span>
+                                    <div class="detalhe-valor"><?= $valorOuPadrao($representante['nome']) ?></div>
+                                </div>
+                                <div class="mb-3">
+                                    <span class="field-label">E-mail</span>
+                                    <div class="detalhe-valor"><?= $valorOuPadrao($representante['email']) ?></div>
+                                </div>
+                                <div>
+                                    <span class="field-label">Telefone</span>
+                                    <div class="detalhe-valor"><?= $formatarTelefone($representante['telefone']) ?></div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                <? endforeach; ?>
-            </div>
+                    <? endforeach; ?>
+                </div>
+            <? endif; ?>
         </div>
     </div>
 
@@ -591,7 +639,46 @@
             });
         });
 
+        $('.representante-telefone').mask('(00) 00000-0000');
         $('.summit-telefone').mask('(00) 00000-0000');
+
+        $('#form-representantes-inscricao').submit(function(e) {
+            e.preventDefault();
+
+            $('.salvar-representantes-inscricao').prop('disabled', true);
+
+            $.ajax({
+                type: "POST",
+                url: "../../inscricao/salvarrepresentantes",
+                data: $(this).serialize(),
+                success: function(data) {
+                    if (data.trim().length > 0) {
+                        swal({
+                            title: "Atencao!",
+                            text: data,
+                            type: "error"
+                        });
+                    } else {
+                        swal({
+                            title: "Sucesso!",
+                            text: "Representantes salvos com sucesso.",
+                            type: "success"
+                        });
+                    }
+
+                    $('.salvar-representantes-inscricao').prop('disabled', false);
+                },
+                error: function() {
+                    $('.salvar-representantes-inscricao').prop('disabled', false);
+
+                    swal({
+                        title: "Atencao!",
+                        text: "Nao foi possivel salvar os representantes.",
+                        type: "error"
+                    });
+                }
+            });
+        });
 
         $('#form-summit-inscricao').submit(function(e) {
             e.preventDefault();

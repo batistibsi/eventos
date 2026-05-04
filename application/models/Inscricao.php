@@ -667,6 +667,65 @@ class Inscricao
                 return true;
         }
 
+        public static function salvarRepresentantes($id_inscricao, $campos)
+        {
+                $db = Zend_Registry::get('db');
+
+                $id_inscricao = (int) $id_inscricao;
+
+                if ($id_inscricao <= 0) {
+                        self::$erro = 'Inscricao nao informada.';
+                        return false;
+                }
+
+                $inscricao = self::buscaId($id_inscricao);
+                if (!$inscricao || !is_array($inscricao)) {
+                        self::$erro = 'Inscricao nao encontrada.';
+                        return false;
+                }
+
+                $dados = [];
+
+                for ($i = 1; $i <= 3; $i++) {
+                        $nome = self::validarTamanhoTexto($campos['representante_' . $i . '_nome'] ?? '', self::MAX_REPRESENTANTE_NOME, 'nome do representante ' . $i, false);
+                        if ($nome === false) {
+                                return false;
+                        }
+
+                        $email = trim((string) ($campos['representante_' . $i . '_email'] ?? ''));
+                        $telefone = trim((string) ($campos['representante_' . $i . '_telefone'] ?? ''));
+
+                        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                                self::$erro = 'Informe um e-mail valido para o representante ' . $i . '.';
+                                return false;
+                        }
+
+                        if ($email !== '' && strlen($email) > 150) {
+                                self::$erro = 'O e-mail do representante ' . $i . ' deve ter no maximo 150 caracteres.';
+                                return false;
+                        }
+
+                        if ($telefone !== '' && strlen($telefone) > 20) {
+                                self::$erro = 'O telefone do representante ' . $i . ' deve ter no maximo 20 caracteres.';
+                                return false;
+                        }
+
+                        $dados['representante_' . $i . '_nome'] = $nome !== '' ? $nome : null;
+                        $dados['representante_' . $i . '_email'] = $email !== '' ? $email : null;
+                        $dados['representante_' . $i . '_telefone'] = $telefone !== '' ? $telefone : null;
+                }
+
+                try {
+                        $where = $db->quoteInto('id_inscricao = ?', $id_inscricao);
+                        $db->update('eventos_inscricao', $dados, $where);
+                } catch (Exception $e) {
+                        self::$erro = 'Nao foi possivel salvar os representantes.';
+                        return false;
+                }
+
+                return true;
+        }
+
         public static function buscaEventoVinculadoUsuario($id_usuario)
         {
                 $db = Zend_Registry::get('db');

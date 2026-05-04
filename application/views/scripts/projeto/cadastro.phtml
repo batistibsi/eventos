@@ -18,7 +18,15 @@
 			<button type="button" onclick="carregarTela('../../projeto')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
 		</div>
 	</div>
-	<div class="alert alert-info mb-3">Este formulário será utilizado para cadastrar seus projetos na Certificação, onde cada projeto deverá ser preenchido com todas as suas particularidades apresentadas no decorrer do formulário.</div>
+<div class="section-card projeto-cadastro-aviso mb-3">
+	<div class="projeto-cadastro-aviso__icon">
+		<i class="fa fa-lightbulb-o" aria-hidden="true"></i>
+	</div>
+	<div>
+		<div class="section-title mb-1">Preenchimento do projeto</div>
+		<p class="section-subtitle mb-0">Use este formulário para cadastrar seus projetos na Certificação e detalhe cada iniciativa com atenção, preenchendo as informações solicitadas ao longo das etapas.</p>
+	</div>
+</div>
 	<form id="formulario" class="projeto-form" novalidate>
 		<input name="id_projeto" type="hidden" value="<?= $registro ? $registro['id_projeto'] : '' ?>" id="id_projeto">
 		<input name="id_evento" type="hidden" value="<?= $eventoVinculado ? (int) $eventoVinculado['id_evento'] : '' ?>" id="id_evento">
@@ -238,6 +246,7 @@
 					<div class="row mt-3">
 						<div class="form-group col-md-6">
 							<span><label for="quantidade_itens">Informe a quantidade de itens.</label></span>
+							<small class="form-text text-muted">Digite a quantidade total de itens relacionada ao projeto.</small>
 							<input class="form-control" name="quantidade_itens" type="number" min="0" step="0.01" value="<?= $registro && !empty($registro['quantidade_itens']) ? $this->escape($registro['quantidade_itens']) : '' ?>" id="quantidade_itens">
 						</div>
 						<div class="form-group col-md-6">
@@ -276,6 +285,7 @@
 				<div class="form-group col-md-12">
 					<span><label>Informe o tipo de público relacionado ao projeto.</label></span>
 					<div class="mt-2">
+					<small class="form-text text-muted">Selecione se o projeto envolve pÃºblico interno, externo ou ambos.</small>
 						<label class="mr-4" for="publico_tipo_interno">
 							<input type="checkbox" name="publico_tipo[]" id="publico_tipo_interno" value="Interno" <?= !empty($registro['publico_tipo']) && strpos((string) $registro['publico_tipo'], 'Interno') !== false ? 'checked' : '' ?>>
 							Interno (colaboradores, equipe do projeto, departamento, outros)
@@ -292,10 +302,12 @@
 			<div class="row">
 				<div class="form-group col-md-6">
 					<span><label for="quantidade_publico_interno">Informe a quantidade do público INTERNO relacionado ao projeto.</label></span>
+					<small class="form-text text-muted">Digite o total de pessoas internas envolvidas ou beneficiadas.</small>
 					<input class="form-control" name="quantidade_publico_interno" type="number" min="0" step="1" value="<?= $registro && !empty($registro['quantidade_publico_interno']) ? $this->escape($registro['quantidade_publico_interno']) : '' ?>" id="quantidade_publico_interno">
 				</div>
 				<div class="form-group col-md-6">
-					<span><label for="quantidade_publico_externo">Informe a quantidade do público EXTERNO relacionado ao projeto.</label></span>
+					<span><label for="quantidade_publico_externo">Informe a quantidade do pÃºblico EXTERNO relacionado ao projeto.</label></span>
+					<small class="form-text text-muted">Digite o total de pessoas externas envolvidas ou beneficiadas.</small>
 					<input class="form-control" name="quantidade_publico_externo" type="number" min="0" step="1" value="<?= $registro && !empty($registro['quantidade_publico_externo']) ? $this->escape($registro['quantidade_publico_externo']) : '' ?>" id="quantidade_publico_externo">
 				</div>
 			</div>
@@ -324,6 +336,7 @@
 			<div class="row">
 				<div class="form-group col-md-6">
 					<span><label for="quantidade_parceiros">Quantidade de parceiros envolvidos no projeto.</label></span>
+					<small class="form-text text-muted">Informe o total de parceiros que colaboraram com o projeto.</small>
 					<input class="form-control" name="quantidade_parceiros" type="number" min="0" step="1" value="<?= $registro && !empty($registro['quantidade_parceiros']) ? $this->escape($registro['quantidade_parceiros']) : '' ?>" id="quantidade_parceiros">
 				</div>
 				<div class="form-group col-md-6">
@@ -354,6 +367,43 @@
 		</div>
 	</form>
 </div>
+
+<style>
+	.projeto-cadastro-aviso {
+		display: flex;
+		align-items: flex-start;
+		gap: 16px;
+		padding: 18px 20px;
+		background: linear-gradient(135deg, #eef8ff 0%, #f7fbf2 100%);
+		border: 1px solid #cfe0ee;
+	}
+
+	.projeto-cadastro-aviso__icon {
+		width: 48px;
+		height: 48px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 14px;
+		background: #dff1ff;
+		color: #2d6c9f;
+		font-size: 24px;
+		flex: 0 0 auto;
+	}
+
+	@media (max-width: 767px) {
+		.projeto-cadastro-aviso {
+			padding: 16px;
+			gap: 12px;
+		}
+
+		.projeto-cadastro-aviso__icon {
+			width: 42px;
+			height: 42px;
+			font-size: 20px;
+		}
+	}
+</style>
 
 <script type="text/javascript">
 	$(document).ready(function() {
