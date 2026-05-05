@@ -18,8 +18,8 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->registros = Projeto::lista(Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'), $idInscricao);
 		$ehAdmin = Zend_Registry::get('permissao') == 1;
 		$atingiuLimiteProjetos = !$ehAdmin && Projeto::quantidadeProjetosUsuario(Zend_Registry::get('id_usuario')) >= Projeto::MAX_PROJETOS_POR_USUARIO;
-		$this->view->mostrarBotaoSubmeter = !$idInscricao && !$ehAdmin && Zend_Registry::get('permissao') != 2 && Projeto::todosListadosNoStatus(0, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
-		$this->view->mostrarBotaoNovo = !$idInscricao && ($ehAdmin || (!$atingiuLimiteProjetos && Zend_Registry::get('permissao') != 2 && !Projeto::existeListadoNoStatus(1, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'))));
+		$this->view->mostrarBotaoSubmeter = Zend_Registry::get('permissao') != 2 && Projeto::todosListadosNoStatus(0, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+		$this->view->mostrarBotaoNovo = (!$atingiuLimiteProjetos && Zend_Registry::get('permissao') != 2 && !Projeto::existeListadoNoStatus(1, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao')));
 		$this->view->permitirEditarExcluir = $ehAdmin || $this->view->mostrarBotaoNovo;
 		$this->view->atingiuLimiteProjetos = $atingiuLimiteProjetos;
 		$this->view->inscricaoProjeto = false;
@@ -63,24 +63,26 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->eventosPorUsuario = array();
 		$this->view->empresasPorUsuario = array();
 		if (Zend_Registry::get('permissao') == 1) {
-			foreach ($this->view->usuarios as $usuario) {
-				$eventoUsuario = Inscricao::buscaEventoVinculadoUsuario((int) $usuario['id_usuario']);
-				$empresaUsuario = Inscricao::buscaResumoVinculadoUsuario((int) $usuario['id_usuario']);
-				$this->view->eventosPorUsuario[(int) $usuario['id_usuario']] = array(
-					'id_evento' => $eventoUsuario ? (int) $eventoUsuario['id_evento'] : null,
-					'label' => $eventoUsuario ? $eventoUsuario['label'] : 'Nenhuma inscricao vinculada encontrada para este usuario.'
-				);
-				$this->view->empresasPorUsuario[(int) $usuario['id_usuario']] = array(
-					'nome_organizacao' => $empresaUsuario ? ($empresaUsuario['nome_organizacao'] ?? '') : '',
-					'cnpj' => $empresaUsuario ? ($empresaUsuario['cnpj'] ?? '') : '',
-					'nome_certificado' => $empresaUsuario ? ($empresaUsuario['nome_certificado'] ?? '') : '',
-					'numero_colaboradores' => $empresaUsuario ? (int) ($empresaUsuario['numero_colaboradores'] ?? 0) : '',
-					'nome' => $empresaUsuario ? ($empresaUsuario['nome'] ?? '') : '',
-					'email' => $empresaUsuario ? ($empresaUsuario['email'] ?? '') : '',
-					'telefone' => $empresaUsuario ? ($empresaUsuario['telefone'] ?? '') : '',
-					'evento_label' => $empresaUsuario ? ($empresaUsuario['evento_label'] ?? '') : '',
-					'vazio' => !$empresaUsuario
-				);
+			if ($this->view->usuarios) {
+				foreach ($this->view->usuarios as $usuario) {
+					$eventoUsuario = Inscricao::buscaEventoVinculadoUsuario((int) $usuario['id_usuario']);
+					$empresaUsuario = Inscricao::buscaResumoVinculadoUsuario((int) $usuario['id_usuario']);
+					$this->view->eventosPorUsuario[(int) $usuario['id_usuario']] = array(
+						'id_evento' => $eventoUsuario ? (int) $eventoUsuario['id_evento'] : null,
+						'label' => $eventoUsuario ? $eventoUsuario['label'] : 'Nenhuma inscricao vinculada encontrada para este usuario.'
+					);
+					$this->view->empresasPorUsuario[(int) $usuario['id_usuario']] = array(
+						'nome_organizacao' => $empresaUsuario ? ($empresaUsuario['nome_organizacao'] ?? '') : '',
+						'cnpj' => $empresaUsuario ? ($empresaUsuario['cnpj'] ?? '') : '',
+						'nome_certificado' => $empresaUsuario ? ($empresaUsuario['nome_certificado'] ?? '') : '',
+						'numero_colaboradores' => $empresaUsuario ? (int) ($empresaUsuario['numero_colaboradores'] ?? 0) : '',
+						'nome' => $empresaUsuario ? ($empresaUsuario['nome'] ?? '') : '',
+						'email' => $empresaUsuario ? ($empresaUsuario['email'] ?? '') : '',
+						'telefone' => $empresaUsuario ? ($empresaUsuario['telefone'] ?? '') : '',
+						'evento_label' => $empresaUsuario ? ($empresaUsuario['evento_label'] ?? '') : '',
+						'vazio' => !$empresaUsuario
+					);
+				}
 			}
 		}
 	}
