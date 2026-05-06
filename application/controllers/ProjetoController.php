@@ -120,10 +120,12 @@ class ProjetoController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		$idProjeto = isset($_REQUEST['id_projeto']) ? (int) $_REQUEST['id_projeto'] : 0;
 		$avaliacoes = isset($_REQUEST['avaliacao']) && is_array($_REQUEST['avaliacao']) ? $_REQUEST['avaliacao'] : array();
+		$anexosJustificativa = isset($_FILES['anexos_justificativa']) ? $_FILES['anexos_justificativa'] : null;
 
 		$result = Projeto::salvarAvaliacoes(
 			$idProjeto,
 			$avaliacoes,
+			$anexosJustificativa,
 			Zend_Registry::get('id_usuario'),
 			Zend_Registry::get('permissao')
 		);

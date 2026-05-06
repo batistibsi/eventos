@@ -27,6 +27,7 @@
 	$aprovado = $avaliacao['aprovado'];
 	$comentario = $avaliacao['comentario'];
 	$justificativa = $avaliacao['justificativa'];
+	$anexosJustificativa = isset($avaliacao['anexos_justificativa']) && is_array($avaliacao['anexos_justificativa']) ? $avaliacao['anexos_justificativa'] : array();
 	$etapa2 = $codigoModoAuditoria === 'etapa_2';
 	$etapa3 = $codigoModoAuditoria === 'etapa_3';
 	$etapa4 = $codigoModoAuditoria === 'etapa_4';
@@ -77,6 +78,25 @@
 					placeholder="Informe a justificativa desta devolutiva"
 					<?= $justificativaReadonly ? 'readonly' : '' ?>
 				><?= $view->escape($justificativa) ?></textarea>
+				<div class="projeto-avaliacao-box__anexos-wrap">
+					<label class="field-label mb-1">Anexos da justificativa</label>
+					<? if (count($anexosJustificativa)) : ?>
+						<div class="projeto-avaliacao-box__anexos-lista">
+							<? foreach ($anexosJustificativa as $anexo) : ?>
+								<a href="../../download.php?arquivo=<?= urlencode($anexo['caminho_arquivo']) ?>" target="_blank" class="projeto-avaliacao-box__anexo-item">
+									<i class="fa fa-paperclip" aria-hidden="true"></i>
+									<span><?= $view->escape($anexo['nome_original']) ?></span>
+								</a>
+							<? endforeach; ?>
+						</div>
+					<? else : ?>
+						<div class="detalhe-valor detalhe-valor--muted">Nenhum anexo enviado para esta justificativa.</div>
+					<? endif; ?>
+					<? if (!$justificativaReadonly) : ?>
+						<input type="file" class="form-control mt-2" name="anexos_justificativa[<?= $view->escape($campo) ?>][]" multiple>
+						<small class="text-muted d-block mt-1">Envie ate 5 arquivos por justificativa. Os anexos anteriores permanecem visiveis.</small>
+					<? endif; ?>
+				</div>
 			</div>
 		<? endif; ?>
 	</div>
@@ -90,7 +110,7 @@
 	</div>
 
 	<? if ($podeAvaliarProjeto) : ?>
-		<form id="form-avaliacao-projeto" class="section-card projeto-auditoria-toolbar">
+		<form id="form-avaliacao-projeto" class="section-card projeto-auditoria-toolbar" enctype="multipart/form-data">
 			<input type="hidden" name="id_projeto" value="<?= (int) ($registro['id_projeto'] ?? 0) ?>">
 			<div class="projeto-auditoria-toolbar__conteudo">
 				<div>
@@ -619,6 +639,33 @@
 		resize: vertical;
 	}
 
+	.projeto-avaliacao-box__anexos-wrap {
+		margin-top: 12px;
+	}
+
+	.projeto-avaliacao-box__anexos-lista {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.projeto-avaliacao-box__anexo-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 10px;
+		border: 1px solid #d8e2ef;
+		border-radius: 10px;
+		background: #f8fbff;
+		color: #24527a;
+		text-decoration: none;
+	}
+
+	.projeto-avaliacao-box__anexo-item:hover {
+		text-decoration: none;
+		background: #eef6ff;
+	}
+
 	.projeto-detalhe-classificacao {
 		margin-left: 0;
 		margin-right: 0;
@@ -680,12 +727,15 @@
 		$('#form-avaliacao-projeto').submit(function(e) {
 			e.preventDefault();
 
+			var formData = new FormData(this);
 			$('.salvar-avaliacao-projeto').prop('disabled', true);
 
 			$.ajax({
 				type: "POST",
 				url: "../../projeto/salvaravaliacao",
-				data: $(this).serialize(),
+				data: formData,
+				processData: false,
+				contentType: false,
 				success: function(data) {
 					if (data.trim().length > 0) {
 						swal({

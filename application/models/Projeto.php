@@ -147,6 +147,32 @@ class Projeto
 		return $normalizados;
 	}
 
+	private static function normalizarArquivosCampoAvaliacao($arquivos, $campo)
+	{
+		$normalizados = array();
+
+		if (!$campo || !isset($arquivos['name'][$campo]) || !is_array($arquivos['name'][$campo])) {
+			return $normalizados;
+		}
+
+		foreach ($arquivos['name'][$campo] as $indice => $nome) {
+			$erro = $arquivos['error'][$campo][$indice] ?? UPLOAD_ERR_NO_FILE;
+			if ($erro === UPLOAD_ERR_NO_FILE) {
+				continue;
+			}
+
+			$normalizados[] = array(
+				'name' => $nome,
+				'type' => $arquivos['type'][$campo][$indice] ?? null,
+				'tmp_name' => $arquivos['tmp_name'][$campo][$indice] ?? null,
+				'error' => $erro,
+				'size' => $arquivos['size'][$campo][$indice] ?? 0
+			);
+		}
+
+		return $normalizados;
+	}
+
 	private static function validarArquivoEvidencia($arquivo)
 	{
 		if (!$arquivo || !isset($arquivo['tmp_name']) || !is_uploaded_file($arquivo['tmp_name'])) {
@@ -246,6 +272,80 @@ class Projeto
 			$where .= " and coalesce(tipo_evidencia, 'qualitativa') = " . $db->quote($tipoEvidencia);
 		}
 		return $db->fetchAll('select * from eventos_projeto_arquivo' . $where . ' order by id_projeto_arquivo asc');
+	}
+
+	public static function listaArquivosJustificativaAvaliacao($idProjeto, $campo = null)
+	{
+		$db = Zend_Registry::get('db');
+		$where = ' where id_projeto = ' . (int) $idProjeto;
+		if ($campo) {
+			$where .= ' and campo = ' . $db->quote($campo);
+		}
+		return $db->fetchAll('select * from eventos_projeto_avaliacao_arquivo' . $where . ' order by id_projeto_avaliacao_arquivo asc');
+	}
+
+	private static function salvarArquivosJustificativaAvaliacao($idProjeto, $campo, $arquivos)
+	{
+		$camposPermitidos = self::camposAvaliacao();
+		if (!isset($camposPermitidos[$campo])) {
+			self::$erro = 'Campo de avaliacao invalido para anexo.';
+			return false;
+		}
+
+		$arquivos = self::normalizarArquivosCampoAvaliacao($arquivos, $campo);
+		if (!count($arquivos)) {
+			return array();
+		}
+
+		if (count($arquivos) > 5) {
+			self::$erro = 'Envie no maximo 5 arquivos por justificativa.';
+			return false;
+		}
+
+		$diretorio = self::uploadDir();
+		if (!is_dir($diretorio) && !mkdir($diretorio, 0775, true)) {
+			self::$erro = 'Nao foi possivel preparar a pasta de upload dos anexos da avaliacao.';
+			return false;
+		}
+
+		$db = Zend_Registry::get('db');
+		$salvos = array();
+
+		foreach ($arquivos as $arquivo) {
+			$extensao = self::validarArquivoEvidencia($arquivo);
+			if ($extensao === false) {
+				foreach ($salvos as $salvo) {
+					@unlink($diretorio . DIRECTORY_SEPARATOR . basename($salvo['caminho_arquivo']));
+				}
+				return false;
+			}
+
+			$hash = sha1(uniqid((string) $idProjeto . '_' . $campo, true) . '_' . ($arquivo['name'] ?? 'arquivo'));
+			$nomeFisico = 'projeto_avaliacao_' . (int) $idProjeto . '_' . preg_replace('/[^a-z0-9_]+/i', '_', (string) $campo) . '_' . $hash . '.' . $extensao;
+			$destino = $diretorio . DIRECTORY_SEPARATOR . $nomeFisico;
+
+			if (!move_uploaded_file($arquivo['tmp_name'], $destino)) {
+				foreach ($salvos as $salvo) {
+					@unlink($diretorio . DIRECTORY_SEPARATOR . basename($salvo['caminho_arquivo']));
+				}
+				self::$erro = 'Nao foi possivel salvar um dos anexos da justificativa.';
+				return false;
+			}
+
+			$registro = array(
+				'id_projeto' => (int) $idProjeto,
+				'campo' => $campo,
+				'nome_original' => substr((string) $arquivo['name'], 0, 255),
+				'caminho_arquivo' => 'projetos/' . $nomeFisico,
+				'tamanho_bytes' => (int) ($arquivo['size'] ?? 0),
+				'tipo_mime' => mime_content_type($destino) ?: null
+			);
+
+			$db->insert('eventos_projeto_avaliacao_arquivo', $registro);
+			$salvos[] = $registro;
+		}
+
+		return $salvos;
 	}
 
 	private static function buscaInscricaoProjeto($idUsuario, $idEvento)
@@ -387,6 +487,7 @@ class Projeto
 				'aprovado' => null,
 				'comentario' => '',
 				'justificativa' => '',
+				'anexos_justificativa' => array(),
 				'id_usuario_avaliador' => null,
 				'updated_at' => null
 			);
@@ -412,10 +513,19 @@ class Projeto
 			$avaliacoes[$campo]['updated_at'] = $registro['updated_at'] ?? null;
 		}
 
+		$anexos = self::listaArquivosJustificativaAvaliacao($idProjeto);
+		foreach ($anexos as $anexo) {
+			$campo = (string) ($anexo['campo'] ?? '');
+			if (!isset($avaliacoes[$campo])) {
+				continue;
+			}
+			$avaliacoes[$campo]['anexos_justificativa'][] = $anexo;
+		}
+
 		return $avaliacoes;
 	}
 
-	public static function salvarAvaliacoes($idProjeto, $avaliacoes, $idUsuarioLogado = null, $permissao = null)
+	public static function salvarAvaliacoes($idProjeto, $avaliacoes, $anexosJustificativa = null, $idUsuarioLogado = null, $permissao = null)
 	{
 		$registro = self::buscaId($idProjeto, $idUsuarioLogado, $permissao);
 		if (!$registro) {
@@ -531,6 +641,13 @@ class Projeto
 				} else {
 					$payload['created_at'] = new Zend_Db_Expr('now()');
 					$db->insert('eventos_projeto_avaliacao', $payload);
+				}
+
+				if ($modoAuditoria['codigo'] === 'etapa_3' && $justificativa !== '' && $anexosJustificativa) {
+					$resultadoAnexos = self::salvarArquivosJustificativaAvaliacao($idProjeto, $campo, $anexosJustificativa);
+					if ($resultadoAnexos === false) {
+						throw new Exception(self::$erro);
+					}
 				}
 			}
 

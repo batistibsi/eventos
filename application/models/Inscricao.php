@@ -759,6 +759,39 @@ class Inscricao
                 return true;
         }
 
+        public static function salvarConfirmacaoEncontrosFormacao($id_inscricao, $campos)
+        {
+                $db = Zend_Registry::get('db');
+
+                $id_inscricao = (int) $id_inscricao;
+
+                if ($id_inscricao <= 0) {
+                        self::$erro = 'Inscricao nao informada.';
+                        return false;
+                }
+
+                $inscricao = self::buscaId($id_inscricao);
+                if (!$inscricao || !is_array($inscricao)) {
+                        self::$erro = 'Inscricao nao encontrada.';
+                        return false;
+                }
+
+                $dados = array(
+                        'encontro_formacao_1' => !empty($campos['encontro_formacao_1']),
+                        'encontro_formacao_2' => !empty($campos['encontro_formacao_2'])
+                );
+
+                try {
+                        $where = $db->quoteInto('id_inscricao = ?', $id_inscricao);
+                        $db->update('eventos_inscricao', $dados, $where);
+                } catch (Exception $e) {
+                        self::$erro = 'Nao foi possivel salvar as confirmacoes dos encontros de formacao.';
+                        return false;
+                }
+
+                return true;
+        }
+
         public static function salvarRepresentantes($id_inscricao, $campos)
         {
                 $db = Zend_Registry::get('db');
