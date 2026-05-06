@@ -957,6 +957,10 @@ class Projeto
 			self::$erro = 'A unidade de medida deve ter no maximo 80 caracteres.';
 			return false;
 		}
+		if ($quantidadeItens !== null && in_array($unidadeMedida, array('Unidade', 'Horas'), true) && floor($quantidadeItens) != $quantidadeItens) {
+			self::$erro = 'A quantidade de itens deve ser um numero inteiro quando a unidade de medida for Unidade ou Horas.';
+			return false;
+		}
 
 		$publicoTipo = isset($campos['publico_tipo']) ? $campos['publico_tipo'] : array();
 		if (!is_array($publicoTipo)) {

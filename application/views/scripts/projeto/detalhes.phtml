@@ -12,6 +12,22 @@
 <? $modoAuditoriaProjeto = !empty($this->modoAuditoriaProjeto) && is_array($this->modoAuditoriaProjeto) ? $this->modoAuditoriaProjeto : array(); ?>
 <? $codigoModoAuditoria = !empty($modoAuditoriaProjeto['codigo']) ? $modoAuditoriaProjeto['codigo'] : 'somente_leitura'; ?>
 <? $view = $this; ?>
+<? $formatarQuantidadeItens = function ($quantidade, $unidadeMedida) {
+	if ($quantidade === null || $quantidade === '') {
+		return '-';
+	}
+
+	$numero = (float) $quantidade;
+	if (in_array((string) $unidadeMedida, array('Unidade', 'Horas'), true)) {
+		return (string) (int) round($numero);
+	}
+
+	if (floor($numero) == $numero) {
+		return (string) (int) $numero;
+	}
+
+	return rtrim(rtrim(number_format($numero, 2, '.', ''), '0'), '.');
+}; ?>
 <? $avaliacaoPadrao = function ($campo) use ($avaliacoes) {
 	if (!isset($avaliacoes[$campo]) || !is_array($avaliacoes[$campo])) {
 		return array('aprovado' => null, 'comentario' => '', 'justificativa' => '');
@@ -368,7 +384,7 @@
 					</div>
 					<div class="col-md-4 mb-3">
 						<span class="field-label">Quantidade de itens</span>
-						<div class="detalhe-valor"><?= isset($registro['quantidade_itens']) && $registro['quantidade_itens'] !== null && $registro['quantidade_itens'] !== '' ? $this->escape($registro['quantidade_itens']) : '-' ?></div>
+						<div class="detalhe-valor"><?= $this->escape($formatarQuantidadeItens($registro['quantidade_itens'] ?? null, $registro['unidade_medida'] ?? '')) ?></div>
 					</div>
 					<div class="col-md-4 mb-3">
 						<span class="field-label">Unidade de medida</span>

@@ -18,74 +18,29 @@
 			<button type="button" onclick="carregarTela('../../projeto')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
 		</div>
 	</div>
-<div class="section-card projeto-cadastro-aviso mb-3">
-	<div class="projeto-cadastro-aviso__icon">
-		<i class="fa fa-lightbulb-o" aria-hidden="true"></i>
+	<div class="section-card projeto-cadastro-aviso mb-3">
+		<div class="projeto-cadastro-aviso__icon">
+			<i class="fa fa-lightbulb-o" aria-hidden="true"></i>
+		</div>
+		<div>
+			<div class="section-title mb-1">Preenchimento do projeto</div>
+			<p class="section-subtitle mb-0">Use este formulário para cadastrar seus projetos na Certificação e detalhe cada iniciativa com atenção, preenchendo as informações solicitadas ao longo das etapas.</p>
+		</div>
 	</div>
-	<div>
-		<div class="section-title mb-1">Preenchimento do projeto</div>
-		<p class="section-subtitle mb-0">Use este formulário para cadastrar seus projetos na Certificação e detalhe cada iniciativa com atenção, preenchendo as informações solicitadas ao longo das etapas.</p>
-	</div>
-</div>
 	<form id="formulario" class="projeto-form" novalidate>
 		<input name="id_projeto" type="hidden" value="<?= $registro ? $registro['id_projeto'] : '' ?>" id="id_projeto">
 		<input name="id_evento" type="hidden" value="<?= $eventoVinculado ? (int) $eventoVinculado['id_evento'] : '' ?>" id="id_evento">
-		<? if ($this->permissao != 1): ?>
-			<input name="id_usuario" type="hidden" value="<?= (int) $this->id_usuario ?>" id="id_usuario">
-		<? endif; ?>
+		<input name="id_usuario" type="hidden" value="<?= (int) $this->id_usuario ?>" id="id_usuario">
 
-		<div class="section-card projeto-empresa-resumo">
-			<div class="section-header">
-				<div>
-					<h2 class="section-title">Empresa Vinculada à Inscrição</h2>
-					<p class="section-subtitle">Os dados abaixo vêm da inscrição vinculada ao usuário responsável por este projeto.</p>
-				</div>
-			</div>
-			<div class="row projeto-empresa-resumo__grid" id="empresa_vinculada_dados" <?= !$empresaVinculada ? 'style="display:none;"' : '' ?>>
-				<div class="col-md-6 col-xl-4 mb-3">
-					<span class="field-label">Organização</span>
-					<div class="detalhe-valor" id="empresa_nome_organizacao"><?= $empresaVinculada ? $this->escape($empresaVinculada['nome_organizacao']) : '-' ?></div>
-				</div>
-				<div class="col-md-6 col-xl-4 mb-3">
-					<span class="field-label">CNPJ</span>
-					<div class="detalhe-valor" id="empresa_cnpj"><?= $empresaVinculada ? $this->escape($empresaVinculada['cnpj']) : '-' ?></div>
-				</div>
-				<div class="col-md-6 col-xl-4 mb-3">
-					<span class="field-label">Nome no certificado</span>
-					<div class="detalhe-valor" id="empresa_nome_certificado"><?= $empresaVinculada ? $this->escape($empresaVinculada['nome_certificado']) : '-' ?></div>
-				</div>
-				<div class="col-md-6 col-xl-4 mb-3">
-					<span class="field-label">Colaboradores</span>
-					<div class="detalhe-valor" id="empresa_numero_colaboradores"><?= $empresaVinculada ? (int) $empresaVinculada['numero_colaboradores'] : 0 ?></div>
-				</div>
-				<div class="col-md-6 col-xl-4 mb-3">
-					<span class="field-label">Responsável da inscrição</span>
-					<div class="detalhe-valor" id="empresa_responsavel_inscricao"><?= $empresaVinculada ? $this->escape($empresaVinculada['nome']) : '-' ?></div>
-				</div>
-				<div class="col-md-6 col-xl-4 mb-3">
-					<span class="field-label">Contato</span>
-					<div class="detalhe-valor" id="empresa_contato_inscricao">
-						<? if ($empresaVinculada) : ?>
-							<?= $this->escape($empresaVinculada['email']) ?>
-							<? if (!empty($empresaVinculada['telefone'])) : ?><br><?= $this->escape($empresaVinculada['telefone']) ?><? endif; ?>
-						<? else : ?>
-							-
-						<? endif; ?>
+		<? if ($this->permissao == 1): ?>
+			<div class="section-card">
+				<div class="section-header">
+					<div>
+						<h2 class="section-title">Vínculos e Status</h2>
+						<p class="section-subtitle">Associe o projeto ao status atual.</p>
 					</div>
 				</div>
-			</div>
-			<div class="projeto-empresa-resumo__empty detalhe-valor" id="empresa_vinculada_vazio" <?= $empresaVinculada ? 'style="display:none;"' : '' ?>>Nenhuma inscrição vinculada encontrada para este usuário.</div>
-		</div>
-
-		<div class="section-card">
-			<div class="section-header">
-				<div>
-					<h2 class="section-title">Vínculos e Status</h2>
-					<p class="section-subtitle">Associe o projeto ao usuário, ao evento e ao status atual.</p>
-				</div>
-			</div>
-			<div class="row">
-				<? if ($this->permissao == 1): ?>
+				<div class="row">
 					<div class="form-group col-md-4">
 						<span><label for="status_projeto">Status: </label></span>
 						<select class="form-control" name="status_projeto" id="status_projeto" required>
@@ -94,24 +49,9 @@
 							<? endforeach; ?>
 						</select>
 					</div>
-					<div class="form-group col-md-4">
-						<span><label for="id_usuario">Usuário: </label></span>
-						<select class="form-control" name="id_usuario" id="id_usuario" required>
-							<option value="">Selecione</option>
-							<? foreach ($this->usuarios as $usuario): ?>
-								<option value="<?= (int) $usuario['id_usuario'] ?>" <?= $registro && (int) $registro['id_usuario'] === (int) $usuario['id_usuario'] ? 'selected' : '' ?>><?= $this->escape($usuario['nome']) ?></option>
-							<? endforeach; ?>
-						</select>
-					</div>
-					<div class="form-group col-md-4">
-				<? else: ?>
-					<div class="form-group col-md-12">
-				<? endif; ?>
-					<span><label for="evento_vinculado_label">Evento da inscrição vinculada: </label></span>
-					<input class="form-control" type="text" value="<?= $eventoVinculado ? $this->escape($eventoVinculado['label']) : 'Nenhuma inscrição vinculada encontrada para este usuário.' ?>" id="evento_vinculado_label" readonly>
 				</div>
 			</div>
-		</div>
+		<? endif; ?>
 
 		<div class="section-card">
 			<div class="row">
@@ -245,11 +185,6 @@
 					</div>
 					<div class="row mt-3">
 						<div class="form-group col-md-6">
-							<span><label for="quantidade_itens">Informe a quantidade de itens.</label></span>
-							<small class="form-text text-muted">Digite a quantidade total de itens relacionada ao projeto.</small>
-							<input class="form-control" name="quantidade_itens" type="number" min="0" step="0.01" value="<?= $registro && !empty($registro['quantidade_itens']) ? $this->escape($registro['quantidade_itens']) : '' ?>" id="quantidade_itens">
-						</div>
-						<div class="form-group col-md-6">
 							<span><label>Informe a unidade de medida do item.</label></span>
 							<small class="form-text text-muted">Unidade, Kg, Horas ou outro tipo de medida.</small>
 							<div class="mt-2">
@@ -259,6 +194,11 @@
 								<label for="unidade_medida_outro_opcao"><input type="radio" name="unidade_medida" id="unidade_medida_outro_opcao" value="Outro" <?= $registro && isset($registro['unidade_medida']) && !in_array($registro['unidade_medida'], array('Unidade', 'Kg', 'Horas'), true) && $registro['unidade_medida'] !== '' ? 'checked' : '' ?>> Outro:</label>
 							</div>
 							<input class="form-control mt-2" name="unidade_medida_outro" type="text" value="<?= $registro && isset($registro['unidade_medida']) && !in_array($registro['unidade_medida'], array('Unidade', 'Kg', 'Horas'), true) ? $this->escape($registro['unidade_medida']) : '' ?>" id="unidade_medida_outro" maxlength="80" placeholder="Informe a unidade de medida" style="<?= $registro && isset($registro['unidade_medida']) && !in_array($registro['unidade_medida'], array('Unidade', 'Kg', 'Horas'), true) && $registro['unidade_medida'] !== '' ? '' : 'display:none;' ?>">
+						</div>
+						<div class="form-group col-md-6">
+							<span><label for="quantidade_itens">Informe a quantidade de itens.</label></span>
+							<small class="form-text text-muted">Digite a quantidade total de itens relacionada ao projeto.</small>
+							<input class="form-control" name="quantidade_itens" type="number" min="0" step="0.01" value="<?= $registro && !empty($registro['quantidade_itens']) ? $this->escape($registro['quantidade_itens']) : '' ?>" id="quantidade_itens" <?= empty($registro['unidade_medida']) ? 'disabled' : '' ?>>
 						</div>
 					</div>
 					<label class="upload-heading mt-3">Anexe a evidência quantitativa do material relacionado ao projeto.</label>
@@ -285,7 +225,7 @@
 				<div class="form-group col-md-12">
 					<span><label>Informe o tipo de público relacionado ao projeto.</label></span>
 					<div class="mt-2">
-					<small class="form-text text-muted">Selecione se o projeto envolve pÃºblico interno, externo ou ambos.</small>
+						<small class="form-text text-muted">Selecione se o projeto envolve público interno, externo ou ambos.</small>
 						<label class="mr-4" for="publico_tipo_interno">
 							<input type="checkbox" name="publico_tipo[]" id="publico_tipo_interno" value="Interno" <?= !empty($registro['publico_tipo']) && strpos((string) $registro['publico_tipo'], 'Interno') !== false ? 'checked' : '' ?>>
 							Interno (colaboradores, equipe do projeto, departamento, outros)
@@ -306,7 +246,7 @@
 					<input class="form-control" name="quantidade_publico_interno" type="number" min="0" step="1" value="<?= $registro && !empty($registro['quantidade_publico_interno']) ? $this->escape($registro['quantidade_publico_interno']) : '' ?>" id="quantidade_publico_interno">
 				</div>
 				<div class="form-group col-md-6">
-					<span><label for="quantidade_publico_externo">Informe a quantidade do pÃºblico EXTERNO relacionado ao projeto.</label></span>
+					<span><label for="quantidade_publico_externo">Informe a quantidade do público EXTERNO relacionado ao projeto.</label></span>
 					<small class="form-text text-muted">Digite o total de pessoas externas envolvidas ou beneficiadas.</small>
 					<input class="form-control" name="quantidade_publico_externo" type="number" min="0" step="1" value="<?= $registro && !empty($registro['quantidade_publico_externo']) ? $this->escape($registro['quantidade_publico_externo']) : '' ?>" id="quantidade_publico_externo">
 				</div>
@@ -433,13 +373,30 @@
 			}
 		}
 
+		function atualizarQuantidadeItensPorUnidade() {
+			var unidadeSelecionada = $('input[name="unidade_medida"]:checked').val() || '';
+			var $quantidadeItens = $('#quantidade_itens');
+			var valorAtual = $quantidadeItens.val();
+			var exigeInteiro = unidadeSelecionada === 'Unidade' || unidadeSelecionada === 'Horas';
+			var possuiUnidadeSelecionada = unidadeSelecionada !== '';
+
+			$quantidadeItens.prop('disabled', !possuiUnidadeSelecionada);
+			$quantidadeItens.attr('step', exigeInteiro ? '1' : '0.01');
+
+			if (!possuiUnidadeSelecionada) {
+				$quantidadeItens.val('');
+				return;
+			}
+
+			if (exigeInteiro && valorAtual !== '') {
+				$quantidadeItens.val(Math.trunc(Number(valorAtual)));
+			}
+		}
+
 		$('input[name="unidade_medida"]').on('change', atualizarCampoUnidadeMedidaOutro);
+		$('input[name="unidade_medida"]').on('change', atualizarQuantidadeItensPorUnidade);
 		atualizarCampoUnidadeMedidaOutro();
-		$('select#id_usuario').select2({
-			theme: 'bootstrap4',
-			language: 'pt-BR',
-			width: '100%'
-		});
+		atualizarQuantidadeItensPorUnidade();
 
 		var arquivosExistentes = <?= $registro && !empty($registro['arquivos']) ? count($registro['arquivos']) : 0 ?>;
 		var arquivosExistentesItens = 0;
@@ -487,21 +444,21 @@
 
 				<? if ($registro && !empty($registro['arquivos_itens'])): ?>
 					<? foreach ($registro['arquivos_itens'] as $arquivoItem): ?>
-						(function() {
-							var mockFile = {
-								name: <?= json_encode($arquivoItem['nome_original']) ?>,
-								size: <?= (int) ($arquivoItem['tamanho_bytes'] ?: 0) ?>,
-								accepted: true,
-								existing: true,
-								serverId: <?= (int) $arquivoItem['id_projeto_arquivo'] ?>,
-								url: '../../download.php?arquivo=<?= urlencode($arquivoItem['caminho_arquivo']) ?>'
-							};
-							dzItens.emit('addedfile', mockFile);
-							renderizarPreviewExistenteItens(mockFile);
-							dzItens.emit('complete', mockFile);
-							dzItens.files.push(mockFile);
-							arquivosExistentesItens++;
-						})();
+							(function() {
+								var mockFile = {
+									name: <?= json_encode($arquivoItem['nome_original']) ?>,
+									size: <?= (int) ($arquivoItem['tamanho_bytes'] ?: 0) ?>,
+									accepted: true,
+									existing: true,
+									serverId: <?= (int) $arquivoItem['id_projeto_arquivo'] ?>,
+									url: '../../download.php?arquivo=<?= urlencode($arquivoItem['caminho_arquivo']) ?>'
+								};
+								dzItens.emit('addedfile', mockFile);
+								renderizarPreviewExistenteItens(mockFile);
+								dzItens.emit('complete', mockFile);
+								dzItens.files.push(mockFile);
+								arquivosExistentesItens++;
+							})();
 					<? endforeach; ?>
 				<? endif; ?>
 			}
@@ -523,7 +480,9 @@
 			$.ajax({
 				type: 'POST',
 				url: '../../projeto/removerarquivo',
-				data: { id: file.serverId },
+				data: {
+					id: file.serverId
+				},
 				success: function(data) {
 					if (data.trim().length > 0) {
 						swal({
@@ -588,21 +547,21 @@
 
 				<? if ($registro && !empty($registro['arquivos_pessoas'])): ?>
 					<? foreach ($registro['arquivos_pessoas'] as $arquivoPessoa): ?>
-						(function() {
-							var mockFile = {
-								name: <?= json_encode($arquivoPessoa['nome_original']) ?>,
-								size: <?= (int) ($arquivoPessoa['tamanho_bytes'] ?: 0) ?>,
-								accepted: true,
-								existing: true,
-								serverId: <?= (int) $arquivoPessoa['id_projeto_arquivo'] ?>,
-								url: '../../download.php?arquivo=<?= urlencode($arquivoPessoa['caminho_arquivo']) ?>'
-							};
-							dzPessoas.emit('addedfile', mockFile);
-							renderizarPreviewExistentePessoas(mockFile);
-							dzPessoas.emit('complete', mockFile);
-							dzPessoas.files.push(mockFile);
-							arquivosExistentesPessoas++;
-						})();
+							(function() {
+								var mockFile = {
+									name: <?= json_encode($arquivoPessoa['nome_original']) ?>,
+									size: <?= (int) ($arquivoPessoa['tamanho_bytes'] ?: 0) ?>,
+									accepted: true,
+									existing: true,
+									serverId: <?= (int) $arquivoPessoa['id_projeto_arquivo'] ?>,
+									url: '../../download.php?arquivo=<?= urlencode($arquivoPessoa['caminho_arquivo']) ?>'
+								};
+								dzPessoas.emit('addedfile', mockFile);
+								renderizarPreviewExistentePessoas(mockFile);
+								dzPessoas.emit('complete', mockFile);
+								dzPessoas.files.push(mockFile);
+								arquivosExistentesPessoas++;
+							})();
 					<? endforeach; ?>
 				<? endif; ?>
 			}
@@ -624,7 +583,9 @@
 			$.ajax({
 				type: 'POST',
 				url: '../../projeto/removerarquivo',
-				data: { id: file.serverId },
+				data: {
+					id: file.serverId
+				},
 				success: function(data) {
 					if (data.trim().length > 0) {
 						swal({
@@ -689,21 +650,21 @@
 
 				<? if ($registro && !empty($registro['arquivos_parceiros'])): ?>
 					<? foreach ($registro['arquivos_parceiros'] as $arquivoParceiro): ?>
-						(function() {
-							var mockFile = {
-								name: <?= json_encode($arquivoParceiro['nome_original']) ?>,
-								size: <?= (int) ($arquivoParceiro['tamanho_bytes'] ?: 0) ?>,
-								accepted: true,
-								existing: true,
-								serverId: <?= (int) $arquivoParceiro['id_projeto_arquivo'] ?>,
-								url: '../../download.php?arquivo=<?= urlencode($arquivoParceiro['caminho_arquivo']) ?>'
-							};
-							dzParceiros.emit('addedfile', mockFile);
-							renderizarPreviewExistenteParceiros(mockFile);
-							dzParceiros.emit('complete', mockFile);
-							dzParceiros.files.push(mockFile);
-							arquivosExistentesParceiros++;
-						})();
+							(function() {
+								var mockFile = {
+									name: <?= json_encode($arquivoParceiro['nome_original']) ?>,
+									size: <?= (int) ($arquivoParceiro['tamanho_bytes'] ?: 0) ?>,
+									accepted: true,
+									existing: true,
+									serverId: <?= (int) $arquivoParceiro['id_projeto_arquivo'] ?>,
+									url: '../../download.php?arquivo=<?= urlencode($arquivoParceiro['caminho_arquivo']) ?>'
+								};
+								dzParceiros.emit('addedfile', mockFile);
+								renderizarPreviewExistenteParceiros(mockFile);
+								dzParceiros.emit('complete', mockFile);
+								dzParceiros.files.push(mockFile);
+								arquivosExistentesParceiros++;
+							})();
 					<? endforeach; ?>
 				<? endif; ?>
 			}
@@ -725,7 +686,9 @@
 			$.ajax({
 				type: 'POST',
 				url: '../../projeto/removerarquivo',
-				data: { id: file.serverId },
+				data: {
+					id: file.serverId
+				},
 				success: function(data) {
 					if (data.trim().length > 0) {
 						swal({
@@ -748,53 +711,6 @@
 				}
 			});
 		});
-
-		<? if ($this->permissao == 1): ?>
-		var eventosPorUsuario = <?= json_encode($this->eventosPorUsuario, JSON_UNESCAPED_UNICODE) ?>;
-		var empresasPorUsuario = <?= json_encode($this->empresasPorUsuario, JSON_UNESCAPED_UNICODE) ?>;
-
-		function atualizarEventoVinculado() {
-			var idUsuario = $('#id_usuario').val();
-			var evento = eventosPorUsuario[idUsuario] || { id_evento: '', label: 'Nenhuma inscrição vinculada encontrada para este usuário.' };
-			$('#id_evento').val(evento.id_evento || '');
-			$('#evento_vinculado_label').val(evento.label || '');
-		}
-
-		function atualizarEmpresaVinculada() {
-			var idUsuario = $('#id_usuario').val();
-			var empresa = empresasPorUsuario[idUsuario] || { vazio: true };
-
-			if (empresa.vazio) {
-				$('#empresa_vinculada_dados').hide();
-				$('#empresa_nome_organizacao').text('');
-				$('#empresa_cnpj').text('');
-				$('#empresa_nome_certificado').text('');
-				$('#empresa_numero_colaboradores').text('');
-				$('#empresa_responsavel_inscricao').text('');
-				$('#empresa_contato_inscricao').html('');
-				$('#empresa_vinculada_vazio').text('Nenhuma inscrição vinculada encontrada para este usuário.').show();
-				return;
-			}
-
-			$('#empresa_vinculada_dados').show();
-			$('#empresa_vinculada_vazio').hide();
-			$('#empresa_nome_organizacao').text(empresa.nome_organizacao || '-');
-			$('#empresa_cnpj').text(empresa.cnpj || '-');
-			$('#empresa_nome_certificado').text(empresa.nome_certificado || '-');
-			$('#empresa_numero_colaboradores').text(empresa.numero_colaboradores || '0');
-			$('#empresa_responsavel_inscricao').text(empresa.nome || '-');
-			var contato = empresa.email || '-';
-			if (empresa.telefone) {
-				contato += '<br>' + empresa.telefone;
-			}
-			$('#empresa_contato_inscricao').html(contato);
-		}
-
-		$('#id_usuario').on('change', atualizarEventoVinculado);
-		$('#id_usuario').on('change', atualizarEmpresaVinculada);
-		atualizarEventoVinculado();
-		atualizarEmpresaVinculada();
-		<? endif; ?>
 
 		var dropzone = new Dropzone('#projeto-dropzone', {
 			url: '#',
@@ -837,20 +753,20 @@
 
 				<? if ($registro && !empty($registro['arquivos'])): ?>
 					<? foreach ($registro['arquivos'] as $arquivo): ?>
-						(function() {
-							var mockFile = {
-								name: <?= json_encode($arquivo['nome_original']) ?>,
-								size: <?= (int) ($arquivo['tamanho_bytes'] ?: 0) ?>,
-								accepted: true,
-								existing: true,
-								serverId: <?= (int) $arquivo['id_projeto_arquivo'] ?>,
-								url: '../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>'
-							};
-							dz.emit('addedfile', mockFile);
-							renderizarPreviewExistente(mockFile);
-							dz.emit('complete', mockFile);
-							dz.files.push(mockFile);
-						})();
+							(function() {
+								var mockFile = {
+									name: <?= json_encode($arquivo['nome_original']) ?>,
+									size: <?= (int) ($arquivo['tamanho_bytes'] ?: 0) ?>,
+									accepted: true,
+									existing: true,
+									serverId: <?= (int) $arquivo['id_projeto_arquivo'] ?>,
+									url: '../../download.php?arquivo=<?= urlencode($arquivo['caminho_arquivo']) ?>'
+								};
+								dz.emit('addedfile', mockFile);
+								renderizarPreviewExistente(mockFile);
+								dz.emit('complete', mockFile);
+								dz.files.push(mockFile);
+							})();
 					<? endforeach; ?>
 				<? endif; ?>
 
@@ -871,7 +787,9 @@
 					$.ajax({
 						type: 'POST',
 						url: '../../projeto/removerarquivo',
-						data: { id: file.serverId },
+						data: {
+							id: file.serverId
+						},
 						success: function(data) {
 							if (data.trim().length > 0) {
 								swal({
