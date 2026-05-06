@@ -111,7 +111,7 @@ class ProjetoController extends Zend_Controller_Action
 			}
 		}
 		$this->view->podeAvaliarProjeto = !empty($this->view->modoAuditoriaProjeto['pode_visualizar']) || $possuiRespostasAuditoria;
-		$this->view->podeSalvarAvaliacaoProjeto = !empty($this->view->modoAuditoriaProjeto['pode_salvar']);
+		$this->view->podeEditarAvaliacaoProjeto = !empty($this->view->modoAuditoriaProjeto['pode_salvar']);
 		$this->view->camposAvaliacaoProjeto = Projeto::camposAvaliacao();
 	}
 

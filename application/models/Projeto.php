@@ -37,9 +37,7 @@ class Projeto
 			'evidencia_qualitativa' => 'Evidência qualitativa do projeto',
 			'evidencia_itens' => 'Evidência de Itens',
 			'evidencia_pessoas' => 'Evidência de Pessoas',
-			'evidencia_parceiros' => 'Evidência de Parceiros',
-			'encontro_formacao_1' => 'Encontro de formação 1',
-			'encontro_formacao_2' => 'Encontro de formação 2'
+			'evidencia_parceiros' => 'Evidência de Parceiros'
 		);
 	}
 

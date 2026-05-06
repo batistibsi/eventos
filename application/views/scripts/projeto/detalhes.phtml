@@ -6,7 +6,7 @@
 <? $arquivosParceiros = $registro && !empty($registro['arquivos_parceiros']) ? $registro['arquivos_parceiros'] : array(); ?>
 <? $empresaVinculada = !empty($this->empresaVinculada) && is_array($this->empresaVinculada) ? $this->empresaVinculada : false; ?>
 <? $podeAvaliarProjeto = !empty($this->podeAvaliarProjeto); ?>
-<? $podeSalvarAvaliacaoProjeto = !empty($this->podeSalvarAvaliacaoProjeto); ?>
+<? $podeEditarAvaliacaoProjeto = !empty($this->podeEditarAvaliacaoProjeto); ?>
 <? $avaliacoes = $registro && !empty($registro['avaliacoes']) && is_array($registro['avaliacoes']) ? $registro['avaliacoes'] : array(); ?>
 <? $urlRetornoProjeto = !empty($this->urlRetornoProjeto) ? $this->urlRetornoProjeto : '../../projeto'; ?>
 <? $modoAuditoriaProjeto = !empty($this->modoAuditoriaProjeto) && is_array($this->modoAuditoriaProjeto) ? $this->modoAuditoriaProjeto : array(); ?>
@@ -22,7 +22,7 @@
 		'justificativa' => isset($avaliacoes[$campo]['justificativa']) ? $avaliacoes[$campo]['justificativa'] : ''
 	);
 }; ?>
-<? $renderAvaliacao = function ($campo, $titulo) use ($avaliacaoPadrao, $podeAvaliarProjeto, $podeSalvarAvaliacaoProjeto, $codigoModoAuditoria, $view) {
+<? $renderAvaliacao = function ($campo, $titulo) use ($avaliacaoPadrao, $podeAvaliarProjeto, $podeEditarAvaliacaoProjeto, $codigoModoAuditoria, $view) {
 	$avaliacao = $avaliacaoPadrao($campo);
 	$aprovado = $avaliacao['aprovado'];
 	$comentario = $avaliacao['comentario'];
@@ -30,7 +30,7 @@
 	$etapa2 = $codigoModoAuditoria === 'etapa_2';
 	$etapa3 = $codigoModoAuditoria === 'etapa_3';
 	$etapa4 = $codigoModoAuditoria === 'etapa_4';
-	$somenteLeitura = !$podeSalvarAvaliacaoProjeto;
+	$somenteLeitura = !$podeEditarAvaliacaoProjeto;
 	$mostrarJustificativaRetorno = ($etapa3 && $aprovado !== true) || ((!$etapa2) && $justificativa !== '');
 	$etapa4PodeAlternar = $etapa4 && $justificativa !== '' && ($aprovado === false || $aprovado === true);
 	$radioAprovadoDesabilitado = $somenteLeitura || ($etapa4 ? !$etapa4PodeAlternar : !$etapa2 && !$etapa4);
@@ -485,26 +485,10 @@
 		</div>
 	</div>
 
-	<? if ($podeAvaliarProjeto) : ?>
-		<div class="section-card projeto-auditavel-card">
-			<div class="section-header">
-				<div>
-					<h2 class="section-title">Critérios Complementares</h2>
-					<p class="section-subtitle">Avaliações adicionais independentes dos blocos principais do projeto.</p>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-lg-6">
-					<? $renderAvaliacao('encontro_formacao_1', 'Encontro de formação 1'); ?>
-				</div>
-				<div class="col-lg-6">
-					<? $renderAvaliacao('encontro_formacao_2', 'Encontro de formação 2'); ?>
-				</div>
-			</div>
-		</div>
-	<? endif; ?>
 
-	<? if ($podeAvaliarProjeto && $podeSalvarAvaliacaoProjeto) : ?>
+
+
+	<? if ($podeEditarAvaliacaoProjeto) : ?>
 		<div class="section-card projeto-auditoria-footer">
 			<div class="projeto-auditoria-footer__acoes">
 				<button type="submit" class="btn btn-success salvar-avaliacao-projeto">
@@ -729,3 +713,4 @@
 	});
 </script>
 <? endif; ?>
+
