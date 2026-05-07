@@ -12,6 +12,7 @@ class Auditoria
 
 		$select = "select s.id_status_auditoria,
 					s.nome,
+					s.descricao,
 					s.ordem,
 					coalesce(s.cor, '#475569') as cor
 				from eventos_status_auditoria s
@@ -32,7 +33,7 @@ class Auditoria
 		}
 
 		$statusAtual = $db->fetchRow(
-			'select id_status_auditoria, nome, ordem
+			'select id_status_auditoria, nome, descricao, ordem
 			from eventos_status_auditoria
 			where id_status_auditoria = ' . $db->quote($idStatusAtual) . '
 			limit 1'
@@ -43,7 +44,7 @@ class Auditoria
 		}
 
 		$proximoStatus = $db->fetchRow(
-			'select id_status_auditoria, nome, ordem
+			'select id_status_auditoria, nome, descricao, ordem
 			from eventos_status_auditoria
 			where ordem > ' . $db->quote((int) $statusAtual['ordem']) . '
 			order by ordem asc, id_status_auditoria asc

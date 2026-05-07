@@ -68,6 +68,16 @@ class CadastroController extends Zend_Controller_Action
 		$this->view->registros = FormaPagamento::listar();
 	}
 
+	public function statusauditoriaAction()
+	{
+		if (Zend_Registry::get('permissao') != 1) exit();
+
+		$this->view->usuario = Zend_Registry::get('usuario');
+		$this->view->idUsuario = Zend_Registry::get('id_usuario');
+		$this->view->permissao = Zend_Registry::get('permissao');
+		$this->view->registros = StatusAuditoria::listar();
+	}
+
 	public function salvamaterialAction()
 	{
 		if (Zend_Registry::get('permissao') != 1) exit();
@@ -120,6 +130,22 @@ class CadastroController extends Zend_Controller_Action
 
 		if (!FormaPagamento::salvar($campos)) {
 			echo FormaPagamento::$erro;
+		}
+	}
+
+	public function salvarstatusauditoriaAction()
+	{
+		if (Zend_Registry::get('permissao') != 1) exit();
+
+		$this->_helper->viewRenderer->setNoRender();
+
+		$campos = array(
+			'id_status_auditoria' => $_REQUEST['id_status_auditoria'] ?? null,
+			'descricao' => $_REQUEST['descricao'] ?? null
+		);
+
+		if (!StatusAuditoria::salvar($campos)) {
+			echo StatusAuditoria::$erro;
 		}
 	}
 }

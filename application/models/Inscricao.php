@@ -34,6 +34,7 @@ class Inscricao
                                     b.data_inscricao_summit as data_inscricao_summit,
                                     b.data_summit as data_summit,
                                     sa.nome as status_auditoria_nome,
+                                    sa.descricao as status_auditoria_descricao,
                                     fp.descricao as forma_pagamento_descricao,
                                     u.id_usuario as usuario_id,
                                     u.nome as usuario_nome,

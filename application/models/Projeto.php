@@ -27,18 +27,56 @@ class Projeto
 	public static function camposAvaliacao()
 	{
 		return array(
-			'nome' => 'Nome do projeto',
-			'area_atuacao' => 'Área de atuação',
-			'ods_principal' => 'ODS principal',
-			'demais_ods_relacionados' => 'Demais ODS relacionados',
-			'periodo_execucao' => 'Data Inicializacao e finalizacao',
-			'justificativa' => 'Justificativa do projeto',
-			'objetivos' => 'Objetivo(s) do projeto',
-			'evidencia_qualitativa' => 'Evidência qualitativa do projeto',
-			'evidencia_itens' => 'Evidência de Itens',
-			'evidencia_pessoas' => 'Evidência de Pessoas',
-			'evidencia_parceiros' => 'Evidência de Parceiros'
+			'nome' => array('label' => 'Nome do projeto', 'percentual_avaliacao' => 5, 'obrigatorio' => true),
+			'area_atuacao' => array('label' => 'Área de atuação', 'percentual_avaliacao' => 10, 'obrigatorio' => true),
+			'ods_principal' => array('label' => 'ODS principal', 'percentual_avaliacao' => 10, 'obrigatorio' => true),
+			'demais_ods_relacionados' => array('label' => 'Demais ODS relacionados', 'percentual_avaliacao' => 5, 'obrigatorio' => true),
+			'periodo_execucao' => array('label' => 'Data Inicializacao e finalizacao', 'percentual_avaliacao' => 5, 'obrigatorio' => true),
+			'justificativa' => array('label' => 'Justificativa do projeto', 'percentual_avaliacao' => 10, 'obrigatorio' => true),
+			'objetivos' => array('label' => 'Objetivo(s) do projeto', 'percentual_avaliacao' => 10, 'obrigatorio' => true),
+			'evidencia_qualitativa' => array('label' => 'Evidência qualitativa do projeto', 'percentual_avaliacao' => 10, 'obrigatorio' => false),
+			'evidencia_itens' => array('label' => 'Evidência de Itens', 'percentual_avaliacao' => 10, 'obrigatorio' => false),
+			'evidencia_pessoas' => array('label' => 'Evidência de Pessoas', 'percentual_avaliacao' => 10, 'obrigatorio' => false),
+			'evidencia_parceiros' => array('label' => 'Evidência de Parceiros', 'percentual_avaliacao' => 10, 'obrigatorio' => false)
 		);
+	}
+
+	public static function campoAvaliacaoConfig($campo)
+	{
+		$campos = self::camposAvaliacao();
+		return isset($campos[$campo]) && is_array($campos[$campo]) ? $campos[$campo] : null;
+	}
+
+	public static function campoAvaliacaoLabel($campo)
+	{
+		$config = self::campoAvaliacaoConfig($campo);
+		return $config && isset($config['label']) ? (string) $config['label'] : (string) $campo;
+	}
+
+	public static function calcularPercentualAtingido($avaliacoes)
+	{
+		$camposConfiguracaoAvaliacao = self::camposAvaliacao();
+		$percentualAtingidoProjeto = 0;
+		$percentualNaoObrigatorioAprovado = 0;
+		$possuiNaoObrigatorioAprovado = false;
+
+		foreach ($camposConfiguracaoAvaliacao as $campoConfiguracao => $configCampoAvaliacao) {
+			$avaliacaoCampoConfiguracao = isset($avaliacoes[$campoConfiguracao]) && is_array($avaliacoes[$campoConfiguracao]) ? $avaliacoes[$campoConfiguracao] : array();
+			$campoAprovado = array_key_exists('aprovado', $avaliacaoCampoConfiguracao) && $avaliacaoCampoConfiguracao['aprovado'] === true;
+			if (!$campoAprovado) {
+				continue;
+			}
+
+			$percentualCampoAvaliacao = isset($configCampoAvaliacao['percentual_avaliacao']) ? (float) $configCampoAvaliacao['percentual_avaliacao'] : 0;
+			if (!empty($configCampoAvaliacao['obrigatorio'])) {
+				$percentualAtingidoProjeto += $percentualCampoAvaliacao;
+			} elseif (!$possuiNaoObrigatorioAprovado) {
+				$percentualNaoObrigatorioAprovado = $percentualCampoAvaliacao;
+				$possuiNaoObrigatorioAprovado = true;
+			}
+		}
+
+		return $percentualAtingidoProjeto + $percentualNaoObrigatorioAprovado;
 	}
 
 	private static function podeAvaliarProjeto($permissao = null)
@@ -480,10 +518,12 @@ class Projeto
 
 		$campos = self::camposAvaliacao();
 		$avaliacoes = array();
-		foreach ($campos as $campo => $label) {
+		foreach ($campos as $campo => $config) {
 			$avaliacoes[$campo] = array(
 				'campo' => $campo,
-				'label' => $label,
+				'label' => self::campoAvaliacaoLabel($campo),
+				'percentual_avaliacao' => isset($config['percentual_avaliacao']) ? (float) $config['percentual_avaliacao'] : 0,
+				'obrigatorio' => !empty($config['obrigatorio']),
 				'aprovado' => null,
 				'comentario' => '',
 				'justificativa' => '',
@@ -551,7 +591,8 @@ class Projeto
 			$todasQuestoesRespondidas = true;
 			$todasQuestoesAprovadas = true;
 
-			foreach ($camposPermitidos as $campo => $label) {
+			foreach ($camposPermitidos as $campo => $config) {
+				$label = self::campoAvaliacaoLabel($campo);
 				$dadosCampo = isset($avaliacoes[$campo]) && is_array($avaliacoes[$campo]) ? $avaliacoes[$campo] : array();
 				$existente = $db->fetchRow(
 					'select *
@@ -719,6 +760,8 @@ class Projeto
 
 		foreach ($registros as $indice => $registro) {
 			$registros[$indice]['status_projeto_label'] = self::statusLabel($registro['status_projeto']);
+			$registros[$indice]['avaliacoes'] = self::listaAvaliacoes((int) $registro['id_projeto']);
+			$registros[$indice]['percentual_atingido'] = self::calcularPercentualAtingido($registros[$indice]['avaliacoes']);
 		}
 
 		return $registros;
@@ -1235,3 +1278,5 @@ class Projeto
 		return true;
 	}
 }
+
+

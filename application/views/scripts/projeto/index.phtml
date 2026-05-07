@@ -4,7 +4,21 @@
 		<div class="content-page__toolbar">
 			<? if (!empty($this->id_inscricao)) : ?>
 				<button type="button" onclick="carregarTela('../../inscricao/detalhe?id_inscricao=<?= (int) $this->id_inscricao ?>')" class="btn btn-info"><i class="fa fa-id-card-o" aria-hidden="true"></i> Inscri&ccedil;&atilde;o</button>
-				<? if (!empty($this->mostrarBotaoAvancarAuditoria) && !empty($this->proximoStatusAuditoria['id_status_auditoria'])) : ?>
+				<? if (!empty($this->mostrarBotaoAvancarAuditoria) && !empty($this->proximoStatusAuditoria['id_status_auditoria'])) :
+					$titulo_prosseguir = 'Submeter Projetos';
+
+					switch ($this->inscricaoProjeto['id_status_auditoria']) {
+						case 2:
+							$titulo_prosseguir = 'Finalizar a Correção';
+							break;
+						case 3:
+							$titulo_prosseguir = 'Enviar o Feedback';
+							break;
+						case 4:
+							$titulo_prosseguir = 'Finalizar a Revisão';
+							break;
+					}
+				?>
 					<button
 						type="button"
 						id="avancar-status-auditoria"
@@ -13,7 +27,7 @@
 						data-status-atual="<?= (int) ($this->inscricaoProjeto['id_status_auditoria'] ?? 0) ?>"
 						data-status-atual-nome="<?= $this->escape($this->inscricaoProjeto['status_auditoria_nome'] ?? '') ?>"
 						data-proximo-status="<?= (int) $this->proximoStatusAuditoria['id_status_auditoria'] ?>"
-						data-proximo-status-nome="<?= $this->escape($this->proximoStatusAuditoria['nome'] ?? '') ?>"><i class="fa fa-arrow-right" aria-hidden="true"></i> Submeter Projetos</button>
+						data-proximo-status-nome="<?= $this->escape($this->proximoStatusAuditoria['nome'] ?? '') ?>"><i class="fa fa-arrow-right" aria-hidden="true"></i> <?= $titulo_prosseguir  ?></button>
 				<? endif; ?>
 			<? endif; ?>
 			<? if (!empty($this->mostrarBotaoSubmeter)) : ?>
@@ -28,6 +42,11 @@
 	<? if (!empty($this->mostrarBotaoSubmeter)) : ?>
 		<div class="alert alert-info mb-3">Cada empresa pode cadastrar até <?= (int) Projeto::MAX_PROJETOS_POR_USUARIO ?> projetos.</div>
 		<div class="alert alert-warning mb-3">Lembre-se de preencher todos os campos corretamente e com atenção, pois ele será de envio ÚNICO e NÃO poderá ser editado. REVISE antes de enviar 😉</div>
+	<? endif; ?>
+	<? if ((int) $this->permissao === 3 && !empty(trim((string) ($this->inscricaoProjeto['status_auditoria_descricao'] ?? '')))) : ?>
+		<div class="alert alert-primary mb-3" style="font-size: 1.05rem; font-weight: 600; border-left: 6px solid #0d6efd;">
+			<?= nl2br($this->escape(trim((string) $this->inscricaoProjeto['status_auditoria_descricao']))) ?>
+		</div>
 	<? endif; ?>
 	<? if (!empty($this->atingiuLimiteProjetos)) : ?>
 		<div class="alert alert-warning mb-3">Limite de <?= (int) Projeto::MAX_PROJETOS_POR_USUARIO ?> projetos por usuário atingido.</div>
@@ -45,11 +64,13 @@
 					<th class="text-left">AREA DE ATUACAO</th>
 					<th class="text-left">RESPONSAVEL</th>
 					<th class="text-center">ODS PRINCIPAL</th>
+					<th class="text-center">PROGRESSO</th>
 					<th class="text-left">STATUS</th>
 				</tr>
 				<? if ($this->permissao == 1) : ?>
 					<tr>
 						<th></th>
+						<th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
 						<th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
 						<th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
 						<th class="pr-1"><input type="text" class="form-control" placeholder="Pesquisar" /></th>
@@ -90,6 +111,7 @@
 									-
 								<? endif; ?>
 							</td>
+							<td class="text-center align-middle" data-label="Progresso"><?= $this->escape(rtrim(rtrim(number_format((float) ($value['percentual_atingido'] ?? 0), 2, '.', ''), '0'), '.')) ?>%</td>
 							<td class="text-left align-middle" data-label="Status"><?= $this->escape($value['status_projeto_label']) ?></td>
 						</tr>
 				<? endforeach;
