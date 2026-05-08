@@ -590,6 +590,7 @@ class Projeto
 		try {
 			$todasQuestoesRespondidas = true;
 			$todasQuestoesAprovadas = true;
+			$possuiQuestaoOpcionalAprovada = false;
 
 			foreach ($camposPermitidos as $campo => $config) {
 				$label = self::campoAvaliacaoLabel($campo);
@@ -660,11 +661,21 @@ class Projeto
 					}
 				}
 
+				$campoObrigatorio = !empty($config['obrigatorio']);
+
 				if ($aprovado === null) {
 					$todasQuestoesRespondidas = false;
-					$todasQuestoesAprovadas = false;
-				} elseif ($aprovado !== true) {
-					$todasQuestoesAprovadas = false;
+					if ($campoObrigatorio) {
+						$todasQuestoesAprovadas = false;
+					}
+				} elseif ($aprovado === true) {
+					if (!$campoObrigatorio) {
+						$possuiQuestaoOpcionalAprovada = true;
+					}
+				} else {
+					if ($campoObrigatorio) {
+						$todasQuestoesAprovadas = false;
+					}
 				}
 
 				$payload = array(
@@ -690,6 +701,10 @@ class Projeto
 						throw new Exception(self::$erro);
 					}
 				}
+			}
+
+			if (!$possuiQuestaoOpcionalAprovada) {
+				$todasQuestoesAprovadas = false;
 			}
 
 			$statusProjetoAtualizado = 1;
