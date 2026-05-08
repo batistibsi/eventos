@@ -28,16 +28,16 @@ class Projeto
 	{
 		return array(
 			'nome' => array('label' => 'Nome do projeto', 'percentual_avaliacao' => 5, 'obrigatorio' => true),
-			'area_atuacao' => array('label' => 'Área de atuação', 'percentual_avaliacao' => 10, 'obrigatorio' => true),
+			'area_atuacao' => array('label' => 'Área de atuação', 'percentual_avaliacao' => 5, 'obrigatorio' => true),
 			'ods_principal' => array('label' => 'ODS principal', 'percentual_avaliacao' => 10, 'obrigatorio' => true),
 			'demais_ods_relacionados' => array('label' => 'Demais ODS relacionados', 'percentual_avaliacao' => 5, 'obrigatorio' => true),
 			'periodo_execucao' => array('label' => 'Data Inicializacao e finalizacao', 'percentual_avaliacao' => 5, 'obrigatorio' => true),
-			'justificativa' => array('label' => 'Justificativa do projeto', 'percentual_avaliacao' => 10, 'obrigatorio' => true),
-			'objetivos' => array('label' => 'Objetivo(s) do projeto', 'percentual_avaliacao' => 10, 'obrigatorio' => true),
-			'evidencia_qualitativa' => array('label' => 'Evidência qualitativa do projeto', 'percentual_avaliacao' => 10, 'obrigatorio' => false),
-			'evidencia_itens' => array('label' => 'Evidência de Itens', 'percentual_avaliacao' => 10, 'obrigatorio' => false),
-			'evidencia_pessoas' => array('label' => 'Evidência de Pessoas', 'percentual_avaliacao' => 10, 'obrigatorio' => false),
-			'evidencia_parceiros' => array('label' => 'Evidência de Parceiros', 'percentual_avaliacao' => 10, 'obrigatorio' => false)
+			'justificativa' => array('label' => 'Justificativa do projeto', 'percentual_avaliacao' => 5, 'obrigatorio' => true),
+			'objetivos' => array('label' => 'Objetivo(s) do projeto', 'percentual_avaliacao' => 5, 'obrigatorio' => true),
+			'evidencia_qualitativa' => array('label' => 'Evidência qualitativa do projeto', 'percentual_avaliacao' => 15, 'obrigatorio' => true),
+			'evidencia_itens' => array('label' => 'Evidência de Itens', 'percentual_avaliacao' => 5, 'obrigatorio' => false),
+			'evidencia_pessoas' => array('label' => 'Evidência de Pessoas', 'percentual_avaliacao' => 5, 'obrigatorio' => false),
+			'evidencia_parceiros' => array('label' => 'Evidência de Parceiros', 'percentual_avaliacao' => 5, 'obrigatorio' => false)
 		);
 	}
 
