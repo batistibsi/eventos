@@ -40,21 +40,13 @@
 }; ?>
 <? $camposConfiguracaoAvaliacao = Projeto::camposAvaliacao(); ?>
 <? $percentualAtingidoProjeto = 0; ?>
-<? $percentualNaoObrigatorioAprovado = 0; ?>
-<? $possuiNaoObrigatorioAprovado = false; ?>
 <? foreach ($camposConfiguracaoAvaliacao as $campoConfiguracao => $configCampoAvaliacao) : ?>
 	<? $avaliacaoCampoConfiguracao = isset($avaliacoes[$campoConfiguracao]) && is_array($avaliacoes[$campoConfiguracao]) ? $avaliacoes[$campoConfiguracao] : array(); ?>
 	<? $campoAprovado = array_key_exists('aprovado', $avaliacaoCampoConfiguracao) && $avaliacaoCampoConfiguracao['aprovado'] === true; ?>
 	<? if (!$campoAprovado) continue; ?>
 	<? $percentualCampoAvaliacao = isset($configCampoAvaliacao['percentual_avaliacao']) ? (float) $configCampoAvaliacao['percentual_avaliacao'] : 0; ?>
-	<? if (!empty($configCampoAvaliacao['obrigatorio'])) : ?>
-		<? $percentualAtingidoProjeto += $percentualCampoAvaliacao; ?>
-	<? elseif (!$possuiNaoObrigatorioAprovado) : ?>
-		<? $percentualNaoObrigatorioAprovado = $percentualCampoAvaliacao; ?>
-		<? $possuiNaoObrigatorioAprovado = true; ?>
-	<? endif; ?>
+	<? $percentualAtingidoProjeto += $percentualCampoAvaliacao; ?>
 <? endforeach; ?>
-<? $percentualAtingidoProjeto += $percentualNaoObrigatorioAprovado; ?>
 <? $renderAvaliacao = function ($campo, $titulo) use ($avaliacaoPadrao, $podeAvaliarProjeto, $podeEditarAvaliacaoProjeto, $codigoModoAuditoria, $view) {
 	$configCampo = Projeto::campoAvaliacaoConfig($campo);
 	$percentualAvaliacao = $configCampo && isset($configCampo['percentual_avaliacao']) ? (float) $configCampo['percentual_avaliacao'] : 0;

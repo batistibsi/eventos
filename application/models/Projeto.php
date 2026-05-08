@@ -35,9 +35,9 @@ class Projeto
 			'justificativa' => array('label' => 'Justificativa do projeto', 'percentual_avaliacao' => 5, 'obrigatorio' => true),
 			'objetivos' => array('label' => 'Objetivo(s) do projeto', 'percentual_avaliacao' => 5, 'obrigatorio' => true),
 			'evidencia_qualitativa' => array('label' => 'Evidência qualitativa do projeto', 'percentual_avaliacao' => 15, 'obrigatorio' => true),
-			'evidencia_itens' => array('label' => 'Evidência de Itens', 'percentual_avaliacao' => 5, 'obrigatorio' => false),
-			'evidencia_pessoas' => array('label' => 'Evidência de Pessoas', 'percentual_avaliacao' => 5, 'obrigatorio' => false),
-			'evidencia_parceiros' => array('label' => 'Evidência de Parceiros', 'percentual_avaliacao' => 5, 'obrigatorio' => false)
+			'evidencia_itens' => array('label' => 'Evidência de Itens', 'percentual_avaliacao' => 10, 'obrigatorio' => false),
+			'evidencia_pessoas' => array('label' => 'Evidência de Pessoas', 'percentual_avaliacao' => 10, 'obrigatorio' => false),
+			'evidencia_parceiros' => array('label' => 'Evidência de Parceiros', 'percentual_avaliacao' => 10, 'obrigatorio' => false)
 		);
 	}
 
@@ -57,8 +57,6 @@ class Projeto
 	{
 		$camposConfiguracaoAvaliacao = self::camposAvaliacao();
 		$percentualAtingidoProjeto = 0;
-		$percentualNaoObrigatorioAprovado = 0;
-		$possuiNaoObrigatorioAprovado = false;
 
 		foreach ($camposConfiguracaoAvaliacao as $campoConfiguracao => $configCampoAvaliacao) {
 			$avaliacaoCampoConfiguracao = isset($avaliacoes[$campoConfiguracao]) && is_array($avaliacoes[$campoConfiguracao]) ? $avaliacoes[$campoConfiguracao] : array();
@@ -68,15 +66,10 @@ class Projeto
 			}
 
 			$percentualCampoAvaliacao = isset($configCampoAvaliacao['percentual_avaliacao']) ? (float) $configCampoAvaliacao['percentual_avaliacao'] : 0;
-			if (!empty($configCampoAvaliacao['obrigatorio'])) {
-				$percentualAtingidoProjeto += $percentualCampoAvaliacao;
-			} elseif (!$possuiNaoObrigatorioAprovado) {
-				$percentualNaoObrigatorioAprovado = $percentualCampoAvaliacao;
-				$possuiNaoObrigatorioAprovado = true;
-			}
+			$percentualAtingidoProjeto += $percentualCampoAvaliacao;
 		}
 
-		return $percentualAtingidoProjeto + $percentualNaoObrigatorioAprovado;
+		return $percentualAtingidoProjeto;
 	}
 
 	private static function podeAvaliarProjeto($permissao = null)
