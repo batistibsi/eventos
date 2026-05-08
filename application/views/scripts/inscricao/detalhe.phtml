@@ -590,6 +590,16 @@
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
         }
 
+        function decodificarTextoSwal(valor) {
+            const texto = (valor || '').trim();
+
+            if (!texto) {
+                return '';
+            }
+
+            return $('<textarea/>').html(texto).text();
+        }
+
         function validarTelefoneCampo(campo) {
             if (campo.disabled || campo.readOnly) {
                 return true;
@@ -639,7 +649,7 @@
                     if (data.trim().length > 0) {
                         swal({
                             title: "Atenção!",
-                            text: data,
+                            text: decodificarTextoSwal(data),
                             type: "error"
                         });
                     } else {
@@ -676,8 +686,8 @@
                 success: function(data) {
                     if (data.trim().length > 0) {
                         swal({
-                            title: "AtenÃ§Ã£o!",
-                            text: data,
+                            title: "Atenção!",
+                            text: decodificarTextoSwal(data),
                             type: "error"
                         });
                     } else {
@@ -694,8 +704,8 @@
                     $('.salvar-auditor').prop('disabled', false);
 
                     swal({
-                        title: "AtenÃ§Ã£o!",
-                        text: "NÃ£o foi possÃ­vel definir o auditor.",
+                        title: "Atenção!",
+                        text: "Não foi possível definir o auditor.",
                         type: "error"
                     });
                 }
@@ -714,14 +724,14 @@
                 success: function(data) {
                     if (data.trim().length > 0) {
                         swal({
-                            title: "AtenÃƒÂ§ÃƒÂ£o!",
-                            text: data,
+                            title: "Atenção!",
+                            text: decodificarTextoSwal(data),
                             type: "error"
                         });
                     } else {
                         swal({
                             title: "Sucesso!",
-                            text: "ConfirmaÃ§Ãµes dos encontros salvas com sucesso.",
+                            text: "Confirmações dos encontros salvas com sucesso.",
                             type: "success"
                         });
                     }
@@ -732,8 +742,8 @@
                     $('.salvar-encontros-formacao').prop('disabled', false);
 
                     swal({
-                        title: "AtenÃƒÂ§ÃƒÂ£o!",
-                        text: "NÃƒÂ£o foi possÃƒÂ­vel salvar as confirmaÃ§Ãµes dos encontros.",
+                        title: "Atenção!",
+                        text: "Não foi possível salvar as confirmações dos encontros.",
                         type: "error"
                     });
                 }
@@ -752,8 +762,8 @@
                 success: function(data) {
                     if (data.trim().length > 0) {
                         swal({
-                            title: "Atencao!",
-                            text: data,
+                            title: "Atenção!",
+                            text: decodificarTextoSwal(data),
                             type: "error"
                         });
                     } else {
@@ -770,8 +780,8 @@
                     $('.salvar-forma-pagamento-inscricao').prop('disabled', false);
 
                     swal({
-                        title: "Atencao!",
-                        text: "Nao foi possivel salvar a forma de pagamento.",
+                        title: "Atenção!",
+                        text: "Não foi possível salvar a forma de pagamento.",
                         type: "error"
                     });
                 }
@@ -821,8 +831,8 @@
                 success: function(data) {
                     if (data.trim().length > 0) {
                         swal({
-                            title: "Atencao!",
-                            text: data,
+                            title: "Atenção!",
+                            text: decodificarTextoSwal(data),
                             type: "error"
                         });
                     } else {
@@ -839,8 +849,8 @@
                     $('.salvar-representantes-inscricao').prop('disabled', false);
 
                     swal({
-                        title: "Atencao!",
-                        text: "Nao foi possivel salvar os representantes.",
+                        title: "Atenção!",
+                        text: "Não foi possível salvar os representantes.",
                         type: "error"
                     });
                 }
@@ -874,7 +884,7 @@
                     if (data.trim().length > 0) {
                         swal({
                             title: "Atenção!",
-                            text: data,
+                            text: decodificarTextoSwal(data),
                             type: "error"
                         });
                     } else {
