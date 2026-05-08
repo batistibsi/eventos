@@ -53,7 +53,24 @@ class Projeto
 		return $config && isset($config['label']) ? (string) $config['label'] : (string) $campo;
 	}
 
-	public static function calcularPercentualAtingido($avaliacoes)
+	private static function calcularBonusPercentualInscricao($inscricao = null)
+	{
+		if (!$inscricao || !is_array($inscricao)) {
+			return 0;
+		}
+
+		$bonus = 0;
+		if (!empty($inscricao['encontro_formacao_1'])) {
+			$bonus += 5;
+		}
+		if (!empty($inscricao['encontro_formacao_2'])) {
+			$bonus += 10;
+		}
+
+		return $bonus;
+	}
+
+	public static function calcularPercentualAtingido($avaliacoes, $inscricao = null)
 	{
 		$camposConfiguracaoAvaliacao = self::camposAvaliacao();
 		$percentualAtingidoProjeto = 0;
@@ -69,7 +86,7 @@ class Projeto
 			$percentualAtingidoProjeto += $percentualCampoAvaliacao;
 		}
 
-		return $percentualAtingidoProjeto;
+		return $percentualAtingidoProjeto + self::calcularBonusPercentualInscricao($inscricao);
 	}
 
 	private static function podeAvaliarProjeto($permissao = null)
@@ -498,6 +515,7 @@ class Projeto
 		$registro['arquivos_pessoas'] = self::listaArquivos($registro['id_projeto'], 'pessoas');
 		$registro['arquivos_parceiros'] = self::listaArquivos($registro['id_projeto'], 'parceiros');
 		$registro['avaliacoes'] = self::listaAvaliacoes($registro['id_projeto']);
+		$registro['percentual_atingido'] = self::calcularPercentualAtingido($registro['avaliacoes'], $inscricao);
 		return $registro;
 	}
 
@@ -769,7 +787,8 @@ class Projeto
 		foreach ($registros as $indice => $registro) {
 			$registros[$indice]['status_projeto_label'] = self::statusLabel($registro['status_projeto']);
 			$registros[$indice]['avaliacoes'] = self::listaAvaliacoes((int) $registro['id_projeto']);
-			$registros[$indice]['percentual_atingido'] = self::calcularPercentualAtingido($registros[$indice]['avaliacoes']);
+			$inscricaoProjeto = self::buscaInscricaoProjeto((int) $registro['id_usuario'], (int) $registro['id_evento']);
+			$registros[$indice]['percentual_atingido'] = self::calcularPercentualAtingido($registros[$indice]['avaliacoes'], $inscricaoProjeto);
 		}
 
 		return $registros;
