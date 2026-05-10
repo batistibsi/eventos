@@ -84,6 +84,9 @@
 				<?
 				if (count($this->registros) > 0): foreach ($this->registros as $value):
 						$odsNumero = 0;
+						$percentualAtingido = (float) ($value['percentual_atingido'] ?? 0);
+						$percentualExibicao = rtrim(rtrim(number_format($percentualAtingido, 2, '.', ''), '0'), '.');
+						$percentualBarra = max(0, min(100, $percentualAtingido));
 						if (!empty($value['ods_principal']) && preg_match('/^ODS\s+([1-9]|1[0-7])$/', trim((string) $value['ods_principal']), $matches)) {
 							$odsNumero = (int) $matches[1];
 						}
@@ -111,7 +114,20 @@
 									-
 								<? endif; ?>
 							</td>
-							<td class="text-center align-middle" data-label="Progresso"><?= $this->escape(rtrim(rtrim(number_format((float) ($value['percentual_atingido'] ?? 0), 2, '.', ''), '0'), '.')) ?>%</td>
+							<td class="text-center align-middle" data-label="Progresso">
+								<div style="min-width: 140px;">
+									<div class="progress" style="height: 12px; margin-bottom: 6px;">
+										<div
+											class="progress-bar bg-success"
+											role="progressbar"
+											style="width: <?= $this->escape(number_format($percentualBarra, 2, '.', '')) ?>%;"
+											aria-valuenow="<?= $this->escape(number_format($percentualBarra, 2, '.', '')) ?>"
+											aria-valuemin="0"
+											aria-valuemax="100"></div>
+									</div>
+									<span><?= $this->escape($percentualExibicao) ?>%</span>
+								</div>
+							</td>
 							<td class="text-left align-middle" data-label="Status"><?= $this->escape($value['status_projeto_label']) ?></td>
 						</tr>
 				<? endforeach;
