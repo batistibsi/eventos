@@ -269,12 +269,14 @@
 						swal({
 							title: "Sucesso!",
 							text: "Inscricao encaminhada para o proximo status de auditoria.",
-							type: "success"
-						});
-
-						setTimeout(function() {
+							type: "success",
+							timer: 1,
+							showConfirmButton: false
+						}, function() {
+							swal.close();
 							carregarTela('../../projeto?id_inscricao=<?= (int) $this->id_inscricao ?>');
-						}, 500);
+						});
+						
 					},
 					error: function() {
 						botao.prop('disabled', false);
