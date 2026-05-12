@@ -8,12 +8,18 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->id_usuario = Zend_Registry::get('id_usuario');
 		$this->view->permissao = Zend_Registry::get('permissao');
 		$idInscricao = isset($_REQUEST['id_inscricao']) ? (int) $_REQUEST['id_inscricao'] : 0;
+		
 		if (!$idInscricao && (int) Zend_Registry::get('permissao') === 3) {
 			$resumoInscricao = Inscricao::buscaResumoVinculadoUsuario((int) Zend_Registry::get('id_usuario'));
 			if ($resumoInscricao && !empty($resumoInscricao['id_inscricao'])) {
 				$idInscricao = (int) $resumoInscricao['id_inscricao'];
 			}
 		}
+
+		if ($idInscricao) {
+			$inscricao = Inscricao::buscaId($idInscricao);
+		}
+
 		$this->view->id_inscricao = $idInscricao;
 		$this->view->registros = Projeto::lista(Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'), $idInscricao);
 		$ehAdmin = Zend_Registry::get('permissao') == 1;
@@ -27,17 +33,14 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->proximoStatusAuditoria = false;
 		$this->view->mostrarBotaoAvancarAuditoria = false;
 
-		if ($idInscricao) {
-			$inscricao = Inscricao::buscaId($idInscricao);
-			if ($inscricao && Inscricao::podeVisualizar($inscricao, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'))) {
-				$this->view->inscricaoProjeto = $inscricao;
-				$idStatusAuditoria = !empty($inscricao['id_status_auditoria']) ? (int) $inscricao['id_status_auditoria'] : 0;
-				$permissaoAtual = (int) Zend_Registry::get('permissao');
+		if ($inscricao && Inscricao::podeVisualizar($inscricao, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'))) {
+			$this->view->inscricaoProjeto = $inscricao;
+			$idStatusAuditoria = !empty($inscricao['id_status_auditoria']) ? (int) $inscricao['id_status_auditoria'] : 0;
+			$permissaoAtual = (int) Zend_Registry::get('permissao');
 
-				if (Inscricao::podeAvancarStatusAuditoria($idStatusAuditoria, $permissaoAtual)) {
-					$this->view->proximoStatusAuditoria = Auditoria::buscaProximoStatus($idStatusAuditoria);
-					$this->view->mostrarBotaoAvancarAuditoria = !empty($this->view->proximoStatusAuditoria['id_status_auditoria']);
-				}
+			if (Inscricao::podeAvancarStatusAuditoria($idStatusAuditoria, $permissaoAtual)) {
+				$this->view->proximoStatusAuditoria = Auditoria::buscaProximoStatus($idStatusAuditoria);
+				$this->view->mostrarBotaoAvancarAuditoria = !empty($this->view->proximoStatusAuditoria['id_status_auditoria']);
 			}
 		}
 	}
