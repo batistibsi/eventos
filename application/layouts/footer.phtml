@@ -291,10 +291,8 @@
  									timer: 1,
  									showConfirmButton: false
  								}, function() {
+									swal.close();
  									carregarTela("../../" + modulo);
- 									setTimeout(function() {
- 										swal.close();
- 									}, 2000);
  								});
  							}
  						}

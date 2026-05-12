@@ -213,11 +213,10 @@
 							title: "Sucesso!",
 							text: "Projetos submetidos com sucesso.",
 							type: "success"
-						});
-
-						setTimeout(function() {
+						}, function() {
+							swal.close();
 							carregarTela('../../projeto');
-						}, 500);
+						});
 					},
 					error: function() {
 						swal({
