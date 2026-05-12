@@ -40,6 +40,14 @@
 }; ?>
 <? $camposConfiguracaoAvaliacao = Projeto::camposAvaliacao(); ?>
 <? $percentualAtingidoProjeto = isset($registro['percentual_atingido']) ? (float) $registro['percentual_atingido'] : 0; ?>
+<? $percentualAprovadoInicial = 0; ?>
+<? foreach ($camposConfiguracaoAvaliacao as $campoConfiguracao => $configCampoAvaliacao) : ?>
+	<? $avaliacaoCampoConfiguracao = isset($avaliacoes[$campoConfiguracao]) && is_array($avaliacoes[$campoConfiguracao]) ? $avaliacoes[$campoConfiguracao] : array(); ?>
+	<? if (array_key_exists('aprovado', $avaliacaoCampoConfiguracao) && $avaliacaoCampoConfiguracao['aprovado'] === true) : ?>
+		<? $percentualAprovadoInicial += isset($configCampoAvaliacao['percentual_avaliacao']) ? (float) $configCampoAvaliacao['percentual_avaliacao'] : 0; ?>
+	<? endif; ?>
+<? endforeach; ?>
+<? $percentualBonusInscricao = $percentualAtingidoProjeto - $percentualAprovadoInicial; ?>
 <? $renderAvaliacao = function ($campo, $titulo) use ($avaliacaoPadrao, $podeAvaliarProjeto, $podeEditarAvaliacaoProjeto, $codigoModoAuditoria, $view) {
 	$configCampo = Projeto::campoAvaliacaoConfig($campo);
 	$percentualAvaliacao = $configCampo && isset($configCampo['percentual_avaliacao']) ? (float) $configCampo['percentual_avaliacao'] : 0;
@@ -60,7 +68,7 @@
 	$comentarioReadonly = !$etapa2;
 	$justificativaReadonly = !$etapa3;
 ?>
-	<div class="projeto-avaliacao-box">
+	<div class="projeto-avaliacao-box" data-percentual-avaliacao="<?= $view->escape(number_format($percentualAvaliacao, 2, '.', '')) ?>">
 		<div class="projeto-avaliacao-box__header">
 			<div class="projeto-avaliacao-box__titulo">
 				<strong><?= $view->escape($titulo) ?></strong>
@@ -769,6 +777,29 @@
 <? if ($podeAvaliarProjeto) : ?>
 <script type="text/javascript">
 	$(document).ready(function() {
+		var percentualBonusInscricao = <?= json_encode((float) $percentualBonusInscricao) ?>;
+
+		function formatarPercentualResumo(valor) {
+			var numero = Math.max(0, valor || 0);
+			return numero.toFixed(2).replace(/\.?0+$/, '') + '%';
+		}
+
+		function atualizarPercentualResumo() {
+			var percentualAtingido = percentualBonusInscricao;
+
+			$('.projeto-avaliacao-box').each(function() {
+				var $box = $(this);
+				var valor = $box.find('input[type="radio"]:checked').val();
+				var percentualAvaliacao = parseFloat($box.data('percentual-avaliacao')) || 0;
+
+				if (valor === '1') {
+					percentualAtingido += percentualAvaliacao;
+				}
+			});
+
+			$('.projeto-percentual-resumo__valor').text(formatarPercentualResumo(percentualAtingido));
+		}
+
 		function atualizarCoresParecer() {
 			$('.projeto-avaliacao-box').each(function() {
 				var $box = $(this);
@@ -784,6 +815,8 @@
 					$box.addClass('is-pendente');
 				}
 			});
+
+			atualizarPercentualResumo();
 		}
 
 		atualizarCoresParecer();
