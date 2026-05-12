@@ -107,6 +107,7 @@ class CadastroController extends Zend_Controller_Action
 			'help_titulo' => $_REQUEST['help_titulo'] ?? null,
 			'help_subtitulo' => $_REQUEST['help_subtitulo'] ?? null,
 			'help_conteudo' => $_REQUEST['help_conteudo'] ?? null,
+			'help_termo_submissao' => $_REQUEST['help_termo_submissao'] ?? null,
 			'help_contato_nome' => $_REQUEST['help_contato_nome'] ?? null,
 			'help_contato_whatsapp' => $_REQUEST['help_contato_whatsapp'] ?? null
 		);

@@ -23,6 +23,7 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->permitirEditarExcluir = $ehAdmin || $this->view->mostrarBotaoNovo;
 		$this->view->atingiuLimiteProjetos = $atingiuLimiteProjetos;
 		$this->view->inscricaoProjeto = false;
+		$this->view->configHelp = Config::help();
 		$this->view->proximoStatusAuditoria = false;
 		$this->view->mostrarBotaoAvancarAuditoria = false;
 

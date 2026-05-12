@@ -34,6 +34,12 @@
 				</div>
 			</div>
 			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label for="help_termo_submissao">Termo exibido na submissão dos projetos: </label></span>
+					<textarea class="form-control" name="help_termo_submissao" id="help_termo_submissao" rows="12" required><?= $this->escape($registro['help_termo_submissao'] ?? '') ?></textarea>
+				</div>
+			</div>
+			<div class="row">
 				<div class="form-group col-md-6">
 					<span><label for="help_contato_nome">Nome do contato: </label></span>
 					<input class="form-control" name="help_contato_nome" id="help_contato_nome" type="text" maxlength="150" value="<?= $this->escape($registro['help_contato_nome'] ?? '') ?>" required>

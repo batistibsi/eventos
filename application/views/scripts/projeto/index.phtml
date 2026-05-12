@@ -166,9 +166,28 @@
 		<? endif; ?>
 
 		$('#submeter-projetos').on('click', function() {
+			var termoCompromisso = <?= json_encode((string) ($this->configHelp['help_termo_submissao'] ?? '')) ?>;
+			var linhasTermo = (termoCompromisso || '').split(/\r\n|\r|\n/);
+			var linhasTermoHtml = [];
+
+			$.each(linhasTermo, function(indice, linha) {
+				var linhaEscapada = $('<div/>').text(linha).html();
+				if (indice === 0 && linhaEscapada !== '') {
+					linhasTermoHtml.push('<strong>' + linhaEscapada + '</strong>');
+					return;
+				}
+
+				linhasTermoHtml.push(linhaEscapada);
+			});
+
+			var termoCompromissoHtml = '<div style="max-height: 260px; overflow-y: auto; text-align: left; padding: 12px; margin-top: 4px; border: 1px solid #bfc7d1; border-radius: 6px; background: #ffffff; color: #1f2937; white-space: pre-line; font-size: 14px; line-height: 1.6;">' +
+				linhasTermoHtml.join('<br>') +
+				'</div>';
+
 			swal({
 				title: "Confirmar submissão?",
-				text: "Todos os projetos listados em rascunho serão enviados para o status Submetido.",
+				text: termoCompromissoHtml,
+				html: true,
 				type: "warning",
 				showCancelButton: true,
 				confirmButtonText: "Sim, submeter",
