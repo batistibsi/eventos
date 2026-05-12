@@ -212,7 +212,9 @@
 						swal({
 							title: "Sucesso!",
 							text: "Projetos submetidos com sucesso.",
-							type: "success"
+							type: "success",
+							timer: 1,
+							showConfirmButton: false
 						}, function() {
 							swal.close();
 							carregarTela('../../projeto');
