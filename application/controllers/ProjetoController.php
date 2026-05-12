@@ -19,7 +19,7 @@ class ProjetoController extends Zend_Controller_Action
 		$ehAdmin = Zend_Registry::get('permissao') == 1;
 		$atingiuLimiteProjetos = !$ehAdmin && Projeto::quantidadeProjetosUsuario(Zend_Registry::get('id_usuario')) >= Projeto::MAX_PROJETOS_POR_USUARIO;
 		$this->view->mostrarBotaoSubmeter = Zend_Registry::get('permissao') != 2 && Projeto::todosListadosNoStatus(0, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
-		$this->view->mostrarBotaoNovo = (!$atingiuLimiteProjetos && $this->view->mostrarBotaoSubmeter);
+		$this->view->mostrarBotaoNovo = (!$atingiuLimiteProjetos && empty($inscricao['id_status_auditoria']));
 		$this->view->permitirEditarExcluir = $ehAdmin || $this->view->mostrarBotaoNovo;
 		$this->view->atingiuLimiteProjetos = $atingiuLimiteProjetos;
 		$this->view->inscricaoProjeto = false;
