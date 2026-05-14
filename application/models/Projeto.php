@@ -826,6 +826,54 @@ class Projeto
 		return false;
 	}
 
+	public static function calcularNivelCertificacao($registros)
+	{
+		$resultado = array(
+			'possui_projeto_aprovado' => false,
+			'quantidade_aprovados' => 0,
+			'quantidade_ods_principais' => 0,
+			'nivel' => null,
+			'nivel_label' => null
+		);
+
+		if (!is_array($registros) || !count($registros)) {
+			return $resultado;
+		}
+
+		$odsPrincipais = array();
+
+		foreach ($registros as $registro) {
+			if ((int) ($registro['status_projeto'] ?? 0) !== 3) {
+				continue;
+			}
+
+			$resultado['quantidade_aprovados']++;
+			$odsPrincipal = trim((string) ($registro['ods_principal'] ?? ''));
+			if ($odsPrincipal !== '') {
+				$odsPrincipais[strtolower($odsPrincipal)] = $odsPrincipal;
+			}
+		}
+
+		$resultado['possui_projeto_aprovado'] = $resultado['quantidade_aprovados'] > 0;
+		$resultado['quantidade_ods_principais'] = count($odsPrincipais);
+
+		if ($resultado['quantidade_aprovados'] >= 11 && $resultado['quantidade_ods_principais'] >= 3) {
+			$resultado['nivel'] = 'ouro';
+			$resultado['nivel_label'] = 'Ouro';
+		} elseif ($resultado['quantidade_aprovados'] >= 6 && $resultado['quantidade_ods_principais'] >= 2) {
+			$resultado['nivel'] = 'prata';
+			$resultado['nivel_label'] = 'Prata';
+		} elseif ($resultado['quantidade_aprovados'] >= 2) {
+			$resultado['nivel'] = 'bronze';
+			$resultado['nivel_label'] = 'Bronze';
+		} elseif ($resultado['quantidade_aprovados'] >= 1) {
+			$resultado['nivel'] = 'iniciante';
+			$resultado['nivel_label'] = 'Iniciante';
+		}
+
+		return $resultado;
+	}
+
 	public static function quantidadeProjetosUsuario($idUsuario)
 	{
 		$idUsuario = (int) $idUsuario;

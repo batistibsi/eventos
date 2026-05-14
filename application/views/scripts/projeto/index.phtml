@@ -49,19 +49,25 @@
 		</div>
 	<? endif; ?>
 	<? if (!empty($this->inscricaoProjeto) && (int) ($this->inscricaoProjeto['id_status_auditoria'] ?? 0) === 5) : ?>
-		<div class="resultado-final-card">
-			<div class="resultado-final-card__title">RESULTADO FINAL</div>
-			<div class="resultado-final-card__text">
-				<div>Parab&eacute;ns!</div>
-				<div>Sua empresa foi</div>
-				<div>aprovada e recebe o</div>
-				<div class="resultado-final-card__highlight">SELO IMPACTACIM</div>
+		<? if (!empty($this->mostrarQuadroResultadoFinal)) : ?>
+			<div class="resultado-final-card">
+				<div class="resultado-final-card__title">RESULTADO FINAL</div>
+				<div class="resultado-final-card__text">
+					<div>Parab&eacute;ns!</div>
+					<div>Sua empresa foi</div>
+					<div>aprovada e recebe o</div>
+					<div class="resultado-final-card__highlight">SELO IMPACTACIM <?= strtoupper($this->escape($this->resultadoCertificacao['nivel_label'] ?? '')) ?></div>
+				</div>
+				<div class="resultado-final-card__actions">
+					<a href="#" class="resultado-final-card__button">BAIXAR O SELO</a>
+					<a href="#" class="resultado-final-card__button">BAIXAR O CERTIFICADO</a>
+				</div>
 			</div>
-			<div class="resultado-final-card__actions">
-				<a href="#" class="resultado-final-card__button">BAIXAR O SELO</a>
-				<a href="#" class="resultado-final-card__button">BAIXAR O CERTIFICADO</a>
+		<? else : ?>
+			<div class="alert alert-warning mb-3" style="font-size: 1.05rem; font-weight: 600; border-left: 6px solid #f0ad4e;">
+				N&atilde;o foi poss&iacute;vel concluir a certifica&ccedil;&atilde;o por falta de projetos aprovados.
 			</div>
-		</div>
+		<? endif; ?>
 	<? endif; ?>
 	<? if (!empty($this->atingiuLimiteProjetos)) : ?>
 		<div class="alert alert-warning mb-3">Limite de <?= (int) Projeto::MAX_PROJETOS_POR_USUARIO ?> projetos por usuário atingido.</div>
