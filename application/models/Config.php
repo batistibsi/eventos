@@ -4,6 +4,7 @@ class Config
         public static $erro;
         const DASHBOARD_UPLOAD_DIR = 'dashboard';
         const MATERIAL_UPLOAD_DIR = 'dashboard/material';
+        const SELOS_UPLOAD_DIR = 'selos';
         const MATERIAL_ARQUIVOS_LIMITE = 4;
         const MATERIAL_VIDEOS_LIMITE = 6;
 
@@ -36,6 +37,16 @@ class Config
                         'help_termo_submissao' => "TERMO DE COMPROMISSO IMPACTACIM 2026\n\nAo realizar a inscricao na Certificacao IMPACTACIM: Jornada de Sustentabilidade 2026, a empresa participante declara que leu e esta de acordo com o Regulamento da Edicao 2026, comprometendo-se a cumprir integralmente todas as suas disposicoes.\nA organizacao inscrita assume o compromisso de colaborar ativamente com o Instituto ACIM de Responsabilidade Social na realizacao dos objetivos da certificacao, bem como de respeitar os prazos estabelecidos ao longo do processo.\nA empresa tambem se responsabiliza pela veracidade de todas as informacoes fornecidas durante a inscricao e participacao, isentando o Instituto ACIM de quaisquer reivindicacoes de terceiros relacionadas a esses dados.\nNo que diz respeito a protecao de dados, a participante compromete-se a atuar em conformidade com a Lei n 13.709/18 (Lei Geral de Protecao de Dados Pessoais - LGPD), assegurando o tratamento adequado das informacoes envolvidas no processo.\nAo se inscrever, a empresa autoriza o uso de seu nome, imagem, logotipo e materiais visuais, incluindo fotos e videos, pelo Instituto ACIM de Responsabilidade Social, exclusivamente para fins de divulgacao e promocao da certificacao, sem qualquer tipo de compensacao financeira.\nA participante tambem concorda em nao reproduzir, compartilhar ou disponibilizar a terceiros os materiais, metodologias e conteudos utilizados ao longo da Certificacao IMPACTACIM.\nO nao cumprimento das condicoes aqui estabelecidas podera resultar na exclusao da empresa do processo de certificacao.\n\nAo clicar em 'Sim, submeter', a empresa declara ciencia e aceite integral deste termo.",
                         'help_contato_nome' => 'Henrique Nascimento',
                         'help_contato_whatsapp' => '44997399515'
+                );
+        }
+
+        public static function selosDefaults()
+        {
+                return array(
+                        'selo_iniciante_arquivo' => '',
+                        'selo_bronze_arquivo' => '',
+                        'selo_prata_arquivo' => '',
+                        'selo_ouro_arquivo' => ''
                 );
         }
 
@@ -89,6 +100,18 @@ class Config
                 return array_merge($defaults, array_intersect_key($config, $defaults));
         }
 
+        public static function selos()
+        {
+                $config = self::busca();
+                $defaults = self::selosDefaults();
+
+                if (!$config || !is_array($config)) {
+                        return $defaults;
+                }
+
+                return array_merge($defaults, array_intersect_key($config, $defaults));
+        }
+
         private static function validarTexto($valor, $rotulo, $limite, $obrigatorio = false)
         {
                 $valor = trim((string) $valor);
@@ -114,6 +137,11 @@ class Config
         private static function materialUploadDir()
         {
                 return dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, self::MATERIAL_UPLOAD_DIR);
+        }
+
+        private static function selosUploadDir()
+        {
+                return dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, self::SELOS_UPLOAD_DIR);
         }
 
         private static function parseLinhasTituloUrl($texto, $limite = null)
@@ -328,6 +356,56 @@ class Config
                 }
 
                 return '../../download.php?arquivo=' . rawurlencode(self::MATERIAL_UPLOAD_DIR . '/' . $nomeFisico);
+        }
+
+        private static function validarArquivoSelo($arquivo)
+        {
+                if (!$arquivo || !isset($arquivo['tmp_name']) || !is_uploaded_file($arquivo['tmp_name'])) {
+                        self::$erro = 'Arquivo de selo invalido.';
+                        return false;
+                }
+
+                if (($arquivo['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+                        self::$erro = 'Falha ao enviar um dos arquivos de selo.';
+                        return false;
+                }
+
+                if (($arquivo['size'] ?? 0) > 25 * 1024 * 1024) {
+                        self::$erro = 'Cada selo deve ter no maximo 25 MB.';
+                        return false;
+                }
+
+                $extensao = strtolower(pathinfo((string) ($arquivo['name'] ?? ''), PATHINFO_EXTENSION));
+                $permitidas = array('pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'zip');
+                if (!in_array($extensao, $permitidas, true)) {
+                        self::$erro = 'Tipo de arquivo de selo nao permitido.';
+                        return false;
+                }
+
+                return $extensao;
+        }
+
+        private static function salvarArquivoSelo($arquivo)
+        {
+                $extensao = self::validarArquivoSelo($arquivo);
+                if ($extensao === false) {
+                        return false;
+                }
+
+                $diretorio = self::selosUploadDir();
+                if (!is_dir($diretorio) && !mkdir($diretorio, 0775, true)) {
+                        self::$erro = 'Nao foi possivel preparar a pasta de upload dos selos.';
+                        return false;
+                }
+
+                $nomeFisico = 'selo_' . sha1(uniqid((string) mt_rand(), true) . '_' . ($arquivo['name'] ?? 'arquivo')) . '.' . $extensao;
+                $destino = $diretorio . DIRECTORY_SEPARATOR . $nomeFisico;
+                if (!move_uploaded_file($arquivo['tmp_name'], $destino)) {
+                        self::$erro = 'Nao foi possivel salvar um dos arquivos de selo.';
+                        return false;
+                }
+
+                return '../../download.php?arquivo=' . rawurlencode(self::SELOS_UPLOAD_DIR . '/' . $nomeFisico);
         }
 
         public static function salvarDashboard($campos, $arquivos = null)
@@ -575,6 +653,83 @@ class Config
                         $db->update('eventos_config', $data, 'id_config = 1');
                 } catch (Exception $e) {
                         self::$erro = 'Nao foi possivel salvar as configuracoes da pagina de help.';
+                        return false;
+                }
+
+                return true;
+        }
+
+        public static function seloPorNivel($nivelLabel)
+        {
+                $nivelNormalizado = strtolower(trim((string) $nivelLabel));
+                $mapa = array(
+                        'iniciante' => 'selo_iniciante_arquivo',
+                        'bronze' => 'selo_bronze_arquivo',
+                        'prata' => 'selo_prata_arquivo',
+                        'ouro' => 'selo_ouro_arquivo'
+                );
+
+                if (!isset($mapa[$nivelNormalizado])) {
+                        return '';
+                }
+
+                $config = self::selos();
+                return trim((string) ($config[$mapa[$nivelNormalizado]] ?? ''));
+        }
+
+        public static function salvarSelos($campos, $arquivos = null)
+        {
+                $db = Zend_Registry::get('db');
+                $configAtual = self::selos();
+                $camposArquivo = array(
+                        'selo_iniciante_arquivo' => array(
+                                'campo_atual' => 'selo_iniciante_atual',
+                                'campo_upload' => 'selo_iniciante_upload'
+                        ),
+                        'selo_bronze_arquivo' => array(
+                                'campo_atual' => 'selo_bronze_atual',
+                                'campo_upload' => 'selo_bronze_upload'
+                        ),
+                        'selo_prata_arquivo' => array(
+                                'campo_atual' => 'selo_prata_atual',
+                                'campo_upload' => 'selo_prata_upload'
+                        ),
+                        'selo_ouro_arquivo' => array(
+                                'campo_atual' => 'selo_ouro_atual',
+                                'campo_upload' => 'selo_ouro_upload'
+                        )
+                );
+
+                $data = array();
+                foreach ($camposArquivo as $coluna => $definicao) {
+                        $linkAtual = trim((string) ($campos[$definicao['campo_atual']] ?? $configAtual[$coluna] ?? ''));
+                        $linkFinal = $linkAtual;
+                        $arquivoNovo = $arquivos[$definicao['campo_upload']] ?? null;
+
+                        if ($arquivoNovo && ($arquivoNovo['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+                                $linkFinal = self::salvarArquivoSelo($arquivoNovo);
+                                if ($linkFinal === false) {
+                                        return false;
+                                }
+
+                                if ($linkAtual !== '') {
+                                        self::removerArquivoInterno($linkAtual, self::SELOS_UPLOAD_DIR);
+                                }
+                        }
+
+                        $data[$coluna] = $linkFinal !== '' ? $linkFinal : null;
+                }
+
+                try {
+                        $db->update('eventos_config', $data, 'id_config = 1');
+                } catch (Exception $e) {
+                        $mensagem = trim((string) $e->getMessage());
+                        if ($mensagem !== '' && stripos($mensagem, 'selo_') !== false) {
+                                self::$erro = 'Nao foi possivel salvar os selos porque as colunas ainda nao existem no banco. Execute a migration 2026051501_config_selos.sql.';
+                                return false;
+                        }
+
+                        self::$erro = 'Nao foi possivel salvar a configuracao dos selos.';
                         return false;
                 }
 

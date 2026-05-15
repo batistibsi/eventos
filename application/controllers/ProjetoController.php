@@ -33,6 +33,7 @@ class ProjetoController extends Zend_Controller_Action
 		$this->view->proximoStatusAuditoria = false;
 		$this->view->mostrarBotaoAvancarAuditoria = false;
 		$this->view->resultadoCertificacao = Projeto::calcularNivelCertificacao($this->view->registros);
+		$this->view->arquivoSelo = Config::seloPorNivel($this->view->resultadoCertificacao['nivel_label'] ?? '');
 		$this->view->mostrarQuadroResultadoFinal = !empty($this->view->resultadoCertificacao['possui_projeto_aprovado']);
 
 		if ($inscricao && Inscricao::podeVisualizar($inscricao, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'))) {

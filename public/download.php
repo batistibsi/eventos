@@ -9,6 +9,7 @@ ini_set('memory_limit', '1024M');
 }*/
 
 $arquivo = isset($_REQUEST["arquivo"]) ? urldecode($_REQUEST["arquivo"]) : '';
+$forcarDownload = isset($_REQUEST["download"]) && (string) $_REQUEST["download"] === '1';
 
 $arquivo = '/var/www/eventos/uploads/'.$arquivo;
 
@@ -21,7 +22,7 @@ if (file_exists($arquivo)) {
 	// Força o download
 	header('Content-Description: File Transfer');
 	header('Content-Type: ' . $tipo);
-	header('Content-Disposition: inline; filename="' . basename($arquivo) . '"');
+	header('Content-Disposition: ' . ($forcarDownload ? 'attachment' : 'inline') . '; filename="' . basename($arquivo) . '"');
 	header('Content-Length: ' . filesize($arquivo));
 	header('Pragma: public');
 	header('Cache-Control: must-revalidate');

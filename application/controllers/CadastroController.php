@@ -58,6 +58,16 @@ class CadastroController extends Zend_Controller_Action
 		$this->view->registro = Config::help();
 	}
 
+	public function selosAction()
+	{
+		if (Zend_Registry::get('permissao') != 1) exit();
+
+		$this->view->usuario = Zend_Registry::get('usuario');
+		$this->view->idUsuario = Zend_Registry::get('id_usuario');
+		$this->view->permissao = Zend_Registry::get('permissao');
+		$this->view->registro = Config::selos();
+	}
+
 	public function formaspagamentoAction()
 	{
 		if (Zend_Registry::get('permissao') != 1) exit();
@@ -113,6 +123,24 @@ class CadastroController extends Zend_Controller_Action
 		);
 
 		if (!Config::salvarHelp($campos)) {
+			echo Config::$erro;
+		}
+	}
+
+	public function salvaselosAction()
+	{
+		if (Zend_Registry::get('permissao') != 1) exit();
+
+		$this->_helper->viewRenderer->setNoRender();
+
+		$campos = array(
+			'selo_iniciante_atual' => $_REQUEST['selo_iniciante_atual'] ?? null,
+			'selo_bronze_atual' => $_REQUEST['selo_bronze_atual'] ?? null,
+			'selo_prata_atual' => $_REQUEST['selo_prata_atual'] ?? null,
+			'selo_ouro_atual' => $_REQUEST['selo_ouro_atual'] ?? null
+		);
+
+		if (!Config::salvarSelos($campos, $_FILES)) {
 			echo Config::$erro;
 		}
 	}

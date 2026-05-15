@@ -59,7 +59,11 @@
 					<div class="resultado-final-card__highlight">SELO IMPACTACIM <?= strtoupper($this->escape($this->resultadoCertificacao['nivel_label'] ?? '')) ?></div>
 				</div>
 				<div class="resultado-final-card__actions">
-					<a href="#" class="resultado-final-card__button">BAIXAR O SELO</a>
+					<? if (!empty($this->arquivoSelo)) : ?>
+						<a href="<?= $this->escape($this->arquivoSelo . (strpos($this->arquivoSelo, '?') !== false ? '&' : '?') . 'download=1') ?>" class="resultado-final-card__button js-download-selo">BAIXAR O SELO</a>
+					<? else : ?>
+						<a href="#" class="resultado-final-card__button resultado-final-card__button--disabled" onclick="return false;">BAIXAR O SELO</a>
+					<? endif; ?>
 					<a href="#" class="resultado-final-card__button">BAIXAR O CERTIFICADO</a>
 				</div>
 			</div>
@@ -224,6 +228,27 @@
 		filter: brightness(1.03);
 	}
 
+	.resultado-final-card__button--disabled,
+	.resultado-final-card__button--disabled:hover,
+	.resultado-final-card__button--disabled:focus {
+		background: #d4d4d4;
+		border-color: #f3f3f3;
+		color: #666666;
+		cursor: not-allowed;
+		filter: none;
+	}
+
+	.resultado-final-card__button.is-loading,
+	.resultado-final-card__button.is-loading:hover,
+	.resultado-final-card__button.is-loading:focus {
+		background: #d4d4d4;
+		border-color: #f3f3f3;
+		color: #666666;
+		cursor: wait;
+		filter: none;
+		pointer-events: none;
+	}
+
 	@media (max-width: 576px) {
 		.resultado-final-card {
 			padding: 20px 20px 24px;
@@ -242,6 +267,24 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		$(document).on('click', '.js-download-selo', function(e) {
+			var botao = $(this);
+			if (botao.hasClass('is-loading')) {
+				e.preventDefault();
+				return false;
+			}
+
+			botao.addClass('is-loading');
+			botao.attr('aria-disabled', 'true');
+			botao.text('BAIXANDO...');
+
+			window.setTimeout(function() {
+				botao.removeClass('is-loading');
+				botao.removeAttr('aria-disabled');
+				botao.text('BAIXAR O SELO');
+			}, 4000);
+		});
+
 		var tableProjetos = $('#table_projetos').DataTable({
 			orderCellsTop: true,
 			language: {
