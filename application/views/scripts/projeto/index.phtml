@@ -1,3 +1,17 @@
+<?php
+$nomeCertificado = '';
+if (!empty($this->inscricaoProjeto) && is_array($this->inscricaoProjeto)) {
+	$nomeCertificado = trim((string) ($this->inscricaoProjeto['nome_certificado'] ?? ''));
+	if ($nomeCertificado === '') {
+		$nomeCertificado = trim((string) ($this->inscricaoProjeto['nome_organizacao'] ?? ''));
+	}
+	if ($nomeCertificado === '') {
+		$nomeCertificado = trim((string) ($this->inscricaoProjeto['nome'] ?? ''));
+	}
+}
+$dataCertificado = Util::formatData();
+$nivelCertificado = strtoupper(trim((string) ($this->resultadoCertificacao['nivel_label'] ?? '')));
+?>
 <div class="content-page">
 	<div class="content-page__header">
 		<h1 class="content-page__title">Projetos</h1>
@@ -64,7 +78,7 @@
 					<? else : ?>
 						<a href="#" class="resultado-final-card__button resultado-final-card__button--disabled" onclick="return false;">BAIXAR O SELO</a>
 					<? endif; ?>
-					<a href="#" class="resultado-final-card__button">BAIXAR O CERTIFICADO</a>
+					<a href="#" class="resultado-final-card__button js-download-certificado">BAIXAR O CERTIFICADO</a>
 				</div>
 			</div>
 		<? else : ?>
@@ -283,6 +297,75 @@
 				botao.removeAttr('aria-disabled');
 				botao.text('BAIXAR O SELO');
 			}, 4000);
+		});
+
+		$(document).on('click', '.js-download-certificado', function(e) {
+			e.preventDefault();
+
+			var botao = $(this);
+			if (botao.hasClass('is-loading')) {
+				return false;
+			}
+
+			var nomeCertificado = <?= json_encode($nomeCertificado) ?>;
+			var dataCertificado = <?= json_encode($dataCertificado) ?>;
+			var nivelCertificado = <?= json_encode($nivelCertificado) ?>;
+
+			if (!nomeCertificado.length) {
+				swal({
+					title: "Atencao!",
+					text: "Nao foi possivel identificar o nome para emitir o certificado.",
+					type: "error"
+				});
+				return false;
+			}
+
+			botao.addClass('is-loading');
+			botao.attr('aria-disabled', 'true');
+			botao.text('GERANDO...');
+
+			var docDefinition = {
+				pageSize: 'A4',
+				pageOrientation: 'landscape',
+				pageMargins: [48, 42, 48, 42],
+				content: [
+					{ text: 'CERTIFICADO', alignment: 'center', fontSize: 28, bold: true, color: '#0f5553', margin: [0, 10, 0, 20] },
+					{ text: 'Certificamos que', alignment: 'center', fontSize: 18, color: '#444444', margin: [0, 22, 0, 12] },
+					{ text: nomeCertificado, alignment: 'center', fontSize: 26, bold: true, color: '#111111', margin: [30, 0, 30, 18] },
+					{ text: 'recebeu o selo IMPACTACIM ' + nivelCertificado + '.', alignment: 'center', fontSize: 18, color: '#444444', margin: [40, 0, 40, 10] },
+					{ text: 'Documento emitido em ' + dataCertificado + '.', alignment: 'center', fontSize: 16, color: '#444444', margin: [0, 0, 0, 34] },
+					{
+						canvas: [
+							{ type: 'line', x1: 180, y1: 0, x2: 520, y2: 0, lineWidth: 1.2, lineColor: '#0f5553' }
+						],
+						margin: [0, 34, 0, 8]
+					},
+					{ text: 'Instituto ACIM de Responsabilidade Social', alignment: 'center', fontSize: 14, color: '#0f5553', bold: true }
+				],
+				background: function() {
+					return [
+						{ canvas: [{ type: 'rect', x: 18, y: 18, w: 805, h: 559, r: 8, lineWidth: 2, lineColor: '#c7a64b' }] },
+						{ canvas: [{ type: 'rect', x: 30, y: 30, w: 781, h: 535, r: 8, lineWidth: 1, lineColor: '#0f5553' }] }
+					];
+				}
+			};
+
+			var nomeArquivo = 'certificado-' + nomeCertificado.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '.pdf';
+			pdfMake.createPdf(docDefinition).download(nomeArquivo, function() {
+				botao.removeClass('is-loading');
+				botao.removeAttr('aria-disabled');
+				botao.text('BAIXAR O CERTIFICADO');
+			});
+
+			window.setTimeout(function() {
+				if (botao.hasClass('is-loading')) {
+					botao.removeClass('is-loading');
+					botao.removeAttr('aria-disabled');
+					botao.text('BAIXAR O CERTIFICADO');
+				}
+			}, 4000);
+
+			return false;
 		});
 
 		var tableProjetos = $('#table_projetos').DataTable({
