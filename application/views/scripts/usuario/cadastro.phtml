@@ -1,6 +1,6 @@
 <div class="content-page">
 	<div class="content-page__header">
-		<h1 class="content-page__title">UsuÃ¡rio</h1>
+		<h1 class="content-page__title">Usuário</h1>
 		<div class="content-page__toolbar">
 			<button type="button" onclick="carregarTela('../../usuario')" class="btn btn-primary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Voltar</button>
 		</div>
@@ -91,10 +91,10 @@
 			var erro = "";
 
 			if (!validarEmailCampo()) {
-				erro = "Email invÃ¡lido!";
+				erro = "Email inválido!";
 			}
 			else if ($('#nome').val().trim().length < 3 || $('#nome').val().trim().length > 80) {
-				erro = "Nome invÃ¡lido!";
+				erro = "Nome inválido!";
 			}
 			else if ($('#id_perfil').val().trim() == "0") {
 				erro = "Escolha um perfil!";
@@ -114,7 +114,7 @@
 						if (data.trim().length > 0) {
 							$('.salvar').show();
 							swal({
-								title: "AtenÃ§Ã£o!",
+								title: "Atenção!",
 								text: data,
 								type: "error"
 							});
@@ -130,7 +130,7 @@
 				});
 			} else {
 				swal({
-					title: "AtenÃ§Ã£o!",
+					title: "Atenção!",
 					text: erro,
 					type: "error"
 				});
