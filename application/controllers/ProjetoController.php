@@ -2,6 +2,33 @@
 
 class ProjetoController extends Zend_Controller_Action
 {
+	private function bloquearSeAceiteTermoPendente($idInscricao = 0)
+	{
+		$permissao = (int) Zend_Registry::get('permissao');
+		if ($permissao !== 3) {
+			return;
+		}
+
+		$idUsuario = (int) Zend_Registry::get('id_usuario');
+		$resumoInscricao = Inscricao::buscaResumoVinculadoUsuario($idUsuario);
+		if (!$resumoInscricao || !is_array($resumoInscricao)) {
+			return;
+		}
+
+		$idInscricaoVinculada = (int) ($resumoInscricao['id_inscricao'] ?? 0);
+		if ($idInscricaoVinculada <= 0) {
+			return;
+		}
+
+		if ($idInscricao > 0 && $idInscricao !== $idInscricaoVinculada) {
+			die('Nao permitido!');
+		}
+
+		if (empty($resumoInscricao['aceite_termo'])) {
+			die('Voce precisa aceitar o termo da inscricao antes de acessar os projetos.');
+		}
+	}
+
 	public function indexAction()
 	{
 		$this->view->usuario = Zend_Registry::get('usuario');
@@ -20,16 +47,21 @@ class ProjetoController extends Zend_Controller_Action
 			$inscricao = Inscricao::buscaId($idInscricao);
 		}
 
+		$aceiteTermoPendente = (int) Zend_Registry::get('permissao') === 3
+			&& $idInscricao
+			&& (!isset($inscricao['aceite_termo']) || empty($inscricao['aceite_termo']));
+
 		$this->view->id_inscricao = $idInscricao;
-		$this->view->registros = Projeto::lista(Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'), $idInscricao);
+		$this->view->registros = $aceiteTermoPendente ? array() : Projeto::lista(Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'), $idInscricao);
 		$ehAdmin = Zend_Registry::get('permissao') == 1;
 		$atingiuLimiteProjetos = !$ehAdmin && Projeto::quantidadeProjetosUsuario(Zend_Registry::get('id_usuario')) >= Projeto::MAX_PROJETOS_POR_USUARIO;
-		$this->view->mostrarBotaoSubmeter = Zend_Registry::get('permissao') != 2 && Projeto::todosListadosNoStatus(0, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
-		$this->view->mostrarBotaoNovo = (!$atingiuLimiteProjetos && empty($inscricao['id_status_auditoria']));
+		$this->view->mostrarBotaoSubmeter = !$aceiteTermoPendente && Zend_Registry::get('permissao') != 2 && Projeto::todosListadosNoStatus(0, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+		$this->view->mostrarBotaoNovo = !$aceiteTermoPendente && (!$atingiuLimiteProjetos && empty($inscricao['id_status_auditoria']));
 		$this->view->permitirEditarExcluir = $ehAdmin || $this->view->mostrarBotaoNovo;
 		$this->view->atingiuLimiteProjetos = $atingiuLimiteProjetos;
 		$this->view->inscricaoProjeto = false;
 		$this->view->configHelp = Config::help();
+		$this->view->aceiteTermoPendente = $aceiteTermoPendente;
 		$this->view->proximoStatusAuditoria = false;
 		$this->view->mostrarBotaoAvancarAuditoria = false;
 		$this->view->resultadoCertificacao = Projeto::calcularNivelCertificacao($this->view->registros);
@@ -51,6 +83,7 @@ class ProjetoController extends Zend_Controller_Action
 	public function cadastroAction()
 	{
 		if (Zend_Registry::get('permissao') == 2) exit();
+		$this->bloquearSeAceiteTermoPendente();
 
 		$this->view->usuario = Zend_Registry::get('usuario');
 		$this->view->id_usuario = Zend_Registry::get('id_usuario');
@@ -102,6 +135,9 @@ class ProjetoController extends Zend_Controller_Action
 
 		$idProjeto = isset($_REQUEST['id_projeto']) ? (int) $_REQUEST['id_projeto'] : 0;
 		$this->view->registro = Projeto::buscaId($idProjeto, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
+		if ($this->view->registro && !empty($this->view->registro['id_inscricao'])) {
+			$this->bloquearSeAceiteTermoPendente((int) $this->view->registro['id_inscricao']);
+		}
 		$this->view->empresaVinculada = $this->view->registro ? Inscricao::buscaResumoVinculadoUsuario((int) $this->view->registro['id_usuario']) : false;
 		$this->view->urlRetornoProjeto = '../../projeto' . (!empty($this->view->registro['id_inscricao']) ? '?id_inscricao=' . (int) $this->view->registro['id_inscricao'] : '');
 		$this->view->modoAuditoriaProjeto = $this->view->registro ? Projeto::modoAuditoriaProjeto($this->view->registro, Zend_Registry::get('permissao')) : array();
@@ -146,6 +182,7 @@ class ProjetoController extends Zend_Controller_Action
 	{
 		$this->_helper->viewRenderer->setNoRender();
 		if (Zend_Registry::get('permissao') == 2) die('Nao permitido!');
+		$this->bloquearSeAceiteTermoPendente();
 
 		$idProjeto = isset($_REQUEST['id_projeto']) ? (int) $_REQUEST['id_projeto'] : 0;
 		$campos = [];
@@ -201,6 +238,7 @@ class ProjetoController extends Zend_Controller_Action
 	{
 		$this->_helper->viewRenderer->setNoRender();
 		if (Zend_Registry::get('permissao') == 2) die('Nao permitido!');
+		$this->bloquearSeAceiteTermoPendente();
 
 		$idProjeto = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
 		$result = Projeto::delete($idProjeto, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
@@ -212,6 +250,7 @@ class ProjetoController extends Zend_Controller_Action
 	{
 		$this->_helper->viewRenderer->setNoRender();
 		if (Zend_Registry::get('permissao') == 2) die('Nao permitido!');
+		$this->bloquearSeAceiteTermoPendente();
 
 		$idProjetoArquivo = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
 		$result = Projeto::removerArquivo($idProjetoArquivo, Zend_Registry::get('id_usuario'), Zend_Registry::get('permissao'));
@@ -223,6 +262,7 @@ class ProjetoController extends Zend_Controller_Action
 	{
 		$this->_helper->viewRenderer->setNoRender();
 		if (Zend_Registry::get('permissao') == 2) die('Nao permitido!');
+		$this->bloquearSeAceiteTermoPendente();
 
 		if (Zend_Registry::get('permissao') == 1) {
 			echo 'A submissao em lote nao se aplica ao perfil administrador.';

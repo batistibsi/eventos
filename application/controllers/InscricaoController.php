@@ -167,4 +167,27 @@ class InscricaoController extends Zend_Controller_Action
 
 		if (!$result) echo Inscricao::$erro;
 	}
+
+	public function salvaraceitetermoAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+
+		$permissao = (int) Zend_Registry::get('permissao');
+		if (!in_array($permissao, array(1, 3), true)) die('Nao permitido!');
+
+		$id_inscricao = !empty($_REQUEST['id_inscricao']) ? (int) $_REQUEST['id_inscricao'] : 0;
+		$aceite = !empty($_REQUEST['aceite_termo']);
+
+		if (!$aceite) {
+			die('Confirme o aceite do termo para continuar.');
+		}
+
+		$result = Inscricao::salvarAceiteTermo(
+			$id_inscricao,
+			(int) Zend_Registry::get('id_usuario'),
+			$permissao
+		);
+
+		if (!$result) echo Inscricao::$erro;
+	}
 }

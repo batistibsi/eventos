@@ -920,6 +920,50 @@ class Inscricao
                 return true;
         }
 
+        public static function aceiteProjetosPendentePorUsuario($id_usuario)
+        {
+                $resumo = self::buscaResumoVinculadoUsuario($id_usuario);
+                if (!$resumo || !is_array($resumo)) {
+                        return false;
+                }
+
+                return empty($resumo['aceite_termo']);
+        }
+
+        public static function salvarAceiteTermo($id_inscricao, $id_usuario = 0, $permissao = 0)
+        {
+                $db = Zend_Registry::get('db');
+                $id_inscricao = (int) $id_inscricao;
+                $id_usuario = (int) $id_usuario;
+                $permissao = (int) $permissao;
+
+                if ($id_inscricao <= 0) {
+                        self::$erro = 'Inscricao nao informada.';
+                        return false;
+                }
+
+                $inscricao = self::buscaId($id_inscricao);
+                if (!$inscricao || !is_array($inscricao)) {
+                        self::$erro = 'Inscricao nao encontrada.';
+                        return false;
+                }
+
+                if (!self::podeVisualizar($inscricao, $id_usuario, $permissao)) {
+                        self::$erro = 'Nao permitido!';
+                        return false;
+                }
+
+                try {
+                        $where = $db->quoteInto('id_inscricao = ?', $id_inscricao);
+                        $db->update('eventos_inscricao', array('aceite_termo' => true), $where);
+                } catch (Exception $e) {
+                        self::$erro = 'Nao foi possivel registrar o aceite do termo.';
+                        return false;
+                }
+
+                return true;
+        }
+
         public static function buscaEventoVinculadoUsuario($id_usuario)
         {
                 $db = Zend_Registry::get('db');
@@ -991,6 +1035,7 @@ class Inscricao
                                   a.nome,
                                   a.email,
                                   a.telefone,
+                                  a.aceite_termo,
                                   e.titulo,
                                   e.data_hora
                              from eventos_inscricao a

@@ -57,7 +57,7 @@ $nivelCertificado = strtoupper(trim((string) ($this->resultadoCertificacao['nive
 		<div class="alert alert-info mb-3">Cada empresa pode cadastrar até <?= (int) Projeto::MAX_PROJETOS_POR_USUARIO ?> projetos.</div>
 		<div class="alert alert-warning mb-3">Lembre-se de preencher todos os campos corretamente e com atenção, pois ele será de envio ÚNICO e NÃO poderá ser editado. REVISE antes de enviar 😉</div>
 	<? endif; ?>
-	<? if ((int) $this->permissao === 3 && !empty(trim((string) ($this->inscricaoProjeto['status_auditoria_descricao'] ?? '')))) : ?>
+	<? if (empty($this->aceiteTermoPendente) && (int) $this->permissao === 3 && !empty(trim((string) ($this->inscricaoProjeto['status_auditoria_descricao'] ?? '')))) : ?>
 		<div class="alert alert-primary mb-3" style="font-size: 1.05rem; font-weight: 600; border-left: 6px solid #0d6efd;">
 			<?= nl2br($this->escape(trim((string) $this->inscricaoProjeto['status_auditoria_descricao']))) ?>
 		</div>
@@ -91,6 +91,27 @@ $nivelCertificado = strtoupper(trim((string) ($this->resultadoCertificacao['nive
 		<div class="alert alert-warning mb-3">Limite de <?= (int) Projeto::MAX_PROJETOS_POR_USUARIO ?> projetos por usuário atingido.</div>
 	<? endif; ?>
 
+	<? if (!empty($this->aceiteTermoPendente) && !empty($this->id_inscricao)) : ?>
+		<div class="section-card termo-aceite-card">
+			<div class="section-header">
+				<div>
+					<h2 class="section-title">Aceite obrigat&oacute;rio</h2>
+					<p class="section-subtitle">Para acessar os projetos desta inscri&ccedil;&atilde;o, leia o termo abaixo e confirme o aceite.</p>
+				</div>
+			</div>
+			<div class="termo-aceite-card__texto"><?= nl2br($this->escape(trim((string) ($this->configHelp['help_termo_aceite_projetos'] ?? '')))) ?></div>
+			<form id="form-aceite-termo-projetos" class="mt-3">
+				<input type="hidden" name="id_inscricao" value="<?= (int) $this->id_inscricao ?>">
+				<div class="form-check mb-3">
+					<label class="form-check-label" for="aceite_termo">
+						<input class="form-check-input" type="checkbox" name="aceite_termo" id="aceite_termo" value="1">
+						Declaro que li e aceito o termo para prosseguir.
+					</label>
+				</div>
+				<button type="submit" class="btn btn-primary" id="btn-aceitar-termo-projetos">Aceitar e continuar</button>
+			</form>
+		</div>
+	<? else : ?>
 	<div class="table-responsive projeto-table-wrapper">
 		<table class="table table-hover projeto-table" id="table_projetos">
 			<thead>
@@ -174,9 +195,27 @@ $nivelCertificado = strtoupper(trim((string) ($this->resultadoCertificacao['nive
 			</tbody>
 		</table>
 	</div>
+	<? endif; ?>
 </div>
 
 <style>
+	.termo-aceite-card {
+		max-width: 900px;
+		margin: 0 auto;
+	}
+
+	.termo-aceite-card__texto {
+		max-height: 380px;
+		overflow-y: auto;
+		padding: 18px 20px;
+		border: 1px solid #d9e2ec;
+		border-radius: 14px;
+		background: #f8fafc;
+		color: #243b53;
+		line-height: 1.7;
+		white-space: pre-line;
+	}
+
 	.resultado-final-card {
 		max-width: 400px;
 		margin: 0 auto 24px;
@@ -281,6 +320,58 @@ $nivelCertificado = strtoupper(trim((string) ($this->resultadoCertificacao['nive
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		$('#form-aceite-termo-projetos').on('submit', function(e) {
+			e.preventDefault();
+
+			if (!$('#aceite_termo').is(':checked')) {
+				swal({
+					title: "Atenção!",
+					text: "Confirme o aceite do termo para continuar.",
+					type: "warning"
+				});
+				return false;
+			}
+
+			$('#btn-aceitar-termo-projetos').prop('disabled', true);
+
+			$.ajax({
+				type: "POST",
+				url: "../../inscricao/salvaraceitetermo",
+				data: $(this).serialize(),
+				success: function(data) {
+					if (data.trim().length > 0) {
+						$('#btn-aceitar-termo-projetos').prop('disabled', false);
+						swal({
+							title: "Atenção!",
+							text: data,
+							type: "error"
+						});
+						return;
+					}
+
+					swal({
+						title: "Sucesso!",
+						text: "Termo aceito com sucesso.",
+						type: "success",
+						timer: 1,
+						showConfirmButton: false
+					}, function() {
+						swal.close();
+						carregarTela('../../projeto?id_inscricao=<?= (int) $this->id_inscricao ?>');
+					});
+				},
+				error: function() {
+					$('#btn-aceitar-termo-projetos').prop('disabled', false);
+					swal({
+						title: "Atenção!",
+						text: "Não foi possível registrar o aceite do termo.",
+						type: "error"
+					});
+				}
+			});
+		});
+
+		<? if (empty($this->aceiteTermoPendente)) : ?>
 		$(document).on('click', '.js-download-selo', function(e) {
 			var botao = $(this);
 			if (botao.hasClass('is-loading')) {
@@ -518,5 +609,6 @@ $nivelCertificado = strtoupper(trim((string) ($this->resultadoCertificacao['nive
 				});
 			});
 		});
+		<? endif; ?>
 	});
 </script>

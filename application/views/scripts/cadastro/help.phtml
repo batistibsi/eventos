@@ -11,31 +11,37 @@
 		<div class="section-card">
 			<div class="section-header">
 				<div>
-					<h2 class="section-title">Página de Help</h2>
-					<p class="section-subtitle">Personalize os textos e o contato apresentados ao usuário na área de ajuda.</p>
+					<h2 class="section-title">P&aacute;gina de Help</h2>
+					<p class="section-subtitle">Personalize os textos e o contato apresentados ao usu&aacute;rio na &aacute;rea de ajuda.</p>
 				</div>
 			</div>
 			<div class="row">
 				<div class="form-group col-md-12">
-					<span><label for="help_titulo">Título: </label></span>
+					<span><label for="help_titulo">T&iacute;tulo: </label></span>
 					<input class="form-control" name="help_titulo" id="help_titulo" type="text" maxlength="150" value="<?= $this->escape($registro['help_titulo'] ?? '') ?>" required>
 				</div>
 			</div>
 			<div class="row">
 				<div class="form-group col-md-12">
-					<span><label for="help_subtitulo">Subtítulo: </label></span>
+					<span><label for="help_subtitulo">Subt&iacute;tulo: </label></span>
 					<input class="form-control" name="help_subtitulo" id="help_subtitulo" type="text" maxlength="255" value="<?= $this->escape($registro['help_subtitulo'] ?? '') ?>">
 				</div>
 			</div>
 			<div class="row">
 				<div class="form-group col-md-12">
-					<span><label for="help_conteudo">Conteúdo: </label></span>
+					<span><label for="help_conteudo">Conte&uacute;do: </label></span>
 					<textarea class="form-control" name="help_conteudo" id="help_conteudo" rows="10" required><?= $this->escape($registro['help_conteudo'] ?? '') ?></textarea>
 				</div>
 			</div>
 			<div class="row">
 				<div class="form-group col-md-12">
-					<span><label for="help_termo_submissao">Termo exibido na submissão dos projetos: </label></span>
+					<span><label for="help_termo_aceite_projetos">Termo exibido antes do acesso aos projetos: </label></span>
+					<textarea class="form-control" name="help_termo_aceite_projetos" id="help_termo_aceite_projetos" rows="10" required><?= $this->escape($registro['help_termo_aceite_projetos'] ?? '') ?></textarea>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label for="help_termo_submissao">Termo exibido na submiss&atilde;o dos projetos: </label></span>
 					<textarea class="form-control" name="help_termo_submissao" id="help_termo_submissao" rows="12" required><?= $this->escape($registro['help_termo_submissao'] ?? '') ?></textarea>
 				</div>
 			</div>
@@ -78,14 +84,14 @@
 					if (data.trim().length > 0) {
 						$('.salvar').show();
 						swal({
-							title: "Atenção!",
+							title: "Aten&ccedil;&atilde;o!",
 							text: data,
 							type: "error"
 						});
 					} else {
 						swal({
 							title: "Sucesso!",
-							text: "Configurações da página de help salvas com sucesso.",
+							text: "Configura&ccedil;&otilde;es da p&aacute;gina de help salvas com sucesso.",
 							type: "success"
 						}, function() {
 							carregarTela('../../cadastro/help');
@@ -95,8 +101,8 @@
 				error: function() {
 					$('.salvar').show();
 					swal({
-						title: "Atenção!",
-						text: "Não foi possível salvar as configurações da página de help.",
+						title: "Aten&ccedil;&atilde;o!",
+						text: "N&atilde;o foi poss&iacute;vel salvar as configura&ccedil;&otilde;es da p&aacute;gina de help.",
 						type: "error"
 					});
 				}

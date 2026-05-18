@@ -34,6 +34,7 @@ class Config
                         'help_titulo' => 'Cadastro de Projetos',
                         'help_subtitulo' => 'Orientacoes para preencher corretamente o formulario e evitar problemas no envio.',
                         'help_conteudo' => "O cadastro do projeto deve ser preenchido com atencao, contemplando todas as informacoes solicitadas ao longo do formulario.\n\nPreencha os dados principais do projeto, como nome, datas, justificativa, objetivos e ODS, sempre de acordo com a atuacao e os resultados efetivamente realizados.\n\nInclua as evidencias qualitativas e quantitativas em seus respectivos blocos, respeitando o limite de ate 5 arquivos por area.\n\nRevise os campos antes de submeter, pois apos o envio para analise o projeto nao podera mais ser editado.\n\nQuando houver campos sobre itens, pessoas, parceiros ou outros dados quantitativos, informe valores reais e coerentes com as evidencias anexadas.",
+                        'help_termo_aceite_projetos' => "TERMO DE ACEITE PARA ACESSO AOS PROJETOS\n\nDeclaro que li e estou de acordo com as condicoes apresentadas para participar da etapa de cadastro e acompanhamento dos projetos vinculados a esta inscricao.\n\nComprometo-me a fornecer informacoes veridicas, manter os dados atualizados e respeitar os criterios, prazos e orientacoes definidos pela organizacao do evento.\n\nAo marcar o aceite, reconheco minha responsabilidade sobre as informacoes e materiais que forem enviados nesta area.",
                         'help_termo_submissao' => "TERMO DE COMPROMISSO IMPACTACIM 2026\n\nAo realizar a inscricao na Certificacao IMPACTACIM: Jornada de Sustentabilidade 2026, a empresa participante declara que leu e esta de acordo com o Regulamento da Edicao 2026, comprometendo-se a cumprir integralmente todas as suas disposicoes.\nA organizacao inscrita assume o compromisso de colaborar ativamente com o Instituto ACIM de Responsabilidade Social na realizacao dos objetivos da certificacao, bem como de respeitar os prazos estabelecidos ao longo do processo.\nA empresa tambem se responsabiliza pela veracidade de todas as informacoes fornecidas durante a inscricao e participacao, isentando o Instituto ACIM de quaisquer reivindicacoes de terceiros relacionadas a esses dados.\nNo que diz respeito a protecao de dados, a participante compromete-se a atuar em conformidade com a Lei n 13.709/18 (Lei Geral de Protecao de Dados Pessoais - LGPD), assegurando o tratamento adequado das informacoes envolvidas no processo.\nAo se inscrever, a empresa autoriza o uso de seu nome, imagem, logotipo e materiais visuais, incluindo fotos e videos, pelo Instituto ACIM de Responsabilidade Social, exclusivamente para fins de divulgacao e promocao da certificacao, sem qualquer tipo de compensacao financeira.\nA participante tambem concorda em nao reproduzir, compartilhar ou disponibilizar a terceiros os materiais, metodologias e conteudos utilizados ao longo da Certificacao IMPACTACIM.\nO nao cumprimento das condicoes aqui estabelecidas podera resultar na exclusao da empresa do processo de certificacao.\n\nAo clicar em 'Sim, submeter', a empresa declara ciencia e aceite integral deste termo.",
                         'help_contato_nome' => 'Henrique Nascimento',
                         'help_contato_whatsapp' => '44997399515'
@@ -629,6 +630,12 @@ class Config
                         return false;
                 }
 
+                $termoAceiteProjetos = trim((string) ($campos['help_termo_aceite_projetos'] ?? ''));
+                if ($termoAceiteProjetos === '') {
+                        self::$erro = 'Informe o termo exibido antes do acesso aos projetos.';
+                        return false;
+                }
+
                 $contatoNome = self::validarTexto($campos['help_contato_nome'] ?? '', 'o nome do contato da pagina de help', 150, true);
                 if ($contatoNome === false) {
                         return false;
@@ -644,6 +651,7 @@ class Config
                         'help_titulo' => $titulo,
                         'help_subtitulo' => $subtitulo !== '' ? $subtitulo : null,
                         'help_conteudo' => $conteudo,
+                        'help_termo_aceite_projetos' => $termoAceiteProjetos,
                         'help_termo_submissao' => $termoSubmissao,
                         'help_contato_nome' => $contatoNome,
                         'help_contato_whatsapp' => $contatoWhatsapp
