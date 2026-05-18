@@ -760,6 +760,74 @@ class Inscricao
                 return true;
         }
 
+        public static function salvarEvento($id_inscricao, $id_evento)
+        {
+                $db = Zend_Registry::get('db');
+
+                $id_inscricao = (int) $id_inscricao;
+                $id_evento = (int) $id_evento;
+
+                if ($id_inscricao <= 0) {
+                        self::$erro = 'Inscricao nao informada.';
+                        return false;
+                }
+
+                if ($id_evento <= 0) {
+                        self::$erro = 'Evento nao informado.';
+                        return false;
+                }
+
+                $inscricao = self::buscaId($id_inscricao);
+                if (!$inscricao || !is_array($inscricao)) {
+                        self::$erro = 'Inscricao nao encontrada.';
+                        return false;
+                }
+
+                $evento = Evento::buscaId($id_evento);
+                if (!$evento || !is_array($evento)) {
+                        self::$erro = 'Evento invalido.';
+                        return false;
+                }
+
+                $idEventoAtual = (int) ($inscricao['id_evento'] ?? 0);
+                if ($idEventoAtual === $id_evento) {
+                        return true;
+                }
+
+                if (!Evento::confereVagas($id_evento, $evento['limite_vagas'])) {
+                        self::$erro = 'Limite de vagas ja atingida para o evento!';
+                        return false;
+                }
+
+                try {
+                        $db->beginTransaction();
+
+                        $where = $db->quoteInto('id_inscricao = ?', $id_inscricao);
+                        $db->update('eventos_inscricao', ['id_evento' => $id_evento], $where);
+
+                        $idUsuario = !empty($inscricao['id_usuario']) ? (int) $inscricao['id_usuario'] : 0;
+                        if ($idUsuario > 0 && !Projeto::sincronizarEventoPorUsuario($idUsuario, $id_evento)) {
+                                if ($db->getConnection()->inTransaction()) {
+                                        $db->rollBack();
+                                }
+
+                                self::$erro = Projeto::$erro ?: 'Nao foi possivel sincronizar o evento dos projetos vinculados.';
+                                return false;
+                        }
+
+                        $db->commit();
+                } catch (Exception $e) {
+                        if ($db->getConnection()->inTransaction()) {
+                                $db->rollBack();
+                        }
+
+                        self::$erro = 'Nao foi possivel salvar o evento da inscricao.';
+                        return false;
+                }
+
+                return true;
+        }
+
         public static function salvarConfirmacaoEncontrosFormacao($id_inscricao, $campos)
         {
                 $db = Zend_Registry::get('db');

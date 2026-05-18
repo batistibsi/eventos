@@ -794,6 +794,31 @@ class Projeto
 		return $registros;
 	}
 
+	public static function sincronizarEventoPorUsuario($idUsuario, $idEvento)
+	{
+		$db = Zend_Registry::get('db');
+		$idUsuario = (int) $idUsuario;
+		$idEvento = (int) $idEvento;
+
+		if ($idUsuario <= 0 || $idEvento <= 0) {
+			self::$erro = 'Usuario ou evento invalido para sincronizacao.';
+			return false;
+		}
+
+		try {
+			$where = array(
+				$db->quoteInto('id_usuario = ?', $idUsuario),
+				'ativo = true'
+			);
+			$db->update('eventos_projeto', array('id_evento' => $idEvento), $where);
+		} catch (Exception $e) {
+			self::$erro = 'Nao foi possivel sincronizar o evento dos projetos vinculados.';
+			return false;
+		}
+
+		return true;
+	}
+
 	public static function todosListadosNoStatus($statusEsperado, $idUsuarioLogado = null, $permissao = null)
 	{
 		$registros = self::lista($idUsuarioLogado, $permissao);
