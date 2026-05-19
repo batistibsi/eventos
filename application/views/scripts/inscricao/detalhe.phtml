@@ -971,5 +971,11 @@
                 }
             });
         });
+
+        if (window.formularioProtegido) {
+            window.setTimeout(function() {
+                window.formularioProtegido.limparEstado();
+            }, 0);
+        }
     });
 </script>

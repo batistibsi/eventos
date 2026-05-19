@@ -890,7 +890,6 @@ function formatarDataHoraEvento($valor)
 
     <script>
       $(function() {
-        let houveAlteracaoFormulario = false;
         let envioFormularioEmAndamento = false;
         const camposFormulario = $('#camposFormulario');
         const mensagemNaoConcorda = $('#mensagemNaoConcorda');
@@ -899,14 +898,58 @@ function formatarDataHoraEvento($valor)
         const camposTelefone = $('input[type="tel"]');
         const camposEmail = $('input[type="email"]');
         const formInscricao = $('#formInscricao');
+        let estadoInicialFormulario = '';
+
+        function normalizarValorCampo(elemento) {
+          const $elemento = $(elemento);
+          const tag = (elemento.tagName || '').toLowerCase();
+          const tipo = (elemento.type || '').toLowerCase();
+
+          if (tipo === 'checkbox' || tipo === 'radio') {
+            return elemento.checked ? '1' : '0';
+          }
+
+          if (tag === 'select' && elemento.multiple) {
+            return JSON.stringify($elemento.val() || []);
+          }
+
+          return $elemento.val() || '';
+        }
+
+        function capturarEstadoFormulario() {
+          const estado = {};
+
+          formInscricao.find(':input[name]').each(function() {
+            if (this.disabled || this.readOnly) {
+              return;
+            }
+
+            const tipo = (this.type || '').toLowerCase();
+            if (['button', 'submit', 'reset', 'image', 'file'].indexOf(tipo) !== -1) {
+              return;
+            }
+
+            if (!estado[this.name]) {
+              estado[this.name] = [];
+            }
+
+            estado[this.name].push(normalizarValorCampo(this));
+          });
+
+          Object.keys(estado).forEach(function(chave) {
+            estado[chave].sort();
+          });
+
+          return JSON.stringify(estado);
+        }
 
         function formularioTemPendencias() {
-          return houveAlteracaoFormulario && !envioFormularioEmAndamento;
+          return !envioFormularioEmAndamento && capturarEstadoFormulario() !== estadoInicialFormulario;
         }
 
         function limparEstadoFormulario() {
-          houveAlteracaoFormulario = false;
           envioFormularioEmAndamento = false;
+          estadoInicialFormulario = capturarEstadoFormulario();
         }
 
         function extrairDigitos(valor) {
@@ -1011,19 +1054,6 @@ function formatarDataHoraEvento($valor)
         $('input[name="lgpd_consentimento"]').on('change', atualizarConsentimento);
         atualizarConsentimento();
 
-        formInscricao.on('input change', ':input', function() {
-          if (this.disabled || this.readOnly) {
-            return;
-          }
-
-          const tipo = (this.type || '').toLowerCase();
-          if (['button', 'submit', 'reset', 'image', 'file'].indexOf(tipo) !== -1) {
-            return;
-          }
-
-          houveAlteracaoFormulario = true;
-        });
-
         camposTelefone.on('input', function() {
           this.value = aplicarMascaraTelefone(this.value);
           validarTelefoneCampo(this);
@@ -1071,7 +1101,6 @@ function formatarDataHoraEvento($valor)
           const dados = new FormData(form);
 
           envioFormularioEmAndamento = true;
-          houveAlteracaoFormulario = false;
           btnEnviar.prop('disabled', true).text('Enviando...');
 
           $.ajax({
@@ -1121,6 +1150,8 @@ function formatarDataHoraEvento($valor)
           e.preventDefault();
           e.returnValue = '';
         });
+
+        limparEstadoFormulario();
       });
     </script>
 

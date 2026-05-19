@@ -57,8 +57,75 @@
 	Dropzone.autoDiscover = false;
 
 	(function(window, document, $) {
-		let houveAlteracaoFormulario = false;
 		let envioFormularioEmAndamento = false;
+		let formulariosMonitorados = [];
+
+		function normalizarValorCampo(elemento) {
+			const $elemento = $(elemento);
+			const tag = (elemento.tagName || '').toLowerCase();
+			const tipo = (elemento.type || '').toLowerCase();
+
+			if (tipo === 'checkbox' || tipo === 'radio') {
+				return elemento.checked ? '1' : '0';
+			}
+
+			if (tag === 'select' && elemento.multiple) {
+				return JSON.stringify($elemento.val() || []);
+			}
+
+			return $elemento.val() || '';
+		}
+
+		function coletarEstadoFormulario(form) {
+			const estado = {};
+
+			$(form).find(':input[name]').each(function() {
+				if (!isCampoRastreavel(this)) {
+					return;
+				}
+
+				const nome = this.name;
+				if (!estado[nome]) {
+					estado[nome] = [];
+				}
+
+				estado[nome].push(normalizarValorCampo(this));
+			});
+
+			Object.keys(estado).forEach(function(chave) {
+				estado[chave].sort();
+			});
+
+			return JSON.stringify(estado);
+		}
+
+		function registrarFormularios(contexto) {
+			const raiz = contexto ? $(contexto) : $(document);
+
+			raiz.find('form').each(function() {
+				const form = this;
+				const estadoAtual = coletarEstadoFormulario(form);
+				const existente = formulariosMonitorados.find(function(item) {
+					return item.form === form;
+				});
+
+				if (existente) {
+					existente.estadoInicial = estadoAtual;
+					return;
+				}
+
+				formulariosMonitorados.push({
+					form: form,
+					estadoInicial: estadoAtual
+				});
+			});
+		}
+
+		function limparFormulariosRemovidos() {
+			formulariosMonitorados = formulariosMonitorados.filter(function(item) {
+				return document.body.contains(item.form);
+			});
+		}
 
 		function isCampoRastreavel(elemento) {
 			if (!elemento || !elemento.form || elemento.disabled || elemento.readOnly) {
@@ -70,12 +137,20 @@
 		}
 
 		function limparEstadoFormulario() {
-			houveAlteracaoFormulario = false;
 			envioFormularioEmAndamento = false;
+			registrarFormularios(document);
 		}
 
 		function formularioTemPendencias() {
-			return houveAlteracaoFormulario && !envioFormularioEmAndamento;
+			if (envioFormularioEmAndamento) {
+				return false;
+			}
+
+			limparFormulariosRemovidos();
+
+			return formulariosMonitorados.some(function(item) {
+				return coletarEstadoFormulario(item.form) !== item.estadoInicial;
+			});
 		}
 
 		function confirmarSaidaFormulario() {
@@ -85,12 +160,10 @@
 		window.formularioProtegido = {
 			temPendencias: formularioTemPendencias,
 			marcarAlterado: function() {
-				houveAlteracaoFormulario = true;
 				envioFormularioEmAndamento = false;
 			},
 			marcarEnviando: function() {
 				envioFormularioEmAndamento = true;
-				houveAlteracaoFormulario = false;
 			},
 			marcarOcioso: function() {
 				envioFormularioEmAndamento = false;
@@ -103,9 +176,7 @@
 		};
 
 		$(document).on('input change', 'form :input', function() {
-			if (isCampoRastreavel(this)) {
-				houveAlteracaoFormulario = true;
-			}
+			limparFormulariosRemovidos();
 		});
 
 		$(document).on('reset', 'form', function() {
@@ -119,6 +190,10 @@
 
 			event.preventDefault();
 			event.returnValue = '';
+		});
+
+		$(function() {
+			registrarFormularios(document);
 		});
 	})(window, document, jQuery);
 
@@ -183,10 +258,13 @@
 
  					localStorage.setItem('last_src', src);
  					localStorage.setItem('last_content', content);
- 				}
- 				conteiner.html(data);
- 				if (isMobile)
- 					$(".sidebar").addClass('active');
+				}
+				conteiner.html(data);
+				if (window.formularioProtegido) {
+					window.formularioProtegido.limparEstado();
+				}
+				if (isMobile)
+					$(".sidebar").addClass('active');
 
  				$('#content').css({
  					'overflow-x': 'auto',
