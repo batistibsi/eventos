@@ -472,7 +472,16 @@
 				type: 'error'
 			});
 		});
+		dropzoneItens.on('addedfile', function(file) {
+			if (!file.existing && window.formularioProtegido) {
+				window.formularioProtegido.marcarAlterado();
+			}
+		});
 		dropzoneItens.on('removedfile', function(file) {
+			if (window.formularioProtegido) {
+				window.formularioProtegido.marcarAlterado();
+			}
+
 			if (!file || !file.existing || !file.serverId) {
 				return;
 			}
@@ -575,7 +584,16 @@
 				type: 'error'
 			});
 		});
+		dropzonePessoas.on('addedfile', function(file) {
+			if (!file.existing && window.formularioProtegido) {
+				window.formularioProtegido.marcarAlterado();
+			}
+		});
 		dropzonePessoas.on('removedfile', function(file) {
+			if (window.formularioProtegido) {
+				window.formularioProtegido.marcarAlterado();
+			}
+
 			if (!file || !file.existing || !file.serverId) {
 				return;
 			}
@@ -678,7 +696,16 @@
 				type: 'error'
 			});
 		});
+		dropzoneParceiros.on('addedfile', function(file) {
+			if (!file.existing && window.formularioProtegido) {
+				window.formularioProtegido.marcarAlterado();
+			}
+		});
 		dropzoneParceiros.on('removedfile', function(file) {
+			if (window.formularioProtegido) {
+				window.formularioProtegido.marcarAlterado();
+			}
+
 			if (!file || !file.existing || !file.serverId) {
 				return;
 			}
@@ -779,7 +806,17 @@
 					});
 				});
 
+				dz.on('addedfile', function(file) {
+					if (!file.existing && window.formularioProtegido) {
+						window.formularioProtegido.marcarAlterado();
+					}
+				});
+
 				dz.on('removedfile', function(file) {
+					if (window.formularioProtegido) {
+						window.formularioProtegido.marcarAlterado();
+					}
+
 					if (!file || !file.existing || !file.serverId) {
 						return;
 					}
@@ -869,6 +906,9 @@
 			}
 
 			$('.salvar').hide();
+			if (window.formularioProtegido) {
+				window.formularioProtegido.marcarEnviando();
+			}
 			var formData = new FormData(this);
 			dropzone.getAcceptedFiles().forEach(function(file) {
 				if (!file.existing) {
@@ -898,6 +938,10 @@
 				contentType: false,
 				success: function(data) {
 					if (data.trim().length > 0) {
+						if (window.formularioProtegido) {
+							window.formularioProtegido.marcarOcioso();
+							window.formularioProtegido.marcarAlterado();
+						}
 						$('.salvar').show();
 						swal({
 							title: "Atenção!",
@@ -905,6 +949,9 @@
 							type: "error"
 						});
 					} else {
+						if (window.formularioProtegido) {
+							window.formularioProtegido.limparEstado();
+						}
 						swal({
 							title: "Sucesso!",
 							text: <?= json_encode($mensagemSucessoProjeto, JSON_UNESCAPED_UNICODE) ?>,
@@ -915,6 +962,10 @@
 					}
 				},
 				error: function() {
+					if (window.formularioProtegido) {
+						window.formularioProtegido.marcarOcioso();
+						window.formularioProtegido.marcarAlterado();
+					}
 					$('.salvar').show();
 					swal({
 						title: "Atenção!",

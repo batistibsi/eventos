@@ -53,10 +53,76 @@
 
  </html>
  <script>
- 	// Desativa autodescoberta para evitar que o Dropzone inicialize 2x
- 	Dropzone.autoDiscover = false;
+	// Desativa autodescoberta para evitar que o Dropzone inicialize 2x
+	Dropzone.autoDiscover = false;
 
- 	var paginaDefault = 'dashboard';
+	(function(window, document, $) {
+		let houveAlteracaoFormulario = false;
+		let envioFormularioEmAndamento = false;
+
+		function isCampoRastreavel(elemento) {
+			if (!elemento || !elemento.form || elemento.disabled || elemento.readOnly) {
+				return false;
+			}
+
+			const tipo = (elemento.type || '').toLowerCase();
+			return ['button', 'submit', 'reset', 'image', 'file'].indexOf(tipo) === -1;
+		}
+
+		function limparEstadoFormulario() {
+			houveAlteracaoFormulario = false;
+			envioFormularioEmAndamento = false;
+		}
+
+		function formularioTemPendencias() {
+			return houveAlteracaoFormulario && !envioFormularioEmAndamento;
+		}
+
+		function confirmarSaidaFormulario() {
+			return !formularioTemPendencias() || window.confirm('Existem dados de formulario nao salvos. Deseja sair desta tela?');
+		}
+
+		window.formularioProtegido = {
+			temPendencias: formularioTemPendencias,
+			marcarAlterado: function() {
+				houveAlteracaoFormulario = true;
+				envioFormularioEmAndamento = false;
+			},
+			marcarEnviando: function() {
+				envioFormularioEmAndamento = true;
+				houveAlteracaoFormulario = false;
+			},
+			marcarOcioso: function() {
+				envioFormularioEmAndamento = false;
+			},
+			podeRecarregar: function() {
+				return !formularioTemPendencias();
+			},
+			confirmarSaida: confirmarSaidaFormulario,
+			limparEstado: limparEstadoFormulario
+		};
+
+		$(document).on('input change', 'form :input', function() {
+			if (isCampoRastreavel(this)) {
+				houveAlteracaoFormulario = true;
+			}
+		});
+
+		$(document).on('reset', 'form', function() {
+			window.setTimeout(limparEstadoFormulario, 0);
+		});
+
+		window.addEventListener('beforeunload', function(event) {
+			if (!formularioTemPendencias()) {
+				return;
+			}
+
+			event.preventDefault();
+			event.returnValue = '';
+		});
+	})(window, document, jQuery);
+
+	var paginaDefault = 'dashboard';
 
  	const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -90,8 +156,12 @@
  		}
  	}
 
- 	function carregarTela(src, content = '#content', back = false) {
- 		let conteiner = $(content);
+	function carregarTela(src, content = '#content', back = false) {
+		if (!back && window.formularioProtegido && !window.formularioProtegido.confirmarSaida()) {
+			return;
+		}
+
+		let conteiner = $(content);
  		$('html, body').animate({
  			scrollTop: 0
  		}, 600);
@@ -148,8 +218,13 @@
  		carregarTela(fallbackSrc || ('../../' + paginaDefault), content, true);
  	}
 
- 	window.addEventListener('popstate', function(event) {
- 		if (event.state && event.state.src) {
+	window.addEventListener('popstate', function(event) {
+		if (window.formularioProtegido && !window.formularioProtegido.confirmarSaida()) {
+			history.forward();
+			return;
+		}
+
+		if (event.state && event.state.src) {
  			// Volta para a tela AJAX correspondente
  			carregarTela(event.state.src, event.state.content, true); // false = não empilhar de novo
  		} else {

@@ -890,12 +890,24 @@ function formatarDataHoraEvento($valor)
 
     <script>
       $(function() {
+        let houveAlteracaoFormulario = false;
+        let envioFormularioEmAndamento = false;
         const camposFormulario = $('#camposFormulario');
         const mensagemNaoConcorda = $('#mensagemNaoConcorda');
         const btnEnviar = $('#btnEnviar');
         const camposObrigatorios = camposFormulario.find(':input').not('[type="button"], [type="submit"], [type="reset"], [disabled]');
         const camposTelefone = $('input[type="tel"]');
         const camposEmail = $('input[type="email"]');
+        const formInscricao = $('#formInscricao');
+
+        function formularioTemPendencias() {
+          return houveAlteracaoFormulario && !envioFormularioEmAndamento;
+        }
+
+        function limparEstadoFormulario() {
+          houveAlteracaoFormulario = false;
+          envioFormularioEmAndamento = false;
+        }
 
         function extrairDigitos(valor) {
           return (valor || '').replace(/\D/g, '');
@@ -999,6 +1011,19 @@ function formatarDataHoraEvento($valor)
         $('input[name="lgpd_consentimento"]').on('change', atualizarConsentimento);
         atualizarConsentimento();
 
+        formInscricao.on('input change', ':input', function() {
+          if (this.disabled || this.readOnly) {
+            return;
+          }
+
+          const tipo = (this.type || '').toLowerCase();
+          if (['button', 'submit', 'reset', 'image', 'file'].indexOf(tipo) !== -1) {
+            return;
+          }
+
+          houveAlteracaoFormulario = true;
+        });
+
         camposTelefone.on('input', function() {
           this.value = aplicarMascaraTelefone(this.value);
           validarTelefoneCampo(this);
@@ -1045,6 +1070,8 @@ function formatarDataHoraEvento($valor)
 
           const dados = new FormData(form);
 
+          envioFormularioEmAndamento = true;
+          houveAlteracaoFormulario = false;
           btnEnviar.prop('disabled', true).text('Enviando...');
 
           $.ajax({
@@ -1068,6 +1095,7 @@ function formatarDataHoraEvento($valor)
               }
 
               if (data && data.success) {
+                limparEstadoFormulario();
                 showAlert('success', data.mensagem || 'Inscrição enviada com sucesso.');
                 $('#formInscricao').slideUp(200);
               } else {
@@ -1079,9 +1107,19 @@ function formatarDataHoraEvento($valor)
               showAlert('danger', 'Não foi possível enviar. Tente novamente.');
             },
             complete: function() {
+              envioFormularioEmAndamento = false;
               btnEnviar.prop('disabled', false).text('Enviar inscrição');
             }
           });
+        });
+
+        window.addEventListener('beforeunload', function(e) {
+          if (!formularioTemPendencias()) {
+            return;
+          }
+
+          e.preventDefault();
+          e.returnValue = '';
         });
       });
     </script>
