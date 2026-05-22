@@ -11,6 +11,14 @@ if (!empty($this->inscricaoProjeto) && is_array($this->inscricaoProjeto)) {
 }
 $dataCertificado = Util::formatData();
 $nivelCertificado = strtoupper(trim((string) ($this->resultadoCertificacao['nivel_label'] ?? '')));
+$anoCertificado = date('Y');
+$urlSeloCertificado = !empty($this->arquivoSelo) ? (string) $this->arquivoSelo : '../../padrao/Selo%20Side%20Mono.png';
+$urlLogoInstituto = '../../padrao/logo_rodape.png';
+$urlLogoAcim = '../../padrao/logo_horizontal.png';
+$urlsOdsCertificado = array();
+for ($indiceOds = 1; $indiceOds <= 17; $indiceOds++) {
+	$urlsOdsCertificado[] = '../../objetivos/' . $indiceOds . '.png';
+}
 ?>
 <div class="content-page">
 	<div class="content-page__header">
@@ -78,7 +86,7 @@ $nivelCertificado = strtoupper(trim((string) ($this->resultadoCertificacao['nive
 					<? else : ?>
 						<a href="#" class="resultado-final-card__button resultado-final-card__button--disabled" onclick="return false;">BAIXAR O SELO</a>
 					<? endif; ?>
-					<a href="#" class="resultado-final-card__button js-download-certificado">BAIXAR O CERTIFICADO</a>
+					<a href="#" class="resultado-final-card__button js-download-certificado">VISUALIZAR CERTIFICADO</a>
 				</div>
 			</div>
 		<? else : ?>
@@ -401,6 +409,11 @@ $nivelCertificado = strtoupper(trim((string) ($this->resultadoCertificacao['nive
 			var nomeCertificado = <?= json_encode($nomeCertificado) ?>;
 			var dataCertificado = <?= json_encode($dataCertificado) ?>;
 			var nivelCertificado = <?= json_encode($nivelCertificado) ?>;
+			var anoCertificado = <?= json_encode($anoCertificado) ?>;
+			var urlSeloCertificado = <?= json_encode($urlSeloCertificado) ?>;
+			var urlLogoInstituto = <?= json_encode($urlLogoInstituto) ?>;
+			var urlLogoAcim = <?= json_encode($urlLogoAcim) ?>;
+			var urlsOdsCertificado = <?= json_encode($urlsOdsCertificado) ?>;
 
 			if (!nomeCertificado.length) {
 				swal({
@@ -413,46 +426,232 @@ $nivelCertificado = strtoupper(trim((string) ($this->resultadoCertificacao['nive
 
 			botao.addClass('is-loading');
 			botao.attr('aria-disabled', 'true');
-			botao.text('GERANDO...');
+			botao.text('PREPARANDO...');
 
-			var docDefinition = {
-				pageSize: 'A4',
-				pageOrientation: 'landscape',
-				pageMargins: [48, 42, 48, 42],
-				content: [
-					{ text: 'CERTIFICADO', alignment: 'center', fontSize: 28, bold: true, color: '#0f5553', margin: [0, 10, 0, 20] },
-					{ text: 'Certificamos que', alignment: 'center', fontSize: 18, color: '#444444', margin: [0, 22, 0, 12] },
-					{ text: nomeCertificado, alignment: 'center', fontSize: 26, bold: true, color: '#111111', margin: [30, 0, 30, 18] },
-					{ text: 'recebeu o selo IMPACTACIM ' + nivelCertificado + '.', alignment: 'center', fontSize: 18, color: '#444444', margin: [40, 0, 40, 10] },
-					{ text: 'Documento emitido em ' + dataCertificado + '.', alignment: 'center', fontSize: 16, color: '#444444', margin: [0, 0, 0, 34] },
-					{
-						canvas: [
-							{ type: 'line', x1: 180, y1: 0, x2: 520, y2: 0, lineWidth: 1.2, lineColor: '#0f5553' }
-						],
-						margin: [0, 34, 0, 8]
-					},
-					{ text: 'Instituto ACIM de Responsabilidade Social', alignment: 'center', fontSize: 14, color: '#0f5553', bold: true }
-				],
-				background: function() {
-					return [
-						{ canvas: [{ type: 'rect', x: 18, y: 18, w: 805, h: 559, r: 8, lineWidth: 2, lineColor: '#c7a64b' }] },
-						{ canvas: [{ type: 'rect', x: 30, y: 30, w: 781, h: 535, r: 8, lineWidth: 1, lineColor: '#0f5553' }] }
-					];
-				}
-			};
-
-			var nomeArquivo = 'certificado-' + nomeCertificado.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '.pdf';
-			pdfMake.createPdf(docDefinition).download(nomeArquivo, function() {
+			var janelaPreview = window.open('', '_blank');
+			if (!janelaPreview) {
 				botao.removeClass('is-loading');
 				botao.removeAttr('aria-disabled');
-				botao.text('BAIXAR O CERTIFICADO');
+				botao.text('VISUALIZAR CERTIFICADO');
+				swal({
+					title: "Atencao!",
+					text: "Nao foi possivel abrir a visualizacao. Verifique se o navegador bloqueou a nova aba.",
+					type: "error"
+				});
+				return false;
+			}
+
+			janelaPreview.document.write('<!DOCTYPE html><title>Gerando certificado...</title><body style="font-family: Arial, sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; color:#0f5553;">Gerando visualizacao do certificado...</body>');
+			janelaPreview.document.close();
+
+			var carregarImagemComoDataUrl = function(url) {
+				return new Promise(function(resolve) {
+					var imagem = new Image();
+					imagem.crossOrigin = 'anonymous';
+					imagem.onload = function() {
+						var canvas = document.createElement('canvas');
+						canvas.width = imagem.naturalWidth || imagem.width;
+						canvas.height = imagem.naturalHeight || imagem.height;
+						var contexto = canvas.getContext('2d');
+						contexto.drawImage(imagem, 0, 0);
+						resolve(canvas.toDataURL('image/png'));
+					};
+					imagem.onerror = function() {
+						resolve(null);
+					};
+					imagem.src = url;
+				});
+			};
+
+			var quebrarTexto = function(texto, tamanhoMaximo, maxLinhas) {
+				var palavras = (texto || '').split(/\s+/);
+				var linhas = [];
+				var linhaAtual = '';
+
+				$.each(palavras, function(_, palavra) {
+					var candidata = linhaAtual ? (linhaAtual + ' ' + palavra) : palavra;
+					if (candidata.length <= tamanhoMaximo || !linhaAtual) {
+						linhaAtual = candidata;
+						return;
+					}
+
+					linhas.push(linhaAtual);
+					linhaAtual = palavra;
+				});
+
+				if (linhaAtual) {
+					linhas.push(linhaAtual);
+				}
+
+				if (maxLinhas && linhas.length > maxLinhas) {
+					var excedentes = linhas.slice(maxLinhas - 1).join(' ');
+					linhas = linhas.slice(0, maxLinhas - 1);
+					linhas.push(excedentes);
+				}
+
+				return linhas.join('\n');
+			};
+
+			Promise.all([
+				carregarImagemComoDataUrl(urlSeloCertificado),
+				carregarImagemComoDataUrl(urlLogoInstituto),
+				carregarImagemComoDataUrl(urlLogoAcim),
+				Promise.all($.map(urlsOdsCertificado, function(url) {
+					return carregarImagemComoDataUrl(url);
+				}))
+			]).then(function(imagens) {
+				var seloCertificado = imagens[0];
+				var logoInstituto = imagens[1];
+				var logoAcim = imagens[2];
+				var imagensOds = imagens[3] || [];
+				var nomeCertificadoFormatado = quebrarTexto(nomeCertificado.toUpperCase(), 20, 2);
+				var descricaoCertificado = 'e uma organizacao comprometida com os principios Ambientais,\nSociais e de Governanca (ESG) e com os Objetivos de Desenvolvimento\nSustentavel (ODS), sendo reconhecida pelo Instituto ACIM em ' + anoCertificado + '.';
+				var gradeOds = [];
+				var primeiraLinhaOds = [];
+				var segundaLinhaOds = [];
+
+				$.each(imagensOds, function(indice, imagemOds) {
+					if (!imagemOds) {
+						return;
+					}
+
+					var itemOds = {
+						image: imagemOds,
+						width: 58,
+						height: 58,
+						margin: [0, 0, 4, 0]
+					};
+
+					if (indice < 9) {
+						primeiraLinhaOds.push(itemOds);
+						return;
+					}
+
+					segundaLinhaOds.push(itemOds);
+				});
+
+				if (primeiraLinhaOds.length) {
+					gradeOds.push({
+						columns: primeiraLinhaOds,
+						columnGap: 0,
+						margin: [0, 8, 0, 4]
+					});
+				}
+
+				if (segundaLinhaOds.length) {
+					gradeOds.push({
+						columns: segundaLinhaOds,
+						columnGap: 0,
+						margin: [0, 0, 0, 0]
+					});
+				}
+
+				var docDefinition = {
+					pageSize: 'A4',
+					pageOrientation: 'landscape',
+					pageMargins: [54, 42, 54, 36],
+					content: [
+						{
+							columns: [
+								{
+									width: '*',
+									stack: [
+										{ text: 'CERTIFICAMOS QUE', fontSize: 19, characterSpacing: 4, color: '#111111', margin: [0, 28, 0, 12] },
+										{ text: nomeCertificadoFormatado, fontSize: 40, bold: true, color: '#0d5b58', lineHeight: 0.92, margin: [0, 0, 0, 18] },
+										{ text: descricaoCertificado, fontSize: 17, color: '#202124', lineHeight: 1.22, margin: [0, 0, 0, 10] },
+										{
+											stack: gradeOds,
+											margin: [0, 6, 0, 18]
+										}
+									]
+								},
+								{
+									width: 150,
+									stack: seloCertificado ? [
+										{ image: seloCertificado, width: 132, alignment: 'right', margin: [0, 0, 0, 0] }
+									] : []
+								}
+							]
+						},
+						{
+							columns: [
+								{
+									width: '*',
+									stack: [
+										{
+											canvas: [
+												{ type: 'line', x1: 0, y1: 0, x2: 150, y2: 0, lineWidth: 1.2, lineColor: '#4b5563' }
+											],
+											margin: [0, 6, 0, 6]
+										},
+										{ text: 'Nadia Felippe Corazza', fontSize: 12.5, bold: true, color: '#202124', margin: [0, 0, 0, 2] },
+										{ text: 'Presidente', fontSize: 11, color: '#202124' }
+									]
+								},
+								{
+									width: 125,
+									stack: [
+										{ text: 'Realizacao:', fontSize: 11.5, bold: true, color: '#374151', margin: [0, 0, 0, 6] },
+										logoInstituto ? { image: logoInstituto, width: 86 } : { text: 'Instituto ACIM', fontSize: 12, bold: true, color: '#1f2937' }
+									]
+								},
+								{
+									width: 205,
+									stack: [
+										{ text: 'Parceiros:', fontSize: 11.5, bold: true, color: '#374151', margin: [0, 0, 0, 6] },
+										logoAcim ? { image: logoAcim, width: 170, margin: [0, 0, 0, 8] } : { text: 'ACIM', fontSize: 14, bold: true, color: '#1f2937', margin: [0, 0, 0, 8] },
+										{ text: 'SEBRAE', fontSize: 18, bold: true, color: '#0c67b2', margin: [0, 0, 0, 4] },
+										{ text: 'Instituto Brasileiro de ESG', fontSize: 10.5, color: '#4b5563', margin: [0, 0, 0, 2] },
+										{ text: 'Movimento Inovacao e ESG de Maringa', fontSize: 9.5, color: '#4b5563' }
+									]
+								}
+							],
+							margin: [0, 0, 0, 0]
+						}
+					],
+					background: function() {
+						var marcaDagua = seloCertificado ? [{ image: seloCertificado, width: 395, opacity: 0.08, absolutePosition: { x: 82, y: 64 } }] : [];
+						return marcaDagua.concat([
+							{ canvas: [{ type: 'line', x1: 62, y1: 28, x2: 62, y2: 240, lineWidth: 14, lineColor: '#0d5b58' }] },
+							{ canvas: [{ type: 'line', x1: 62, y1: 28, x2: 265, y2: 28, lineWidth: 14, lineColor: '#0d5b58' }] },
+							{ canvas: [{ type: 'line', x1: 83, y1: 240, x2: 83, y2: 546, lineWidth: 2.2, lineColor: '#0d5b58' }] },
+							{ canvas: [{ type: 'line', x1: 83, y1: 546, x2: 755, y2: 546, lineWidth: 2.2, lineColor: '#0d5b58' }] },
+							{ canvas: [{ type: 'line', x1: 755, y1: 546, x2: 755, y2: 178, lineWidth: 2.2, lineColor: '#0d5b58' }] },
+							{ canvas: [{ type: 'line', x1: 240, y1: 36, x2: 630, y2: 36, lineWidth: 2.2, lineColor: '#0d5b58' }] }
+						]);
+					}
+				};
+
+				pdfMake.createPdf(docDefinition).getBlob(function(blob) {
+					var urlPreview = URL.createObjectURL(blob);
+					janelaPreview.location.href = urlPreview;
+					janelaPreview.document.title = 'Certificado ' + nomeCertificado;
+
+					window.setTimeout(function() {
+						URL.revokeObjectURL(urlPreview);
+					}, 60000);
+
+					botao.removeClass('is-loading');
+					botao.removeAttr('aria-disabled');
+					botao.text('VISUALIZAR CERTIFICADO');
+				});
+			}).catch(function() {
+				janelaPreview.close();
+				botao.removeClass('is-loading');
+				botao.removeAttr('aria-disabled');
+				botao.text('VISUALIZAR CERTIFICADO');
+				swal({
+					title: "Atencao!",
+					text: "Nao foi possivel gerar a visualizacao do certificado.",
+					type: "error"
+				});
 			});
 
 			window.setTimeout(function() {
 				if (botao.hasClass('is-loading')) {
 					botao.removeClass('is-loading');
 					botao.removeAttr('aria-disabled');
-					botao.text('BAIXAR O CERTIFICADO');
+					botao.text('VISUALIZAR CERTIFICADO');
 				}
 			}, 4000);
 
