@@ -298,28 +298,61 @@
             <div class="detalhe-card">
                 <div class="detalhe-card-body">
                     <div class="section-title">Responsável pela inscrição</div>
-                    <div class="row">
-                        <div class="col-12 mb-3">
-                            <span class="field-label">Nome</span>
-                            <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['nome'] ?? null) ?></div>
+                    <? if ((int) ($this->permissao ?? 0) === 1) : ?>
+                        <form id="form-responsavel-inscricao">
+                            <input type="hidden" name="id_inscricao" value="<?= (int) ($inscricao['id_inscricao'] ?? 0) ?>">
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label for="responsavel_nome" class="field-label">Nome</label>
+                                    <input type="text" class="form-control" id="responsavel_nome" name="nome" maxlength="120" required value="<?= $this->escape((string) ($inscricao['nome'] ?? '')) ?>">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="responsavel_cpf" class="field-label">CPF</label>
+                                    <input type="text" class="form-control cpf-inscricao" id="responsavel_cpf" name="cpf_responsavel" maxlength="14" inputmode="numeric" required value="<?= $this->escape($formatarDocumento($inscricao['cpf_responsavel'] ?? null) === 'Não informado' ? '' : $formatarDocumento($inscricao['cpf_responsavel'] ?? null)) ?>">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="responsavel_email" class="field-label">E-mail</label>
+                                    <input type="email" class="form-control" id="responsavel_email" name="email" maxlength="120" autocomplete="email" required value="<?= $this->escape((string) ($inscricao['email'] ?? '')) ?>">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="responsavel_telefone" class="field-label">Telefone</label>
+                                    <input type="tel" class="form-control telefone-responsavel" id="responsavel_telefone" name="telefone" maxlength="20" inputmode="numeric" autocomplete="tel" required pattern="\(\d{2}\)\s\d{4,5}-\d{4}" title="Informe um telefone válido com DDD, por exemplo: (44) 99853-0909" value="<?= $this->escape($formatarTelefone($inscricao['telefone'] ?? null) === 'Não informado' ? '' : $formatarTelefone($inscricao['telefone'] ?? null)) ?>">
+                                </div>
+                                <div class="form-group col-12">
+                                    <label for="responsavel_endereco" class="field-label">Endereço</label>
+                                    <input type="text" class="form-control" id="responsavel_endereco" name="endereco" maxlength="200" required value="<?= $this->escape((string) ($inscricao['endereco'] ?? '')) ?>">
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary salvar-responsavel-inscricao">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Salvar responsável
+                                </button>
+                            </div>
+                        </form>
+                    <? else : ?>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <span class="field-label">Nome</span>
+                                <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['nome'] ?? null) ?></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <span class="field-label">CPF</span>
+                                <div class="detalhe-valor"><?= $formatarDocumento($inscricao['cpf_responsavel'] ?? null) ?></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <span class="field-label">E-mail</span>
+                                <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['email'] ?? null) ?></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <span class="field-label">Telefone</span>
+                                <div class="detalhe-valor"><?= $formatarTelefone($inscricao['telefone'] ?? null) ?></div>
+                            </div>
+                            <div class="col-12">
+                                <span class="field-label">Endereço</span>
+                                <div class="detalhe-valor"><?= nl2br($this->escape($valorOuPadrao($inscricao['endereco'] ?? null))) ?></div>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <span class="field-label">CPF</span>
-                            <div class="detalhe-valor"><?= $formatarDocumento($inscricao['cpf_responsavel'] ?? null) ?></div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <span class="field-label">E-mail</span>
-                            <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['email'] ?? null) ?></div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <span class="field-label">Telefone</span>
-                            <div class="detalhe-valor"><?= $formatarTelefone($inscricao['telefone'] ?? null) ?></div>
-                        </div>
-                        <div class="col-12">
-                            <span class="field-label">Endereço</span>
-                            <div class="detalhe-valor"><?= nl2br($this->escape($valorOuPadrao($inscricao['endereco'] ?? null))) ?></div>
-                        </div>
-                    </div>
+                    <? endif; ?>
                 </div>
             </div>
         </div>
@@ -328,54 +361,134 @@
             <div class="detalhe-card">
                 <div class="detalhe-card-body">
                     <div class="section-title">Organização</div>
-                    <div class="row">
-                        <div class="col-12 mb-3">
-                            <span class="field-label">Nome da organização</span>
-                            <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['nome_organizacao'] ?? null) ?></div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <span class="field-label">CNPJ</span>
-                            <div class="detalhe-valor text-nowrap"><?= $formatarDocumento($inscricao['cnpj'] ?? null) ?></div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <span class="field-label">Nome no certificado</span>
-                            <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['nome_certificado'] ?? null) ?></div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <span class="field-label">Logo enviada</span>
-                            <div class="detalhe-valor">
-                                <? if ($logo) : ?>
-                                    <? if ($logoEhImagem) : ?>
-                                        <a href="<?= $logo ?>" target="_blank" class="logo-preview mb-3">
-                                            <img src="<?= $logo ?>" alt="Logo da organização">
+                    <? if ((int) ($this->permissao ?? 0) === 1) : ?>
+                        <form id="form-organizacao-inscricao" enctype="multipart/form-data">
+                            <input type="hidden" name="id_inscricao" value="<?= (int) ($inscricao['id_inscricao'] ?? 0) ?>">
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label for="organizacao_nome" class="field-label">Nome da organização</label>
+                                    <input type="text" class="form-control" id="organizacao_nome" name="nome_organizacao" maxlength="150" required value="<?= $this->escape((string) ($inscricao['nome_organizacao'] ?? '')) ?>">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="organizacao_cnpj" class="field-label">CNPJ</label>
+                                    <input type="text" class="form-control cnpj-inscricao" id="organizacao_cnpj" name="cnpj" maxlength="18" inputmode="numeric" required value="<?= $this->escape($formatarDocumento($inscricao['cnpj'] ?? null) === 'Não informado' ? '' : $formatarDocumento($inscricao['cnpj'] ?? null)) ?>">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="organizacao_numero_colaboradores" class="field-label">Colaboradores</label>
+                                    <input type="number" class="form-control" id="organizacao_numero_colaboradores" name="numero_colaboradores" min="1" step="1" required value="<?= (int) ($inscricao['numero_colaboradores'] ?? 0) ?>">
+                                </div>
+                                <div class="form-group col-12">
+                                    <label for="organizacao_nome_certificado" class="field-label">Nome no certificado</label>
+                                    <input type="text" class="form-control" id="organizacao_nome_certificado" name="nome_certificado" maxlength="150" required value="<?= $this->escape((string) ($inscricao['nome_certificado'] ?? '')) ?>">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="field-label d-block">Primeira participação</label>
+                                    <div class="custom-control custom-radio mb-2">
+                                        <input type="radio" id="organizacao_primeira_participacao_sim" name="primeira_participacao" value="sim" class="custom-control-input" required <?= !empty($inscricao['primeira_participacao']) ? 'checked' : '' ?>>
+                                        <label class="custom-control-label" for="organizacao_primeira_participacao_sim">Sim</label>
+                                    </div>
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" id="organizacao_primeira_participacao_nao" name="primeira_participacao" value="nao" class="custom-control-input" required <?= empty($inscricao['primeira_participacao']) ? 'checked' : '' ?>>
+                                        <label class="custom-control-label" for="organizacao_primeira_participacao_nao">Não</label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="organizacao_como_soube" class="field-label">Como soube da certificação</label>
+                                    <select class="form-control" id="organizacao_como_soube" name="como_soube" required>
+                                        <option value="">Selecione...</option>
+                                        <? foreach (['E-mail', 'Redes Sociais', 'Eventos do Instituto ACIM', 'Participante de edições anteriores', 'Outro'] as $opcaoComoSoube) : ?>
+                                            <option value="<?= $this->escape($opcaoComoSoube) ?>" <?= (string) ($inscricao['como_soube'] ?? '') === $opcaoComoSoube ? 'selected' : '' ?>><?= $this->escape($opcaoComoSoube) ?></option>
+                                        <? endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="form-group col-12">
+                                    <label for="organizacao_indicacao" class="field-label">Organização que indicou</label>
+                                    <textarea class="form-control" id="organizacao_indicacao" name="indicacao_organizacao" rows="3" maxlength="500"><?= $this->escape((string) ($inscricao['indicacao_organizacao'] ?? '')) ?></textarea>
+                                </div>
+                                <div class="form-group col-12">
+                                    <span class="field-label">Logo enviada</span>
+                                    <div class="detalhe-valor mb-2">
+                                        <? if ($logo) : ?>
+                                            <? if ($logoEhImagem) : ?>
+                                                <a href="<?= $logo ?>" target="_blank" class="logo-preview mb-3">
+                                                    <img src="<?= $logo ?>" alt="Logo da organização">
+                                                </a>
+                                            <? else : ?>
+                                                <div class="logo-preview mb-3">
+                                                    <div class="logo-placeholder">
+                                                        Pré-visualização indisponível para este formato.<br>
+                                                        Abra o arquivo para visualizar o conteúdo.
+                                                    </div>
+                                                </div>
+                                            <? endif; ?>
+                                            <a href="<?= $logo ?>" download class="btn btn-outline-primary btn-sm">
+                                                <i class="fa fa-download" aria-hidden="true"></i> Baixar arquivo
+                                            </a>
+                                        <? else : ?>
+                                            Não enviado
+                                        <? endif; ?>
+                                    </div>
+                                    <label for="organizacao_logo" class="field-label">Trocar logo</label>
+                                    <input type="file" class="form-control-file" id="organizacao_logo" name="logo_organizacao" accept=".pdf,image/*">
+                                    <small class="text-muted d-block mt-1">Envie somente se desejar substituir a logo atual.</small>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary salvar-organizacao-inscricao">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Salvar organização
+                                </button>
+                            </div>
+                        </form>
+                    <? else : ?>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <span class="field-label">Nome da organização</span>
+                                <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['nome_organizacao'] ?? null) ?></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <span class="field-label">CNPJ</span>
+                                <div class="detalhe-valor text-nowrap"><?= $formatarDocumento($inscricao['cnpj'] ?? null) ?></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <span class="field-label">Nome no certificado</span>
+                                <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['nome_certificado'] ?? null) ?></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <span class="field-label">Logo enviada</span>
+                                <div class="detalhe-valor">
+                                    <? if ($logo) : ?>
+                                        <? if ($logoEhImagem) : ?>
+                                            <a href="<?= $logo ?>" target="_blank" class="logo-preview mb-3">
+                                                <img src="<?= $logo ?>" alt="Logo da organização">
+                                            </a>
+                                        <? else : ?>
+                                            <div class="logo-preview mb-3">
+                                                <div class="logo-placeholder">
+                                                    Pré-visualização indisponível para este formato.<br>
+                                                    Abra o arquivo para visualizar o conteúdo.
+                                                </div>
+                                            </div>
+                                        <? endif; ?>
+                                        <a href="<?= $logo ?>" download class="btn btn-outline-primary btn-sm">
+                                            <i class="fa fa-download" aria-hidden="true"></i> Baixar arquivo
                                         </a>
                                     <? else : ?>
-                                        <div class="logo-preview mb-3">
-                                            <div class="logo-placeholder">
-                                                Pré-visualização indisponível para este formato.<br>
-                                                Abra o arquivo para visualizar o conteúdo.
-                                            </div>
-                                        </div>
+                                        Não enviado
                                     <? endif; ?>
-                                    <a href="<?= $logo ?>" download class="btn btn-outline-primary btn-sm">
-                                        <i class="fa fa-download" aria-hidden="true"></i> Baixar arquivo
-                                    </a>
-                                <? else : ?>
-                                    Não enviado
-                                <? endif; ?>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <span class="field-label">Primeira participação</span>
+                                <div class="detalhe-valor mb-3"><?= $formatarBooleano($inscricao['primeira_participacao'] ?? null) ?></div>
+
+                                <span class="field-label">Como soube da certificação</span>
+                                <div class="detalhe-valor mb-3"><?= $valorOuPadrao($inscricao['como_soube'] ?? null) ?></div>
+
+                                <span class="field-label">Organização que indicou</span>
+                                <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['indicacao_organizacao'] ?? null) ?></div>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <span class="field-label">Primeira participação</span>
-                            <div class="detalhe-valor mb-3"><?= $formatarBooleano($inscricao['primeira_participacao'] ?? null) ?></div>
-
-                            <span class="field-label">Como soube da certificação</span>
-                            <div class="detalhe-valor mb-3"><?= $valorOuPadrao($inscricao['como_soube'] ?? null) ?></div>
-
-                            <span class="field-label">Organização que indicou</span>
-                            <div class="detalhe-valor"><?= $valorOuPadrao($inscricao['indicacao_organizacao'] ?? null) ?></div>
-                        </div>
-                    </div>
+                    <? endif; ?>
                 </div>
             </div>
         </div>
@@ -611,6 +724,10 @@
             }
 
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
+        }
+
+        function documentoComTamanho(valor, tamanho) {
+            return extrairDigitos(valor).length === tamanho;
         }
 
         function decodificarTextoSwal(valor) {
@@ -853,13 +970,132 @@
 
         $('.representante-telefone').mask('(00) 00000-0000');
         $('.summit-telefone').mask('(00) 00000-0000');
+        $('.telefone-responsavel').mask('(00) 00000-0000');
+        $('.cpf-inscricao').mask('000.000.000-00');
+        $('.cnpj-inscricao').mask('00.000.000/0000-00');
 
-        $(document).on('input blur', '.representante-telefone, .summit-telefone', function() {
+        $(document).on('input blur', '.representante-telefone, .summit-telefone, .telefone-responsavel', function() {
             validarTelefoneCampo(this);
         });
 
         $(document).on('input blur', 'input[type="email"]', function() {
             validarEmailCampo(this);
+        });
+
+        $('#form-responsavel-inscricao').submit(function(e) {
+            e.preventDefault();
+
+            const form = this;
+            let valido = true;
+            const cpf = form.querySelector('[name="cpf_responsavel"]');
+
+            $(form).find('.telefone-responsavel').each(function() {
+                if (!validarTelefoneCampo(this)) {
+                    valido = false;
+                }
+            });
+
+            $(form).find('input[type="email"]').each(function() {
+                if (!validarEmailCampo(this)) {
+                    valido = false;
+                }
+            });
+
+            cpf.setCustomValidity(documentoComTamanho(cpf.value, 11) ? '' : 'Informe um CPF válido com 11 dígitos.');
+            if (cpf.validationMessage) {
+                valido = false;
+            }
+
+            if (!valido || !form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            $('.salvar-responsavel-inscricao').prop('disabled', true);
+
+            $.ajax({
+                type: "POST",
+                url: "../../inscricao/salvarresponsavel",
+                data: $(this).serialize(),
+                success: function(data) {
+                    if (data.trim().length > 0) {
+                        swal({
+                            title: "Atenção!",
+                            text: decodificarTextoSwal(data),
+                            type: "error"
+                        });
+                        $('.salvar-responsavel-inscricao').prop('disabled', false);
+                    } else {
+                        swal({
+                            title: "Sucesso!",
+                            text: "Dados do responsável salvos com sucesso.",
+                            type: "success"
+                        }, function() {
+                            carregarTela('../../inscricao/detalhe?id_inscricao=<?= (int) ($inscricao['id_inscricao'] ?? 0) ?>');
+                        });
+                    }
+                },
+                error: function() {
+                    $('.salvar-responsavel-inscricao').prop('disabled', false);
+
+                    swal({
+                        title: "Atenção!",
+                        text: "Não foi possível salvar os dados do responsável.",
+                        type: "error"
+                    });
+                }
+            });
+        });
+
+        $('#form-organizacao-inscricao').submit(function(e) {
+            e.preventDefault();
+
+            const form = this;
+            const cnpj = form.querySelector('[name="cnpj"]');
+
+            cnpj.setCustomValidity(documentoComTamanho(cnpj.value, 14) ? '' : 'Informe um CNPJ válido com 14 dígitos.');
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            $('.salvar-organizacao-inscricao').prop('disabled', true);
+
+            $.ajax({
+                type: "POST",
+                url: "../../inscricao/salvarorganizacao",
+                data: new FormData(form),
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    if (data.trim().length > 0) {
+                        swal({
+                            title: "Atenção!",
+                            text: decodificarTextoSwal(data),
+                            type: "error"
+                        });
+                        $('.salvar-organizacao-inscricao').prop('disabled', false);
+                    } else {
+                        swal({
+                            title: "Sucesso!",
+                            text: "Dados da organização salvos com sucesso.",
+                            type: "success"
+                        }, function() {
+                            carregarTela('../../inscricao/detalhe?id_inscricao=<?= (int) ($inscricao['id_inscricao'] ?? 0) ?>');
+                        });
+                    }
+                },
+                error: function() {
+                    $('.salvar-organizacao-inscricao').prop('disabled', false);
+
+                    swal({
+                        title: "Atenção!",
+                        text: "Não foi possível salvar os dados da organização.",
+                        type: "error"
+                    });
+                }
+            });
         });
 
         $('#form-representantes-inscricao').submit(function(e) {

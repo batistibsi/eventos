@@ -6,6 +6,9 @@ class Inscricao
         const MAX_NOME_ORGANIZACAO = 150;
         const MAX_REPRESENTANTE_NOME = 120;
         const MAX_NOME_CERTIFICADO = 150;
+        const MAX_ENDERECO = 200;
+        const MAX_COMO_SOUBE = 120;
+        const MAX_INDICACAO_ORGANIZACAO = 500;
         const MAX_SUMMIT_INSCRICOES = 3;
         const MAX_SUMMIT_NOME = 150;
         const MAX_SUMMIT_CARGO = 150;
@@ -107,11 +110,39 @@ class Inscricao
                 return false;
         }
 
+        public static function uniqueInscricaoEmailExceto($email, $id_inscricao)
+        {
+                $db = Zend_Registry::get('db');
+                $id_inscricao = (int) $id_inscricao;
+
+                $select = "select * from eventos_inscricao where email = " . $db->quote($email) . " and id_inscricao <> " . $id_inscricao . " and status not in (" . implode(',', array_map([$db, 'quote'], self::statusInativos())) . ")";
+
+                $registros = $db->fetchAll($select);
+
+                if (count($registros) == 0) return true;
+
+                return false;
+        }
+
         public static function uniqueInscricaoCNPJ($cnpj)
         {
                 $db = Zend_Registry::get('db');
 
                 $select = "select * from eventos_inscricao where cnpj = " . $db->quote($cnpj) . " and status not in (" . implode(',', array_map([$db, 'quote'], self::statusInativos())) . ")";
+
+                $registros = $db->fetchAll($select);
+
+                if (count($registros) == 0) return true;
+
+                return false;
+        }
+
+        public static function uniqueInscricaoCNPJExceto($cnpj, $id_inscricao)
+        {
+                $db = Zend_Registry::get('db');
+                $id_inscricao = (int) $id_inscricao;
+
+                $select = "select * from eventos_inscricao where cnpj = " . $db->quote($cnpj) . " and id_inscricao <> " . $id_inscricao . " and status not in (" . implode(',', array_map([$db, 'quote'], self::statusInativos())) . ")";
 
                 $registros = $db->fetchAll($select);
 
@@ -291,6 +322,11 @@ class Inscricao
         private static function emailValido($valor)
         {
                 return filter_var((string) $valor, FILTER_VALIDATE_EMAIL) !== false;
+        }
+
+        private static function documentoNumerico($valor)
+        {
+                return preg_replace('/\D+/', '', trim((string) $valor));
         }
 
         public static function novo($campos)
@@ -914,6 +950,173 @@ class Inscricao
                         $db->update('eventos_inscricao', $dados, $where);
                 } catch (Exception $e) {
                         self::$erro = 'Nao foi possivel salvar os representantes.';
+                        return false;
+                }
+
+                return true;
+        }
+
+        public static function salvarResponsavel($id_inscricao, $campos)
+        {
+                $db = Zend_Registry::get('db');
+
+                $id_inscricao = (int) $id_inscricao;
+
+                if ($id_inscricao <= 0) {
+                        self::$erro = 'Inscricao nao informada.';
+                        return false;
+                }
+
+                $inscricao = self::buscaId($id_inscricao);
+                if (!$inscricao || !is_array($inscricao)) {
+                        self::$erro = 'Inscricao nao encontrada.';
+                        return false;
+                }
+
+                $nome = self::validarTamanhoTexto($campos['nome'] ?? '', self::MAX_NOME_RESPONSAVEL, 'nome do responsavel');
+                if ($nome === false) {
+                        return false;
+                }
+
+                $cpf = self::documentoNumerico($campos['cpf_responsavel'] ?? '');
+                if (!Util::validaCPF($cpf)) {
+                        self::$erro = 'Informe um CPF valido para o responsavel.';
+                        return false;
+                }
+
+                $email = trim((string) ($campos['email'] ?? ''));
+                if ($email === '' || !self::emailValido($email)) {
+                        self::$erro = 'Informe um e-mail valido para o responsavel.';
+                        return false;
+                }
+                if (strlen($email) > 120) {
+                        self::$erro = 'O e-mail do responsavel deve ter no maximo 120 caracteres.';
+                        return false;
+                }
+                if (!self::uniqueInscricaoEmailExceto($email, $id_inscricao)) {
+                        self::$erro = 'Inscricao ja realizada para o email: ' . $email . '!';
+                        return false;
+                }
+
+                $telefone = self::normalizarTelefone($campos['telefone'] ?? '');
+                if (!self::telefoneValido($telefone)) {
+                        self::$erro = 'Informe um telefone valido com DDD para o responsavel.';
+                        return false;
+                }
+
+                $endereco = self::validarTamanhoTexto($campos['endereco'] ?? '', self::MAX_ENDERECO, 'endereco');
+                if ($endereco === false) {
+                        return false;
+                }
+
+                $dados = array(
+                        'nome' => $nome,
+                        'cpf_responsavel' => $cpf,
+                        'email' => $email,
+                        'telefone' => $telefone,
+                        'endereco' => $endereco
+                );
+
+                try {
+                        $where = $db->quoteInto('id_inscricao = ?', $id_inscricao);
+                        $db->update('eventos_inscricao', $dados, $where);
+                } catch (Exception $e) {
+                        self::$erro = 'Nao foi possivel salvar os dados do responsavel.';
+                        return false;
+                }
+
+                return true;
+        }
+
+        public static function salvarOrganizacao($id_inscricao, $campos, $logo = null)
+        {
+                $db = Zend_Registry::get('db');
+
+                $id_inscricao = (int) $id_inscricao;
+
+                if ($id_inscricao <= 0) {
+                        self::$erro = 'Inscricao nao informada.';
+                        return false;
+                }
+
+                $inscricao = self::buscaId($id_inscricao);
+                if (!$inscricao || !is_array($inscricao)) {
+                        self::$erro = 'Inscricao nao encontrada.';
+                        return false;
+                }
+
+                $nomeOrganizacao = self::validarTamanhoTexto($campos['nome_organizacao'] ?? '', self::MAX_NOME_ORGANIZACAO, 'nome da organizacao');
+                if ($nomeOrganizacao === false) {
+                        return false;
+                }
+
+                $cnpj = self::documentoNumerico($campos['cnpj'] ?? '');
+                if (!Util::validaCNPJ($cnpj)) {
+                        self::$erro = 'Informe um CNPJ valido.';
+                        return false;
+                }
+                if (!self::uniqueInscricaoCNPJExceto($cnpj, $id_inscricao)) {
+                        self::$erro = 'Inscricao ja realizada para o CNPJ: ' . $cnpj . '!';
+                        return false;
+                }
+
+                $numeroColaboradores = isset($campos['numero_colaboradores']) ? (int) $campos['numero_colaboradores'] : 0;
+                if ($numeroColaboradores <= 0) {
+                        self::$erro = 'Informe a quantidade de colaboradores.';
+                        return false;
+                }
+
+                $nomeCertificado = self::validarTamanhoTexto($campos['nome_certificado'] ?? '', self::MAX_NOME_CERTIFICADO, 'nome da organizacao no certificado');
+                if ($nomeCertificado === false) {
+                        return false;
+                }
+
+                $primeiraParticipacao = trim((string) ($campos['primeira_participacao'] ?? ''));
+                if (!in_array($primeiraParticipacao, array('sim', 'nao'), true)) {
+                        self::$erro = 'Informe corretamente se e a primeira participacao.';
+                        return false;
+                }
+
+                $comoSoube = self::validarTamanhoTexto($campos['como_soube'] ?? '', self::MAX_COMO_SOUBE, 'como ficou sabendo da certificacao');
+                if ($comoSoube === false) {
+                        return false;
+                }
+
+                $indicacaoOrganizacao = self::validarTamanhoTexto($campos['indicacao_organizacao'] ?? '', self::MAX_INDICACAO_ORGANIZACAO, 'organizacao indicada', false);
+                if ($indicacaoOrganizacao === false) {
+                        return false;
+                }
+
+                $dados = array(
+                        'nome_organizacao' => $nomeOrganizacao,
+                        'cnpj' => $cnpj,
+                        'numero_colaboradores' => $numeroColaboradores,
+                        'nome_certificado' => $nomeCertificado,
+                        'primeira_participacao' => $primeiraParticipacao === 'sim',
+                        'como_soube' => $comoSoube,
+                        'indicacao_organizacao' => $indicacaoOrganizacao !== '' ? $indicacaoOrganizacao : null
+                );
+
+                $logoPath = null;
+                if ($logo && isset($logo['error']) && (int) $logo['error'] !== UPLOAD_ERR_NO_FILE) {
+                        if ((int) $logo['error'] !== UPLOAD_ERR_OK) {
+                                self::$erro = 'Nao foi possivel receber a logo enviada.';
+                                return false;
+                        }
+
+                        $tokenLogo = !empty($inscricao['token_confirmacao']) ? $inscricao['token_confirmacao'] : 'edicao_' . $id_inscricao . '_' . time();
+                        $logoPath = self::salvarLogo($logo, $tokenLogo);
+                        if ($logoPath === false) {
+                                return false;
+                        }
+                        $dados['logo_organizacao'] = $logoPath;
+                }
+
+                try {
+                        $where = $db->quoteInto('id_inscricao = ?', $id_inscricao);
+                        $db->update('eventos_inscricao', $dados, $where);
+                } catch (Exception $e) {
+                        self::$erro = 'Nao foi possivel salvar os dados da organizacao.';
                         return false;
                 }
 

@@ -168,6 +168,32 @@ class InscricaoController extends Zend_Controller_Action
 		if (!$result) echo Inscricao::$erro;
 	}
 
+	public function salvarresponsavelAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+
+		if (Zend_Registry::get('permissao') != 1) die('Nao permitido!');
+
+		$id_inscricao = !empty($_REQUEST['id_inscricao']) ? (int) $_REQUEST['id_inscricao'] : 0;
+
+		$result = Inscricao::salvarResponsavel($id_inscricao, $_REQUEST);
+
+		if (!$result) echo Inscricao::$erro;
+	}
+
+	public function salvarorganizacaoAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+
+		if (Zend_Registry::get('permissao') != 1) die('Nao permitido!');
+
+		$id_inscricao = !empty($_REQUEST['id_inscricao']) ? (int) $_REQUEST['id_inscricao'] : 0;
+
+		$result = Inscricao::salvarOrganizacao($id_inscricao, $_REQUEST, $_FILES['logo_organizacao'] ?? null);
+
+		if (!$result) echo Inscricao::$erro;
+	}
+
 	public function salvaraceitetermoAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
