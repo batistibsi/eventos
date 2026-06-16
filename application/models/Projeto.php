@@ -1020,10 +1020,9 @@ class Projeto
 		$anoPassado = $anoReferencia - 1;
 		$anoRetrasado = $anoReferencia - 2;
 		$anosPermitidos = array($anoRetrasado, $anoPassado);
-		$anoDataInicializacao = (int) date('Y', strtotime($dataInicializacao));
 		$anoDataFinalizacao = (int) date('Y', strtotime($dataFinalizacao));
-		if (!in_array($anoDataInicializacao, $anosPermitidos, true)) {
-			self::$erro = 'A data de inicializacao deve estar entre os anos de ' . $anoRetrasado . ' e ' . $anoPassado . '.';
+		if (strtotime($dataInicializacao) > strtotime($dataFinalizacao)) {
+			self::$erro = 'A data de inicializacao nao pode ser posterior a data de finalizacao.';
 			return false;
 		}
 		if (!in_array($anoDataFinalizacao, $anosPermitidos, true)) {

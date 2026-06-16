@@ -73,8 +73,8 @@
 			<div class="row">
 				<div class="form-group col-md-6">
 					<span><label for="data_inicializacao">Data da inicialização: </label></span>
-					<small class="form-text text-muted">Necessário que tenha sido realizado em <?= $anoRetrasado ?> - <?= $anoPassado ?>.</small>
-					<input class="form-control" name="data_inicializacao" type="date" min="<?= $dataMinimaProjeto ?>" max="<?= $dataMaximaProjeto ?>" value="<?= $registro && !empty($registro['data_inicializacao']) ? date('Y-m-d', strtotime($registro['data_inicializacao'])) : '' ?>" id="data_inicializacao" required>
+					<small class="form-text text-muted">A data da inicialização não pode ser posterior à data da finalização.</small>
+					<input class="form-control" name="data_inicializacao" type="date" value="<?= $registro && !empty($registro['data_inicializacao']) ? date('Y-m-d', strtotime($registro['data_inicializacao'])) : '' ?>" id="data_inicializacao" required>
 				</div>
 				<div class="form-group col-md-6">
 					<span><label for="data_finalizacao">Data da finalização: </label></span>
@@ -956,8 +956,32 @@
 			}
 		});
 
+		var dataInicializacao = document.getElementById('data_inicializacao');
+		var dataFinalizacao = document.getElementById('data_finalizacao');
+
+		function validarPeriodoProjeto() {
+			dataInicializacao.setCustomValidity('');
+
+			if (dataFinalizacao.value) {
+				dataInicializacao.max = dataFinalizacao.value;
+			} else {
+				dataInicializacao.removeAttribute('max');
+			}
+
+			if (dataInicializacao.value && dataFinalizacao.value && dataInicializacao.value > dataFinalizacao.value) {
+				dataInicializacao.setCustomValidity('A data da inicialização não pode ser posterior à data da finalização.');
+				return false;
+			}
+
+			return true;
+		}
+
+		$('#data_inicializacao, #data_finalizacao').on('change input', validarPeriodoProjeto);
+		validarPeriodoProjeto();
+
 		$("#formulario").submit(function(e) {
 			e.preventDefault();
+			validarPeriodoProjeto();
 
 			if (!this.checkValidity()) {
 				this.reportValidity();
