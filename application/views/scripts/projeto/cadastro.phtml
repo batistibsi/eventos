@@ -86,7 +86,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="form-group col-md-12">
+				<div class="form-group col-md-12 projeto-diamante-field">
 					<span><label for="justificativa_diamante">PARA NIVEL DIAMANTE:</label></span>
 					<small class="form-text text-muted">Para credenciamento ao nível DIAMENTE, relate como essa iniciativa pode ser replicada em outras organizações?</small>
 					<textarea class="form-control" name="justificativa_diamante" id="justificativa_diamante" rows="4"><?= $registro && !empty($registro['justificativa_diamante']) ? $this->escape($registro['justificativa_diamante']) : '' ?></textarea>
@@ -175,7 +175,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="form-group col-md-12">
+				<div class="form-group col-md-12 projeto-diamante-field">
 					<span><label for="objetivos_diamante">PARA NIVEL DIAMANTE:</label></span>
 					<small class="form-text text-muted">Para credenciamento ao nível DIAMENTE, justifique o impacto deste projeto nos ODS selecionados, mencionando a(s) meta(s) relacionada(s).</small>
 					<textarea class="form-control" name="objetivos_diamante" id="objetivos_diamante" rows="4"><?= $registro && !empty($registro['objetivos_diamante']) ? $this->escape($registro['objetivos_diamante']) : '' ?></textarea>
@@ -345,10 +345,40 @@
 		flex: 0 0 auto;
 	}
 
+	.projeto-diamante-field {
+		background: #f4efff;
+		border: 1px solid #8e62d9;
+		border-left: 5px solid #6f3cc3;
+		border-radius: 8px;
+		padding: 16px 18px;
+		margin: 0 15px 1rem;
+		box-shadow: 0 8px 20px rgba(111, 60, 195, 0.12);
+	}
+
+	.projeto-form .projeto-diamante-field > span > label {
+		color: #4f238f;
+		font-weight: 800;
+	}
+
+	.projeto-form .projeto-diamante-field .form-text {
+		color: #5c477f !important;
+	}
+
+	.projeto-form .projeto-diamante-field .form-control {
+		border-color: #bda4e9;
+		background: #fff;
+	}
+
 	@media (max-width: 767px) {
 		.projeto-cadastro-aviso {
 			padding: 16px;
 			gap: 12px;
+		}
+
+		.projeto-diamante-field {
+			margin-left: 15px;
+			margin-right: 15px;
+			padding: 14px;
 		}
 
 		.projeto-cadastro-aviso__icon {
