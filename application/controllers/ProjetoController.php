@@ -194,8 +194,10 @@ class ProjetoController extends Zend_Controller_Action
 		$campos['data_inicializacao'] = !empty($_REQUEST['data_inicializacao']) ? $_REQUEST['data_inicializacao'] : null;
 		$campos['data_finalizacao'] = !empty($_REQUEST['data_finalizacao']) ? $_REQUEST['data_finalizacao'] : null;
 		$campos['justificativa'] = !empty($_REQUEST['justificativa']) ? $_REQUEST['justificativa'] : null;
+		$campos['justificativa_diamante'] = !empty($_REQUEST['justificativa_diamante']) ? $_REQUEST['justificativa_diamante'] : null;
 		$campos['area_atuacao'] = !empty($_REQUEST['area_atuacao']) ? $_REQUEST['area_atuacao'] : null;
 		$campos['objetivos'] = !empty($_REQUEST['objetivos']) ? $_REQUEST['objetivos'] : null;
+		$campos['objetivos_diamante'] = !empty($_REQUEST['objetivos_diamante']) ? $_REQUEST['objetivos_diamante'] : null;
 		$campos['ods_principal'] = !empty($_REQUEST['ods_principal']) ? $_REQUEST['ods_principal'] : null;
 		$campos['demais_ods_relacionados'] = isset($_REQUEST['demais_ods_relacionados']) ? $_REQUEST['demais_ods_relacionados'] : array();
 		$campos['tipo_item'] = !empty($_REQUEST['tipo_item']) ? $_REQUEST['tipo_item'] : null;

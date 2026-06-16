@@ -263,6 +263,10 @@
 						<span class="field-label">Justificativa do projeto</span>
 						<div class="detalhe-valor"><?= nl2br($this->escape($registro['justificativa'])) ?></div>
 					</div>
+					<div class="col-md-12 mb-3">
+						<span class="field-label">PARA NIVEL DIAMANTE</span>
+						<div class="detalhe-valor"><?= !empty($registro['justificativa_diamante']) ? nl2br($this->escape($registro['justificativa_diamante'])) : '-' ?></div>
+					</div>
 				</div>
 			</div>
 			<? if ($podeAvaliarProjeto) : ?>
@@ -340,6 +344,14 @@
 						<div class="detalhe-card projeto-objetivos-card">
 							<div class="detalhe-card-body">
 								<div class="detalhe-valor"><?= nl2br($this->escape($registro['objetivos'])) ?></div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12 mb-1 mt-3">
+						<span class="field-label">PARA NIVEL DIAMANTE</span>
+						<div class="detalhe-card projeto-objetivos-card">
+							<div class="detalhe-card-body">
+								<div class="detalhe-valor"><?= !empty($registro['objetivos_diamante']) ? nl2br($this->escape($registro['objetivos_diamante'])) : '-' ?></div>
 							</div>
 						</div>
 					</div>

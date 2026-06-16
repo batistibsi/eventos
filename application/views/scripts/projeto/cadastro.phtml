@@ -85,6 +85,13 @@
 					<textarea class="form-control" name="justificativa" id="justificativa" rows="4" required><?= $registro && !empty($registro['justificativa']) ? $this->escape($registro['justificativa']) : '' ?></textarea>
 				</div>
 			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label for="justificativa_diamante">PARA NIVEL DIAMANTE:</label></span>
+					<small class="form-text text-muted">Para credenciamento ao nível DIAMENTE, relate como essa iniciativa pode ser replicada em outras organizações?</small>
+					<textarea class="form-control" name="justificativa_diamante" id="justificativa_diamante" rows="4"><?= $registro && !empty($registro['justificativa_diamante']) ? $this->escape($registro['justificativa_diamante']) : '' ?></textarea>
+				</div>
+			</div>
 		</div>
 
 		<div class="section-card">
@@ -165,6 +172,13 @@
 							<small>Você pode visualizar e remover os uploads antes de salvar.</small>
 						</div>
 					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-12">
+					<span><label for="objetivos_diamante">PARA NIVEL DIAMANTE:</label></span>
+					<small class="form-text text-muted">Para credenciamento ao nível DIAMENTE, justifique o impacto deste projeto nos ODS selecionados, mencionando a(s) meta(s) relacionada(s).</small>
+					<textarea class="form-control" name="objetivos_diamante" id="objetivos_diamante" rows="4"><?= $registro && !empty($registro['objetivos_diamante']) ? $this->escape($registro['objetivos_diamante']) : '' ?></textarea>
 				</div>
 			</div>
 		</div>

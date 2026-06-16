@@ -1036,6 +1036,7 @@ class Projeto
 			self::$erro = 'Informe a justificativa do projeto.';
 			return false;
 		}
+		$justificativaDiamante = isset($campos['justificativa_diamante']) ? trim((string) $campos['justificativa_diamante']) : '';
 
 		$areaAtuacao = isset($campos['area_atuacao']) ? trim((string) $campos['area_atuacao']) : '';
 		if (!in_array($areaAtuacao, array('Ambiental', 'Social', 'Governanca'), true)) {
@@ -1048,6 +1049,7 @@ class Projeto
 			self::$erro = 'Informe os objetivos do projeto.';
 			return false;
 		}
+		$objetivosDiamante = isset($campos['objetivos_diamante']) ? trim((string) $campos['objetivos_diamante']) : '';
 
 		$odsPrincipal = isset($campos['ods_principal']) ? trim((string) $campos['ods_principal']) : '';
 		if (!preg_match('/^ODS ([1-9]|1[0-7])$/', $odsPrincipal)) {
@@ -1173,8 +1175,10 @@ class Projeto
 			'data_inicializacao' => $dataInicializacao,
 			'data_finalizacao' => $dataFinalizacao,
 			'justificativa' => $justificativa,
+			'justificativa_diamante' => $justificativaDiamante !== '' ? $justificativaDiamante : null,
 			'area_atuacao' => $areaAtuacao,
 			'objetivos' => $objetivos,
+			'objetivos_diamante' => $objetivosDiamante !== '' ? $objetivosDiamante : null,
 			'ods_principal' => $odsPrincipal,
 			'demais_ods_relacionados' => count($demaisOdsValidos) ? implode(', ', $demaisOdsValidos) : null,
 			'tipo_item' => $tipoItem !== '' ? $tipoItem : null,
