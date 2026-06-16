@@ -1159,8 +1159,8 @@ class Projeto
 		}
 
 		$parceiros = isset($campos['parceiros']) ? trim((string) $campos['parceiros']) : '';
-		if (strlen($parceiros) > 255) {
-			self::$erro = 'O campo parceiros deve ter no maximo 255 caracteres.';
+		if (strlen($parceiros) > 1024) {
+			self::$erro = 'O campo parceiros deve ter no maximo 1024 caracteres.';
 			return false;
 		}
 

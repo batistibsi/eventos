@@ -302,15 +302,15 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="form-group col-md-6">
+				<div class="form-group col-md-4">
 					<span><label for="quantidade_parceiros">Quantidade de parceiros envolvidos no projeto.</label></span>
 					<small class="form-text text-muted">Informe o total de parceiros que colaboraram com o projeto.</small>
 					<input class="form-control" name="quantidade_parceiros" type="number" min="0" step="1" value="<?= $registro && !empty($registro['quantidade_parceiros']) ? $this->escape($registro['quantidade_parceiros']) : '' ?>" id="quantidade_parceiros">
 				</div>
-				<div class="form-group col-md-6">
+				<div class="form-group col-md-8">
 					<span><label for="parceiros">Parceiros</label></span>
 					<small class="form-text text-muted">Nome das organizações parceiras do projeto.</small>
-					<input class="form-control" name="parceiros" type="text" value="<?= $registro && !empty($registro['parceiros']) ? $this->escape($registro['parceiros']) : '' ?>" id="parceiros" maxlength="255">
+					<textarea class="form-control" name="parceiros" id="parceiros" rows="4" maxlength="1024"><?= $registro && !empty($registro['parceiros']) ? $this->escape($registro['parceiros']) : '' ?></textarea>
 				</div>
 			</div>
 			<div class="row">
