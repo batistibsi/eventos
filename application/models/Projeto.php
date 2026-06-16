@@ -1052,7 +1052,7 @@ class Projeto
 		$objetivosDiamante = isset($campos['objetivos_diamante']) ? trim((string) $campos['objetivos_diamante']) : '';
 
 		$odsPrincipal = isset($campos['ods_principal']) ? trim((string) $campos['ods_principal']) : '';
-		if (!preg_match('/^ODS ([1-9]|1[0-7])$/', $odsPrincipal)) {
+		if (!preg_match('/^ODS ([1-9]|1[0-8])$/', $odsPrincipal)) {
 			self::$erro = 'Informe o ODS principal do projeto.';
 			return false;
 		}
@@ -1064,7 +1064,7 @@ class Projeto
 		$demaisOdsValidos = array();
 		foreach ($demaisOds as $ods) {
 			$ods = trim((string) $ods);
-			if (preg_match('/^ODS ([1-9]|1[0-7])$/', $ods)) {
+			if (preg_match('/^ODS ([1-9]|1[0-8])$/', $ods)) {
 				$demaisOdsValidos[] = $ods;
 			}
 		}

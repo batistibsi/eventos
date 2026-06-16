@@ -125,7 +125,7 @@
 					<span><label>ODS principal do projeto: </label></span>
 					<small class="form-text text-muted">Selecione o ODS - Objetivo de Desenvolvimento Sustentável - de acordo com a atuação do projeto.</small>
 					<div class="ods-grid">
-						<? for ($i = 1; $i <= 17; $i++): $ods = 'ODS ' . $i; ?>
+						<? for ($i = 1; $i <= 18; $i++): $ods = 'ODS ' . $i; ?>
 							<label class="ods-option" for="ods_principal_<?= $i ?>">
 								<input type="radio" name="ods_principal" id="ods_principal_<?= $i ?>" value="<?= $ods ?>" <?= $registro && $registro['ods_principal'] === $ods ? 'checked' : '' ?> required>
 								<span class="ods-card">
@@ -149,7 +149,7 @@
 					<span><label>Demais ODS relacionados com o projeto: </label></span>
 					<small class="form-text text-muted">Selecione outros ODS - Objetivo de Desenvolvimento Sustentável - que estejam relacionados com a atuação do projeto (item não obrigatório).</small>
 					<div class="ods-grid">
-						<? for ($i = 1; $i <= 17; $i++): $ods = 'ODS ' . $i; ?>
+						<? for ($i = 1; $i <= 18; $i++): $ods = 'ODS ' . $i; ?>
 							<label class="ods-option" for="demais_ods_relacionados_<?= $i ?>">
 								<input type="checkbox" name="demais_ods_relacionados[]" value="<?= $ods ?>" id="demais_ods_relacionados_<?= $i ?>" <?= in_array($ods, $odsRelacionados, true) ? 'checked' : '' ?>>
 								<span class="ods-card">

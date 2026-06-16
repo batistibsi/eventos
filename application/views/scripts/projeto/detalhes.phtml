@@ -310,7 +310,7 @@
 						<div class="detalhe-card projeto-detalhe-bloco h-100">
 							<div class="detalhe-card-body">
 								<div class="projeto-detalhe-ods-principal">
-									<? if (!empty($registro['ods_principal']) && preg_match('/^ODS\s+([1-9]|1[0-7])$/', trim((string) $registro['ods_principal']), $matches)) : ?>
+									<? if (!empty($registro['ods_principal']) && preg_match('/^ODS\s+([1-9]|1[0-8])$/', trim((string) $registro['ods_principal']), $matches)) : ?>
 										<img src="../../objetivos/<?= (int) $matches[1] ?>.png" alt="<?= $this->escape($registro['ods_principal']) ?>">
 									<? endif; ?>
 									<div class="detalhe-valor"><?= $this->escape($registro['ods_principal']) ?></div>
@@ -325,7 +325,7 @@
 								<? if (count($odsRelacionados)) : ?>
 									<div class="projeto-detalhe-ods-secundarios">
 										<? foreach ($odsRelacionados as $ods) : ?>
-											<? if (preg_match('/^ODS\s+([1-9]|1[0-7])$/', trim((string) $ods), $matchesRelacionados)) : ?>
+											<? if (preg_match('/^ODS\s+([1-9]|1[0-8])$/', trim((string) $ods), $matchesRelacionados)) : ?>
 												<div class="ods-card">
 													<img src="../../objetivos/<?= (int) $matchesRelacionados[1] ?>.png" alt="<?= $this->escape($ods) ?>">
 													<span><?= $this->escape($ods) ?></span>

@@ -16,7 +16,7 @@ $urlSeloCertificado = !empty($this->arquivoSelo) ? (string) $this->arquivoSelo :
 $urlLogoInstituto = '../../padrao/logo_rodape.png';
 $urlLogoAcim = '../../padrao/logo_horizontal.png';
 $urlsOdsCertificado = array();
-for ($indiceOds = 1; $indiceOds <= 17; $indiceOds++) {
+for ($indiceOds = 1; $indiceOds <= 18; $indiceOds++) {
 	$urlsOdsCertificado[] = '../../objetivos/' . $indiceOds . '.png';
 }
 ?>
@@ -155,7 +155,7 @@ for ($indiceOds = 1; $indiceOds <= 17; $indiceOds++) {
 						$percentualAtingido = (float) ($value['percentual_atingido'] ?? 0);
 						$percentualExibicao = rtrim(rtrim(number_format($percentualAtingido, 2, '.', ''), '0'), '.');
 						$percentualBarra = max(0, min(100, $percentualAtingido));
-						if (!empty($value['ods_principal']) && preg_match('/^ODS\s+([1-9]|1[0-7])$/', trim((string) $value['ods_principal']), $matches)) {
+						if (!empty($value['ods_principal']) && preg_match('/^ODS\s+([1-9]|1[0-8])$/', trim((string) $value['ods_principal']), $matches)) {
 							$odsNumero = (int) $matches[1];
 						}
 				?>
