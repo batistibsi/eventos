@@ -25,6 +25,10 @@
 		<div>
 			<div class="section-title mb-1">Preenchimento do projeto</div>
 			<p class="section-subtitle mb-0">Use este formulário para cadastrar seus projetos na Certificação e detalhe cada iniciativa com atenção, preenchendo as informações solicitadas ao longo das etapas.</p>
+			<p class="section-subtitle projeto-cadastro-aviso__edital mb-0">
+				<i class="fa fa-diamond projeto-diamante-icon" aria-hidden="true"></i>
+				Acesse o <a href="https://docs.google.com/document/d/10gieVrHcRgXZAGxRnXcqEPjfaDJfNyildg333RTXAJI/edit?usp=sharing" target="_blank" rel="noopener noreferrer">EDITAL</a> para conhecer os critérios do Nível DIAMANTE.
+			</p>
 		</div>
 	</div>
 	<form id="formulario" class="projeto-form" novalidate>
@@ -87,7 +91,7 @@
 			</div>
 			<div class="row">
 				<div class="form-group col-md-12 projeto-diamante-field">
-					<span><label for="justificativa_diamante"><i class="fa fa-diamond projeto-diamante-icon" aria-hidden="true"></i> PARA NIVEL DIAMANTE:</label></span>
+					<span><label for="justificativa_diamante" class="projeto-diamante-label"><i class="fa fa-diamond projeto-diamante-icon" aria-hidden="true"></i> PARA NIVEL DIAMANTE:</label></span>
 					<small class="form-text text-muted">Para credenciamento ao nível DIAMANTE, relate como essa iniciativa pode ser replicada em outras organizações.</small>
 					<textarea class="form-control" name="justificativa_diamante" id="justificativa_diamante" rows="4"><?= $registro && !empty($registro['justificativa_diamante']) ? $this->escape($registro['justificativa_diamante']) : '' ?></textarea>
 				</div>
@@ -176,7 +180,7 @@
 			</div>
 			<div class="row">
 				<div class="form-group col-md-12 projeto-diamante-field">
-					<span><label for="objetivos_diamante"><i class="fa fa-diamond projeto-diamante-icon" aria-hidden="true"></i> PARA NIVEL DIAMANTE:</label></span>
+					<span><label for="objetivos_diamante" class="projeto-diamante-label"><i class="fa fa-diamond projeto-diamante-icon" aria-hidden="true"></i> PARA NIVEL DIAMANTE:</label></span>
 					<small class="form-text text-muted">Para credenciamento ao nível DIAMANTE, justifique o impacto deste projeto nos ODS selecionados, mencionando a(s) meta(s) relacionada(s).</small>
 					<textarea class="form-control" name="objetivos_diamante" id="objetivos_diamante" rows="4"><?= $registro && !empty($registro['objetivos_diamante']) ? $this->escape($registro['objetivos_diamante']) : '' ?></textarea>
 				</div>
@@ -355,6 +359,22 @@
 		flex: 0 0 auto;
 	}
 
+	.projeto-cadastro-aviso__edital {
+		margin-top: 8px;
+		color: #4f238f;
+		font-weight: 700;
+	}
+
+	.projeto-cadastro-aviso__edital a {
+		color: #4f238f;
+		font-weight: 800;
+		text-decoration: underline;
+	}
+
+	.projeto-cadastro-aviso__edital .projeto-diamante-icon {
+		color: #4f238f;
+	}
+
 	.projeto-cadastro-aviso--diamante {
 		background: #f4efff;
 		border-color: #8e62d9;
@@ -362,7 +382,7 @@
 
 	.projeto-cadastro-aviso--diamante .projeto-cadastro-aviso__icon {
 		background: #e7d9ff;
-		color: #5b2ca0;
+		color: #4f238f;
 	}
 
 	.projeto-cadastro-aviso--diamante .section-title {
@@ -371,6 +391,7 @@
 	}
 
 	.projeto-diamante-icon {
+		color: #4f238f;
 		margin-right: 6px;
 	}
 
@@ -389,8 +410,16 @@
 	}
 
 	.projeto-form .projeto-diamante-field > span > label {
-		color: #4f238f;
+		color: #4f238f !important;
 		font-weight: 800;
+	}
+
+	.projeto-form .projeto-diamante-label {
+		color: #4f238f !important;
+	}
+
+	.projeto-diamante-label .projeto-diamante-icon {
+		color: inherit;
 	}
 
 	.projeto-form .projeto-diamante-field .form-text {
