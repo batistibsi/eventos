@@ -1028,7 +1028,7 @@ class Inscricao
                 return true;
         }
 
-        public static function salvarOrganizacao($id_inscricao, $campos, $logo = null)
+        public static function salvarOrganizacao($id_inscricao, $campos, $logo = null, $permitirCnpjDuplicado = false)
         {
                 $db = Zend_Registry::get('db');
 
@@ -1055,7 +1055,7 @@ class Inscricao
                         self::$erro = 'Informe um CNPJ valido.';
                         return false;
                 }
-                if (!self::uniqueInscricaoCNPJExceto($cnpj, $id_inscricao)) {
+                if (!$permitirCnpjDuplicado && !self::uniqueInscricaoCNPJExceto($cnpj, $id_inscricao)) {
                         self::$erro = 'Inscricao ja realizada para o CNPJ: ' . $cnpj . '!';
                         return false;
                 }

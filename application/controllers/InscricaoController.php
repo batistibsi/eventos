@@ -189,7 +189,7 @@ class InscricaoController extends Zend_Controller_Action
 
 		$id_inscricao = !empty($_REQUEST['id_inscricao']) ? (int) $_REQUEST['id_inscricao'] : 0;
 
-		$result = Inscricao::salvarOrganizacao($id_inscricao, $_REQUEST, $_FILES['logo_organizacao'] ?? null);
+		$result = Inscricao::salvarOrganizacao($id_inscricao, $_REQUEST, $_FILES['logo_organizacao'] ?? null, true);
 
 		if (!$result) echo Inscricao::$erro;
 	}
