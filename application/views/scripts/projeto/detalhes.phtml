@@ -264,7 +264,7 @@
 						<div class="detalhe-valor"><?= nl2br($this->escape($registro['justificativa'])) ?></div>
 					</div>
 					<div class="col-md-12 mb-3 projeto-detalhe-diamante">
-						<span class="field-label">PARA NIVEL DIAMANTE</span>
+						<span class="field-label"><i class="fa fa-diamond projeto-diamante-icon" aria-hidden="true"></i> PARA NIVEL DIAMANTE</span>
 						<div class="detalhe-valor"><?= !empty($registro['justificativa_diamante']) ? nl2br($this->escape($registro['justificativa_diamante'])) : '-' ?></div>
 					</div>
 				</div>
@@ -348,7 +348,7 @@
 						</div>
 					</div>
 					<div class="col-md-12 mb-1 mt-3 projeto-detalhe-diamante">
-						<span class="field-label">PARA NIVEL DIAMANTE</span>
+						<span class="field-label"><i class="fa fa-diamond projeto-diamante-icon" aria-hidden="true"></i> PARA NIVEL DIAMANTE</span>
 						<div class="detalhe-card projeto-objetivos-card">
 							<div class="detalhe-card-body">
 								<div class="detalhe-valor"><?= !empty($registro['objetivos_diamante']) ? nl2br($this->escape($registro['objetivos_diamante'])) : '-' ?></div>
@@ -638,6 +638,10 @@
 	.projeto-detalhe-diamante .field-label {
 		color: #4f238f;
 		font-weight: 800;
+	}
+
+	.projeto-diamante-icon {
+		margin-right: 6px;
 	}
 
 	.projeto-detalhe-diamante .detalhe-card {
