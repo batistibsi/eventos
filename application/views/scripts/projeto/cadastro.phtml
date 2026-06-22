@@ -1033,6 +1033,25 @@
 				return false;
 			}
 
+			var limiteTotalAnexos = 900 * 1024 * 1024;
+			var tamanhoTotalAnexos = 0;
+			[dropzone, dropzoneItens, dropzonePessoas, dropzoneParceiros].forEach(function(areaUpload) {
+				areaUpload.getAcceptedFiles().forEach(function(file) {
+					if (!file.existing) {
+						tamanhoTotalAnexos += file.size || 0;
+					}
+				});
+			});
+
+			if (tamanhoTotalAnexos > limiteTotalAnexos) {
+				swal({
+					title: "Atenção!",
+					text: "O tamanho total dos novos anexos não pode ultrapassar 900 MB. Remova alguns arquivos ou reduza o tamanho dos anexos antes de salvar o projeto.",
+					type: "error"
+				});
+				return false;
+			}
+
 			$('.salvar').hide();
 			if (window.formularioProtegido) {
 				window.formularioProtegido.marcarEnviando();
