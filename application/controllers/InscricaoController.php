@@ -11,7 +11,7 @@ class InscricaoController extends Zend_Controller_Action
 		$this->view->idUsuario = Zend_Registry::get('id_usuario');
 		$this->view->permissao = Zend_Registry::get('permissao');
 
-		$inicio = !empty($_REQUEST['inicio']) ? $_REQUEST['inicio'] : 'first day of this month';
+		$inicio = !empty($_REQUEST['inicio']) ? $_REQUEST['inicio'] : '2026-01-01';
 		$fim = !empty($_REQUEST['fim']) ? $_REQUEST['fim'] : 'last day of this month';
 
 		$dtInicio = new DateTime($inicio);

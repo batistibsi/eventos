@@ -181,6 +181,9 @@ class ProjetoController extends Zend_Controller_Action
 	public function salvarAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
+		@ini_set('max_execution_time', '300');
+		@set_time_limit(300);
+
 		if (Zend_Registry::get('permissao') == 2) die('Nao permitido!');
 		$this->bloquearSeAceiteTermoPendente();
 
