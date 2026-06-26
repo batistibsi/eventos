@@ -3,10 +3,6 @@
 <? $eventoVinculado = !empty($this->eventoVinculado) && is_array($this->eventoVinculado) ? $this->eventoVinculado : false; ?>
 <? $empresaVinculada = !empty($this->empresaVinculada) && is_array($this->empresaVinculada) ? $this->empresaVinculada : false; ?>
 <? $anoReferencia = ($registro && !empty($registro['created_at'])) ? (int) date('Y', strtotime($registro['created_at'])) : (int) date('Y'); ?>
-<? $anoPassado = $anoReferencia - 1; ?>
-<? $anoRetrasado = $anoReferencia - 2; ?>
-<? $dataMinimaProjeto = $anoRetrasado . '-01-01'; ?>
-<? $dataMaximaProjeto = $anoPassado . '-12-31'; ?>
 <? $mensagemSucessoProjeto = 'Projeto inserido com sucesso. Você poderá editá-lo até que os projetos sejam submetidos a análise.'; ?>
 <? if ($eventoVinculado && !empty($eventoVinculado['data_submissao'])): ?>
 	<? $mensagemSucessoProjeto = 'Projeto inserido com sucesso. Você poderá editá-lo até que se encerre a data de submissão do evento da sua inscrição (' . date('d/m/Y', strtotime($eventoVinculado['data_submissao'])) . ') ou até que os projetos sejam submetidos a análise.'; ?>
@@ -78,8 +74,8 @@
 				</div>
 				<div class="form-group col-md-6">
 					<span><label for="data_finalizacao">Data da finalização: </label></span>
-					<small class="form-text text-muted">Necessário que tenha sido realizado em <?= $anoRetrasado ?> - <?= $anoPassado ?>.</small>
-					<input class="form-control" name="data_finalizacao" type="date" min="<?= $dataMinimaProjeto ?>" max="<?= $dataMaximaProjeto ?>" value="<?= $registro && !empty($registro['data_finalizacao']) ? date('Y-m-d', strtotime($registro['data_finalizacao'])) : '' ?>" id="data_finalizacao" required>
+					<small class="form-text text-muted">Necessário que tenha sido realizado até 31/07/<?= $anoReferencia; ?>.</small>
+					<input class="form-control" name="data_finalizacao" type="date" max="<?= $anoReferencia ?>-07-31" value="<?= $registro && !empty($registro['data_finalizacao']) ? date('Y-m-d', strtotime($registro['data_finalizacao'])) : '' ?>" id="data_finalizacao" required>
 				</div>
 			</div>
 			<div class="row">

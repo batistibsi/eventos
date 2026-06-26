@@ -1017,16 +1017,13 @@ class Projeto
 		}
 
 		$anoReferencia = $anoReferencia ? (int) $anoReferencia : (int) date('Y');
-		$anoPassado = $anoReferencia - 1;
-		$anoRetrasado = $anoReferencia - 2;
-		$anosPermitidos = array($anoRetrasado, $anoPassado);
-		$anoDataFinalizacao = (int) date('Y', strtotime($dataFinalizacao));
+		$dataLimiteFinalizacao = $anoReferencia . '-07-31';
 		if (strtotime($dataInicializacao) > strtotime($dataFinalizacao)) {
 			self::$erro = 'A data de inicializacao nao pode ser posterior a data de finalizacao.';
 			return false;
 		}
-		if (!in_array($anoDataFinalizacao, $anosPermitidos, true)) {
-			self::$erro = 'A data de finalizacao deve estar entre os anos de ' . $anoRetrasado . ' e ' . $anoPassado . '.';
+		if (strtotime($dataFinalizacao) > strtotime($dataLimiteFinalizacao)) {
+			self::$erro = 'A data de finalizacao deve ser ate 31/07/' . $anoReferencia . '.';
 			return false;
 		}
 
